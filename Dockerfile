@@ -24,7 +24,7 @@ RUN gradle bootJar --no-daemon
 #Docker 레이어는 캐시와 별개이기 때문에 안하는게 나음 (독립으로 하자)
 
 #2단계 위애 생성된 jar로 실행하기
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
