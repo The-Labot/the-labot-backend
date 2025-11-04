@@ -271,3 +271,5 @@ id_ed25519
 
 ###############################################
 .idea/
+src/main/resources/application-local.yaml
+
