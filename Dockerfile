@@ -15,7 +15,7 @@
 
 # Gradle 공식 이미지 사용하기 위해 멀티스테이지 빌드
 #1단계 빌드먼저
-FROM gradle:8.14.3-jdk17 AS builder
+FROM gradle:8.14.3-jdk21 AS builder
 WORKDIR /app
 COPY . .
 RUN gradle bootJar --no-daemon
@@ -24,7 +24,7 @@ RUN gradle bootJar --no-daemon
 #Docker 레이어는 캐시와 별개이기 때문에 안하는게 나음 (독립으로 하자)
 
 #2단계 위애 생성된 jar로 실행하기
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
