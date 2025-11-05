@@ -11,3 +11,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+# Jwt 토큰
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY}
