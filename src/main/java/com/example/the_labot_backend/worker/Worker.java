@@ -1,6 +1,5 @@
 package com.example.the_labot_backend.worker;
 
-
 import com.example.the_labot_backend.enums.WorkerStatus;
 import com.example.the_labot_backend.users.User;
 import jakarta.persistence.*;
