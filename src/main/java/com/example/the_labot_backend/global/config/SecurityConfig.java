@@ -38,8 +38,8 @@ public class SecurityConfig {
                         // security에서는 사용자 권한이 ROLE_XXX 형태로 저장됨.
                         // hasRole("XXX") 하면 Role_XXX로 붙여 검사
                         // XXX의 권한을 가지고 있어야 접근 가능
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/worker/**").hasRole("WORKER")
+                        .requestMatchers("/api/manage/**").hasRole("MANAGER")//현장관리자
+                        .requestMatchers("/api/worker/**").hasRole("WORKER")//현장근로자
                         
                         // swagger 접속할 수 있게 해제
                         .requestMatchers(

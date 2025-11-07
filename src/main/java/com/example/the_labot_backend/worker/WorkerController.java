@@ -55,10 +55,10 @@ public class WorkerController {
     // 객체안의 필드를 또 재귀적으로 반환한다.
 
     // 근로자 정보 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateWorker(@PathVariable Long id,
+    @PutMapping("/{workerId}")
+    public ResponseEntity<?> updateWorker(@PathVariable Long workerId,
                                           @RequestBody WorkerUpdateRequest dto) {
-        workerService.updateWorker(id, dto);
+        workerService.updateWorker(workerId, dto);
         return ResponseEntity.ok(Map.of("status", 200, "message", "근로자 정보 수정 완료"));
     }
 }

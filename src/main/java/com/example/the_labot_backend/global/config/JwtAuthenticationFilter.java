@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 //OncePerRequestFilter는 요청마다 딱 한번 실행되는 필터
@@ -40,14 +42,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         //토큰 추출
         String token = resolveToken(request);
+
         //토큰 유효성 검증
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            String phoneNumber = jwtTokenProvider.getPhoneNumberFromToken(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(phoneNumber);
+            String phoneNumber = jwtTokenProvider.getPhoneNumberFromToken(token); // 전화번호 추출
+            String role = jwtTokenProvider.getRoleFromToken(token); // 역할 추출
+            
+            UserDetails userDetails = userDetailsService.loadUserByUsername(phoneNumber); //
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
+                            userDetails, null, List.of(new SimpleGrantedAuthority(role)));
             //SecurityContext 등록
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

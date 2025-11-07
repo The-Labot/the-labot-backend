@@ -35,12 +35,13 @@ public class JwtTokenProvider {
 
 
     // 토큰 생성
-    public String generateToken(String phoneNumber) {
+    public String generateToken(String phoneNumber, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenValidity);
 
         return Jwts.builder()
                 .setSubject(phoneNumber) // JWT의 주체(식별자)
+                .claim("role", role)  // ✅ 권한 정보 추가
                 .setIssuedAt(now) // 발급시간
                 .setExpiration(expiryDate) // 만료시간
                 .signWith(key, SignatureAlgorithm.HS256) // 비밀키로 서명 생성
@@ -56,6 +57,17 @@ public class JwtTokenProvider {
                 .getBody()
                 .getSubject();
     }
+
+    // 토큰에서 Role 추출
+    public String getRoleFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+    }
+
 
     // 토큰 유효성 검증
     public boolean validateToken(String token) {

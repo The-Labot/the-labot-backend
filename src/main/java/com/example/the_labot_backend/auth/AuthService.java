@@ -29,7 +29,7 @@ public class AuthService {
             throw new RuntimeException("비밀번호가 올바르지 않습니다.");
         }
 
-        return jwtTokenProvider.generateToken(user.getPhoneNumber());
+        return jwtTokenProvider.generateToken(user.getPhoneNumber(),user.getRole().name());
     }
 
     //임시 회원가입
