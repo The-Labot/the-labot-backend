@@ -1,9 +1,10 @@
-package com.example.the_labot_backend.hazards;
+package com.example.the_labot_backend.hazards.entity;
 
 
-import com.example.the_labot_backend.enums.HazardStatus;
 import com.example.the_labot_backend.users.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-public class HazardReport {
+@AllArgsConstructor
+@Builder
+public class Hazard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +25,7 @@ public class HazardReport {
     private String location; // 위치
     private String description; // 설명
     private String fileUrl; // 파일
-    private boolean isUrgent; // 긴급 여부
+    private boolean urgent; // 긴급 여부
     
     @Enumerated(EnumType.STRING)
     private HazardStatus status; // 상태: WAITING, IN_PROGRESS, RESOLVED
@@ -31,6 +34,6 @@ public class HazardReport {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
-    private User reporter;
+    private User reporter;// 신고자
 }
 

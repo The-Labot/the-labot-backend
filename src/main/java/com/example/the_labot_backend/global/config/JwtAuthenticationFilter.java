@@ -45,15 +45,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         //토큰 유효성 검증
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            String phoneNumber = jwtTokenProvider.getPhoneNumberFromToken(token); // 전화번호 추출
+            String id = jwtTokenProvider.getIdFromToken(token); // id 추출
             String role = jwtTokenProvider.getRoleFromToken(token); // 역할 추출
-            
-            UserDetails userDetails = userDetailsService.loadUserByUsername(phoneNumber); //
 
+            // 여기서 인증 과정을 수행
+            // 항상 파라미터는 String 타입이어야 한다.
+            UserDetails userDetails = userDetailsService.loadUserByUsername(id);
+
+            // Authentication 객체 생성 (userId, 권한)
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             userDetails, null, List.of(new SimpleGrantedAuthority(role)));
-            //SecurityContext 등록
+
+            // SecurityContextHolder에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

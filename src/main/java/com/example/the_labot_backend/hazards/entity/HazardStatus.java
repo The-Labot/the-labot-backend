@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.enums;
+package com.example.the_labot_backend.hazards.entity;
 
 public enum HazardStatus {
     WAITING,      // 대기중
