@@ -1,0 +1,38 @@
+name: ci.yml
+
+#언제
+on:
+  pull_request:
+    branches:
+      - main
+
+#무슨 작업
+jobs:
+  #빌드
+  build:
+    #우분투기반-버전은 최근꺼
+    runs-on: ubuntu-latest
+
+    #한 작업 안에서 수행할 작은 단위를 의미
+    steps:
+      #코드 받기
+      - name: checkout
+        uses: actions/checkout@v4
+
+      #jdk 설정
+      - name: set up jdk
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      #gradle caching - 캐싱을 통한 빌드 시간 향상 거의 필수!
+      - name: gradle caching
+        uses: gradle/actions/setup-gradle@v3
+
+      #gradle 실행 권한 추가
+      - name: gradle permission
+        run: chmod +x gradlew
+
+      - name: gradle build
+        run: ./gradlew clean build
