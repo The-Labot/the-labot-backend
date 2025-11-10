@@ -22,7 +22,7 @@ public class ManagerHazardController {
 
     private final HazardService hazardService;
 
-    // 🔎 목록 조회
+    // 목록 조회
     @GetMapping
     public ResponseEntity<?> getHazardList() {
         List<HazardListResponse> list = hazardService.getHazardList();
