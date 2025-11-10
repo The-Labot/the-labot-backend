@@ -1,14 +1,20 @@
 package com.example.the_labot_backend.notices;
 
+import com.example.the_labot_backend.enums.WorkerStatus;
+import com.example.the_labot_backend.files.File;
+import com.example.the_labot_backend.files.FileService;
 import com.example.the_labot_backend.notices.dto.*;
 import com.example.the_labot_backend.notices.entity.Notice;
+import com.example.the_labot_backend.notices.entity.NoticeCategory;
 import com.example.the_labot_backend.users.User;
 import com.example.the_labot_backend.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +24,7 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository;
     private final UserRepository userRepository;
+    private final FileService fileService;
 
     // 현장별 공지사항 목록 조회
     public List<NoticeListResponse> getNoticeList(Long userId) {
@@ -49,52 +56,69 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
 
-        return NoticeDetailResponse.builder()
-                .id(notice.getId())
-                .title(notice.getTitle())
-                .fileUrl(notice.getFileUrl())
-                .category(notice.getCategory())
-                .urgent(notice.isUrgent())
-                .pinned(notice.isPinned())
-                .writer(notice.getWriter().getName())
-                .createdAt(notice.getCreatedAt())
-                .updatedAt(notice.getUpdatedAt())
-                .build();
+        List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
+
+        return new NoticeDetailResponse(notice, files);
     }
 
     // 공지사항 작성
-    public NoticeResponse createNotice(Long writerId, NoticeRequest request) {
+    public void createNotice(String title, String content, NoticeCategory category,
+                                       boolean urgent, boolean pinned, List<MultipartFile> files , Long writerId) {
+
         User writer = userRepository.findById(writerId)
                 .orElseThrow(() -> new RuntimeException("작성자 정보를 찾을 수 없습니다."));
 
-        Notice notice = Notice.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .fileUrl(request.getFileUrl())
-                .category(request.getCategory())
-                .urgent(request.isUrgent())
-                .pinned(request.isPinned())
-                .writer(writer)
-                .build();
+        // 공지사항 저장
+        Notice notice = noticeRepository.save(
+                Notice.builder()
+                        .title(title)
+                        .content(content)
+                        .category(category)
+                        .urgent(urgent)
+                        .pinned(pinned)
+                        .writer(writer)
+                        // 현장 넣어야함.
+                        .build()
+        );
 
-        Notice saved = noticeRepository.save(notice);
-
-        return toResponse(saved);
+        // 파일 업로드 (로컬 or S3)
+        fileService.saveFiles(files, "NOTICE", notice.getId());
     }
 
     // 공지사항 수정
-    public NoticeResponse updateNotice(Long noticeId, NoticeUpdateRequest request) {
+    public NoticeDetailResponse updateNotice(Long noticeId,
+                                             String title,
+                                             String content,
+                                             NoticeCategory category,
+                                             boolean urgent,
+                                             boolean pinned,
+                                             List<Long> deleteFileIds,
+                                             List<MultipartFile> newFiles) {
+
+        // 기존 공지사항 조회
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
 
-        notice.setTitle(request.getTitle());
-        notice.setContent(request.getContent());
-        notice.setFileUrl(request.getFileUrl());
-        notice.setCategory(request.getCategory());
-        notice.setUrgent(request.isUrgent());
-        notice.setPinned(request.isPinned());
+        // 내용 수정
+        notice.update(title, content, category, urgent, pinned);
 
-        return toResponse(notice);
+        // 삭제할 파일이 있으면 삭제
+        if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
+            for (Long fileId : deleteFileIds) {
+                fileService.deleteFile(fileId);
+            }
+        }
+
+        // 새 파일 업로드
+        if (newFiles != null && !newFiles.isEmpty()) {
+            fileService.saveFiles(newFiles, "NOTICE", notice.getId());
+        }
+
+        // 최신 파일 목록 조회
+        List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
+
+        // 최신 공지사항 정보 + 파일 함께 반환
+        return new NoticeDetailResponse(notice, files);
     }
 
     // 공지사항 삭제
@@ -102,20 +126,5 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
         noticeRepository.delete(notice);
-    }
-
-    private NoticeResponse toResponse(Notice notice) {
-        return NoticeResponse.builder()
-                .id(notice.getId())
-                .title(notice.getTitle())
-                .content(notice.getContent())
-                .fileUrl(notice.getFileUrl())
-                .category(notice.getCategory())
-                .urgent(notice.isUrgent())
-                .pinned(notice.isPinned())
-                .writerName(notice.getWriter().getName())
-                .createdAt(notice.getCreatedAt())
-                .updatedAt(notice.getUpdatedAt())
-                .build();
     }
 }
