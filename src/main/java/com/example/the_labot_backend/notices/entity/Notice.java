@@ -1,11 +1,9 @@
 package com.example.the_labot_backend.notices.entity;
 
-import com.example.the_labot_backend.site.Site;
+import com.example.the_labot_backend.sites.Site;
 import com.example.the_labot_backend.users.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 

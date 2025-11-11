@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.auth;
 
 
-import com.example.the_labot_backend.tmp.SignupRequest;
+import com.example.the_labot_backend.auth.dto.SignupRequest;
 import com.example.the_labot_backend.users.dto.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +17,8 @@ public class AuthController {
 
     private final AuthService authService;
 
-    //로그인
-    //토큰값 반환
+    // 로그인
+    // 토큰값 반환
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         String token = authService.login(request);
@@ -26,7 +26,7 @@ public class AuthController {
                 .body("Bearer " + token);
     }
 
-    //임시 회원가입
+    // 임시 회원가입
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
         authService.signup(request);
