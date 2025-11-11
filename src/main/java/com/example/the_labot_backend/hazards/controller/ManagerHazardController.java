@@ -9,6 +9,8 @@ import com.example.the_labot_backend.users.dto.HazardStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,10 +24,14 @@ public class ManagerHazardController {
 
     private final HazardService hazardService;
 
-    // 🔎 목록 조회
+    // 목록 조회
     @GetMapping
     public ResponseEntity<?> getHazardList() {
-        List<HazardListResponse> list = hazardService.getHazardList();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        List<HazardListResponse> list = hazardService.getHazardsByUser(userId);
 
         return ResponseEntity.ok(Map.of(
                 "status", 200,

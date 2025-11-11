@@ -38,7 +38,7 @@ public class NoticeService {
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
-        
+
         // 여러개 조회, siteId를 조건으로 조회, 정렬, 정렬기준 Pinned, 내림차순
         List<Notice> notices = noticeRepository.findAllBySite_IdOrderByPinnedDesc(siteId);
         return notices.stream()
@@ -53,8 +53,6 @@ public class NoticeService {
                         .build())
                 .toList();
     }
-    // siteId를 통해 현장별 공지사항 목록 조회 (본사관리자용 추후 구현) getNoticesBySite
-
 
     // noticeId를 통해 공지사항 상세 조회
     public NoticeDetailResponse getNoticeDetail(Long noticeId) {

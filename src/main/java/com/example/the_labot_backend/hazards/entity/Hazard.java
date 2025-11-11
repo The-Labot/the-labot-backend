@@ -1,6 +1,7 @@
 package com.example.the_labot_backend.hazards.entity;
 
 
+import com.example.the_labot_backend.sites.Site;
 import com.example.the_labot_backend.users.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,10 @@ public class Hazard {
     private HazardStatus status; // 상태: WAITING, IN_PROGRESS, RESOLVED
 
     private LocalDateTime reportedAt; // 신고 날짜
+
+    @ManyToOne
+    @JoinColumn(name = "site_id")
+    private Site site;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
