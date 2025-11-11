@@ -3,7 +3,9 @@ package com.example.the_labot_backend.auth;
 
 import com.example.the_labot_backend.enums.Role;
 import com.example.the_labot_backend.global.config.JwtTokenProvider;
-import com.example.the_labot_backend.tmp.SignupRequest;
+import com.example.the_labot_backend.auth.dto.SignupRequest;
+import com.example.the_labot_backend.sites.Site;
+import com.example.the_labot_backend.sites.SiteRepository;
 import com.example.the_labot_backend.users.User;
 import com.example.the_labot_backend.users.UserRepository;
 import com.example.the_labot_backend.users.dto.LoginRequest;
@@ -15,10 +17,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final SiteRepository siteRepository;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+    // 로그인
     public String login(LoginRequest request) {
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new RuntimeException("해당 전화번호가 존재하지 않습니다."));
@@ -32,20 +36,26 @@ public class AuthService {
         return jwtTokenProvider.generateToken(user.getId(),user.getRole().name());
     }
 
-    //임시 회원가입
+    // 임시 회원가입
     public void signup(SignupRequest request) {
         // 중복 전화번호 검사
         if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
             throw new RuntimeException("이미 존재하는 전화번호입니다.");
         }
 
-        // ✅ 비밀번호 암호화 후 저장
+        // 현장Id로 현장 찾기
+        Site site = siteRepository.findById(request.getSiteId())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 현장입니다."));
+
+
+        // 비밀번호 암호화 후 저장
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = User.builder()
                 .phoneNumber(request.getPhoneNumber())
                 .password(encodedPassword)
                 .name(request.getName())
+                .site(site)
                 .role(request.getRole() != null ? request.getRole() : Role.ROLE_WORKER)
                 .build();
 

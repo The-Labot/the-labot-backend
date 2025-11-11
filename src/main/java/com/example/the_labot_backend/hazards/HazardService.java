@@ -6,6 +6,7 @@ import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;
 import com.example.the_labot_backend.hazards.entity.HazardStatus;
+import com.example.the_labot_backend.notices.entity.Notice;
 import com.example.the_labot_backend.users.User;
 import com.example.the_labot_backend.users.UserRepository;
 import com.example.the_labot_backend.users.dto.HazardStatusUpdateRequest;
@@ -29,7 +30,7 @@ public class HazardService {
     private final HazardRepository hazardRepository;
     private final UserRepository userRepository;
 
-    // 신고 등록 (현장근로자)
+    // 위험요소 신고 등록 (현장근로자)
     // @Transactional
     public void createHazard(Long reporterId, HazardCreateRequest request) {
         User reporter = userRepository.findById(reporterId)
@@ -49,9 +50,18 @@ public class HazardService {
         hazardRepository.save(hazard);
     }
 
-    // 목록 조회 (현장관리자)
-    public List<HazardListResponse> getHazardList() {
-        List<Hazard> reports = hazardRepository.findAll();
+    // userId를 통한 위험요소 신고 목록 조회
+    public List<HazardListResponse> getHazardsByUser(Long userId) {
+
+        // 해당 User 찾기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // user로 siteId 찾기
+        Long siteId = user.getSite().getId();
+
+        // 여러개 조회, siteId를 조건으로 조회, 정렬, 정렬기준 Pinned, 내림차순
+        List<Hazard> reports = hazardRepository.findAllBySite_Id(siteId);
 
         return reports.stream()
                 .map(hazard -> HazardListResponse.builder()
@@ -66,7 +76,7 @@ public class HazardService {
                 .toList();
     }
 
-    // 상세 조회 (현장관리자)
+    // 위험요소 신고 상세 조회
     public HazardDetailResponse getHazardDetail(Long hazardId) {
         Hazard hazard = hazardRepository.findById(hazardId)
                 .orElseThrow(() -> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다."));
@@ -85,7 +95,7 @@ public class HazardService {
                 .build();
     }
 
-    // 상태 수정
+    // 위험요소 신고 상태 수정
     public Hazard updateStatus(Long id, HazardStatus newStatus) {
         Hazard hazard = hazardRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("해당 위험요소를 찾을 수 없습니다. id=" + id));
@@ -105,7 +115,7 @@ public class HazardService {
         return hazardRepository.save(hazard);
     }
 
-    // 삭제
+    // 위험요소 신고 삭제
     public void deleteHazard(Long id) {
         if (!hazardRepository.existsById(id)) {
             throw new NoSuchElementException("해당 위험요소를 찾을 수 없습니다. id=" + id);

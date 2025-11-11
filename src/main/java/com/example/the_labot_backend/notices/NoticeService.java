@@ -6,6 +6,8 @@ import com.example.the_labot_backend.files.FileService;
 import com.example.the_labot_backend.notices.dto.*;
 import com.example.the_labot_backend.notices.entity.Notice;
 import com.example.the_labot_backend.notices.entity.NoticeCategory;
+import com.example.the_labot_backend.sites.Site;
+import com.example.the_labot_backend.sites.SiteRepository;
 import com.example.the_labot_backend.users.User;
 import com.example.the_labot_backend.users.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,10 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final UserRepository userRepository;
     private final FileService fileService;
+    private final SiteRepository siteRepository;
 
-    // 현장별 공지사항 목록 조회
-    public List<NoticeListResponse> getNoticeList(Long userId) {
+    // userId를 통해 현장별 공지사항 목록 조회
+    public List<NoticeListResponse> getNoticesByUser(Long userId) {
 
         // 해당 User 찾기
         User user = userRepository.findById(userId)
@@ -35,9 +38,9 @@ public class NoticeService {
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
-        
+
         // 여러개 조회, siteId를 조건으로 조회, 정렬, 정렬기준 Pinned, 내림차순
-        List<Notice> notices = noticeRepository.findAllBySiteIdOrderByPinnedDesc(siteId);
+        List<Notice> notices = noticeRepository.findAllBySite_IdOrderByPinnedDesc(siteId);
         return notices.stream()
                 .map(notice -> NoticeListResponse.builder()
                         .id(notice.getId())
@@ -49,9 +52,9 @@ public class NoticeService {
                         .createdAt(notice.getCreatedAt())
                         .build())
                 .toList();
-    } 
+    }
 
-    // 공지사항 상세 조회, 해당 noticeId를 통해 접근
+    // noticeId를 통해 공지사항 상세 조회
     public NoticeDetailResponse getNoticeDetail(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
@@ -68,6 +71,9 @@ public class NoticeService {
         User writer = userRepository.findById(writerId)
                 .orElseThrow(() -> new RuntimeException("작성자 정보를 찾을 수 없습니다."));
 
+
+        Site site = writer.getSite();
+
         // 공지사항 저장
         Notice notice = noticeRepository.save(
                 Notice.builder()
@@ -77,7 +83,7 @@ public class NoticeService {
                         .urgent(urgent)
                         .pinned(pinned)
                         .writer(writer)
-                        // 현장 넣어야함.
+                        .site(site)
                         .build()
         );
 
