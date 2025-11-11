@@ -23,14 +23,14 @@ public class ManagerNoticeController {
 
     private final NoticeService noticeService;
 
-    // 공지사항 목록 조회 (현장별)
+    // 현장별 공지사항 목록 조회 (현장관리자)
     @GetMapping
     public ResponseEntity<?> getNoticeList() {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 
-        List<NoticeListResponse> response = noticeService.getNoticeList(userId);
+        List<NoticeListResponse> response = noticeService.getNoticesByUser(userId);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "공지사항 목록 조회 성공",
@@ -69,7 +69,7 @@ public class ManagerNoticeController {
         ));
     }
 
-    // 🔹 공지사항 수정
+    // 공지사항 수정
     @PutMapping(value = "/{noticeId}", consumes = "multipart/form-data")
     public ResponseEntity<?> updateNotice(
             @PathVariable Long noticeId,

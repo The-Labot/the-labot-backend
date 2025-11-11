@@ -29,8 +29,8 @@ public class NoticeService {
     private final FileService fileService;
     private final SiteRepository siteRepository;
 
-    // 현장별 공지사항 목록 조회
-    public List<NoticeListResponse> getNoticeList(Long userId) {
+    // userId를 통해 현장별 공지사항 목록 조회
+    public List<NoticeListResponse> getNoticesByUser(Long userId) {
 
         // 해당 User 찾기
         User user = userRepository.findById(userId)
@@ -52,9 +52,11 @@ public class NoticeService {
                         .createdAt(notice.getCreatedAt())
                         .build())
                 .toList();
-    } 
+    }
+    // siteId를 통해 현장별 공지사항 목록 조회 (본사관리자용 추후 구현) getNoticesBySite
 
-    // 공지사항 상세 조회, noticeId를 통해 접근
+
+    // noticeId를 통해 공지사항 상세 조회
     public NoticeDetailResponse getNoticeDetail(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
