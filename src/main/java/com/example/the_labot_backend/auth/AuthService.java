@@ -27,11 +27,13 @@ public class AuthService {
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new RuntimeException("해당 전화번호가 존재하지 않습니다."));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
-            System.out.println("암호화된 비밀번호: " + user.getPassword());
-            throw new RuntimeException("비밀번호가 올바르지 않습니다.");
-        }
+        // 테스트용 비밀번호 조회 하지 않도록 설정
+//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+//
+//            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
+//            System.out.println("암호화된 비밀번호: " + user.getPassword());
+//            throw new RuntimeException("비밀번호가 올바르지 않습니다.");
+//        }
 
         return jwtTokenProvider.generateToken(user.getId(),user.getRole().name());
     }
@@ -50,7 +52,10 @@ public class AuthService {
 
         // 비밀번호 암호화 후 저장
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-
+        
+//        // 테스트용도 비밀번호 해쉬하지 않고 저장. 추후 개발 종료시 삭제
+//        String encodedPassword = request.getPassword();
+        
         User user = User.builder()
                 .phoneNumber(request.getPhoneNumber())
                 .password(encodedPassword)
