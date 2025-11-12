@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Builder
 public class NoticeDetailResponse {
 
     private final Long id;
