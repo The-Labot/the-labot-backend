@@ -98,7 +98,6 @@ public class NoticeService {
                                              NoticeCategory category,
                                              boolean urgent,
                                              boolean pinned,
-                                             List<Long> deleteFileIds,
                                              List<MultipartFile> newFiles) {
 
         // 기존 공지사항 조회
@@ -108,12 +107,8 @@ public class NoticeService {
         // 내용 수정
         notice.update(title, content, category, urgent, pinned);
 
-        // 삭제할 파일이 있으면 삭제
-        if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
-            for (Long fileId : deleteFileIds) {
-                fileService.deleteFile(fileId);
-            }
-        }
+        // 기존 파일 전체 삭제
+        fileService.deleteFilesByTarget("NOTICE", noticeId);
 
         // 새 파일 업로드
         if (newFiles != null && !newFiles.isEmpty()) {
@@ -131,6 +126,11 @@ public class NoticeService {
     public void deleteNotice(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+
+        // 공지사항에 연결된 파일 모두 삭제
+        fileService.deleteFilesByTarget("NOTICE", noticeId);
+
+        // 공지사항 삭제
         noticeRepository.delete(notice);
     }
 }

@@ -18,16 +18,16 @@ public class FileService {
 
     private final FileRepository fileRepository;
 
-    // 저장 폴더
-    private final String UPLOAD_DIR = "src/main/resources/static/uploads/";
+    // 저장 폴더 (현재 실행 디렉터리 기준)
+    private final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
 
     // 파일 저장
-    public List<File> saveFiles(List<MultipartFile> multipartFiles, String targetType, Long targetId) {
+    public void saveFiles(List<MultipartFile> multipartFiles, String targetType, Long targetId) {
         List<File> savedFiles = new ArrayList<>();
 
         //파일이 없으면 종료
         if (multipartFiles == null || multipartFiles.isEmpty()) {
-            return savedFiles;
+            return;
         }
 
         for (MultipartFile multipartFile : multipartFiles) {
@@ -68,16 +68,44 @@ public class FileService {
                 throw new RuntimeException("파일 저장 실패: " + originalName, e);
             }
         }
-        return savedFiles; // 저장된 파일 리스트
+        // return savedFiles; // 저장된 파일 리스트
     }
 
     // 파일 삭제
     public void deleteFile(Long fileId) {
-        fileRepository.deleteById(fileId);
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. id=" + fileId));
+
+        Path filePath = Paths.get(UPLOAD_DIR, file.getStoredFileName());
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 삭제 중 오류 발생: " + filePath, e);
+        }
+
+        fileRepository.delete(file);
     }
 
-    // 타입과 Id를 가지고 파일찾기
+    // targetType와 targetId로 파일 목록 조회
     public List<File> getFilesByTarget(String targetType, Long targetId) {
         return fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
+    }
+
+    // 특정 타겟에 연결된 파일 전부 삭제
+    public void deleteFilesByTarget(String targetType, Long targetId) {
+        List<File> files = fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
+
+        for (File file : files) {
+            // 실제 로컬 경로에서 삭제
+            Path filePath = Paths.get(UPLOAD_DIR, file.getStoredFileName());
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                throw new RuntimeException("파일 삭제 중 오류 발생: " + filePath, e);
+            }
+
+            // DB에서도 삭제
+            fileRepository.delete(file);
+        }
     }
 }

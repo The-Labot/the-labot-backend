@@ -273,3 +273,5 @@ id_ed25519
 .idea/
 src/main/resources/application-local.yaml
 
+# 파일 업로드 경로
+uploads/

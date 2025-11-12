@@ -82,7 +82,7 @@ public class ManagerNoticeController {
             @RequestParam(required = false) List<MultipartFile> files
     ) {
         NoticeDetailResponse response = noticeService.updateNotice(
-                noticeId, title, content, category, urgent, pinned, deleteFileIds, files
+                noticeId, title, content, category, urgent, pinned, files
         );
 
         return ResponseEntity.ok(Map.of(
