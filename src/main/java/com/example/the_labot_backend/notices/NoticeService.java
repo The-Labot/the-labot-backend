@@ -1,15 +1,20 @@
 package com.example.the_labot_backend.notices;
 
+import com.example.the_labot_backend.files.File;
+import com.example.the_labot_backend.files.FileService;
 import com.example.the_labot_backend.notices.dto.*;
 import com.example.the_labot_backend.notices.entity.Notice;
+import com.example.the_labot_backend.notices.entity.NoticeCategory;
+import com.example.the_labot_backend.sites.Site;
+import com.example.the_labot_backend.sites.SiteRepository;
 import com.example.the_labot_backend.users.User;
 import com.example.the_labot_backend.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,19 +23,21 @@ public class NoticeService {
 
     private final NoticeRepository noticeRepository;
     private final UserRepository userRepository;
+    private final FileService fileService;
+    private final SiteRepository siteRepository;
 
-    // 현장별 공지사항 목록 조회
-    public List<NoticeListResponse> getNoticeList(Long userId) {
+    // userId를 통해 현장별 공지사항 목록 조회
+    public List<NoticeListResponse> getNoticesByUser(Long userId) {
 
         // 해당 User 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getNoticesByUser) userId:" + userId));
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
-        
+
         // 여러개 조회, siteId를 조건으로 조회, 정렬, 정렬기준 Pinned, 내림차순
-        List<Notice> notices = noticeRepository.findAllBySiteIdOrderByPinnedDesc(siteId);
+        List<Notice> notices = noticeRepository.findAllBySite_IdOrderByPinnedDesc(siteId);
         return notices.stream()
                 .map(notice -> NoticeListResponse.builder()
                         .id(notice.getId())
@@ -42,24 +49,16 @@ public class NoticeService {
                         .createdAt(notice.getCreatedAt())
                         .build())
                 .toList();
-    } 
+    }
 
-    // 공지사항 상세 조회, 해당 noticeId를 통해 접근
+    // noticeId를 통해 공지사항 상세 조회
     public NoticeDetailResponse getNoticeDetail(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(getNoticeDetail) noticeId:" + noticeId));
 
-        return NoticeDetailResponse.builder()
-                .id(notice.getId())
-                .title(notice.getTitle())
-                .fileUrl(notice.getFileUrl())
-                .category(notice.getCategory())
-                .urgent(notice.isUrgent())
-                .pinned(notice.isPinned())
-                .writer(notice.getWriter().getName())
-                .createdAt(notice.getCreatedAt())
-                .updatedAt(notice.getUpdatedAt())
-                .build();
+        List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
+
+        return new NoticeDetailResponse(notice, files);
     }
 
     // 공지사항 작성
@@ -88,9 +87,8 @@ public class NoticeService {
                         .build()
         );
 
-        Notice saved = noticeRepository.save(notice);
-
-        return toResponse(saved);
+        // 파일 업로드 (로컬 or S3)
+        fileService.saveFiles(files, "NOTICE", notice.getId());
     }
 
     // 공지사항 수정
@@ -104,33 +102,35 @@ public class NoticeService {
 
         // 기존 공지사항 조회
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(updateNotice) noticeId:" + noticeId));
+
+        // 내용 수정
+        notice.update(title, content, category, urgent, pinned);
 
         // 기존 파일 전체 삭제
         fileService.deleteFilesByTarget("NOTICE", noticeId);
 
-        return toResponse(notice);
+        // 새 파일 업로드
+        if (newFiles != null && !newFiles.isEmpty()) {
+            fileService.saveFiles(newFiles, "NOTICE", notice.getId());
+        }
+
+        // 최신 파일 목록 조회
+        List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
+
+        // 최신 공지사항 정보 + 파일 함께 반환
+        return new NoticeDetailResponse(notice, files);
     }
 
     // 공지사항 삭제
     public void deleteNotice(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
-        noticeRepository.delete(notice);
-    }
+                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(deleteNotice) noticeId:" + noticeId));
 
-    private NoticeResponse toResponse(Notice notice) {
-        return NoticeResponse.builder()
-                .id(notice.getId())
-                .title(notice.getTitle())
-                .content(notice.getContent())
-                .fileUrl(notice.getFileUrl())
-                .category(notice.getCategory())
-                .urgent(notice.isUrgent())
-                .pinned(notice.isPinned())
-                .writerName(notice.getWriter().getName())
-                .createdAt(notice.getCreatedAt())
-                .updatedAt(notice.getUpdatedAt())
-                .build();
+        // 공지사항에 연결된 파일 모두 삭제
+        fileService.deleteFilesByTarget("NOTICE", noticeId);
+
+        // 공지사항 삭제
+        noticeRepository.delete(notice);
     }
 }

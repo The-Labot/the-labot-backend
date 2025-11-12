@@ -1,11 +1,13 @@
 package com.example.the_labot_backend.hazards;
 
-
+import com.example.the_labot_backend.files.File;
+import com.example.the_labot_backend.files.FileService;
 import com.example.the_labot_backend.hazards.dto.HazardCreateRequest;
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;
 import com.example.the_labot_backend.hazards.entity.HazardStatus;
+import com.example.the_labot_backend.notices.entity.Notice;
 import com.example.the_labot_backend.users.User;
 import com.example.the_labot_backend.users.UserRepository;
 import com.example.the_labot_backend.users.dto.HazardStatusUpdateRequest;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,25 +31,34 @@ public class HazardService {
 
     private final HazardRepository hazardRepository;
     private final UserRepository userRepository;
+    private final FileService fileService;
 
-    // 신고 등록 (현장근로자)
+    // 위험요소 신고 등록 (현장근로자)
     // @Transactional
-    public void createHazard(Long reporterId, HazardCreateRequest request) {
-        User reporter = userRepository.findById(reporterId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(HazardService) Id: " + reporterId));
+    public void createHazard(String hazardType,
+                             String location,
+                             String description,
+                             boolean urgent,
+                             HazardStatus status,
+                             List<MultipartFile> files,
+                             Long userId)   {
+        User reporter = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(createHazard) userId:" + userId));
 
+        // 신고 엔티티 생성
         Hazard hazard = Hazard.builder()
-                .hazardType(request.getHazardType())
-                .description(request.getDescription())
-                .location(request.getLocation())
-                .fileUrl(request.getFileUrl())
-                .urgent(request.isUrgent())
-                .status(HazardStatus.WAITING)
+                .hazardType(hazardType)
+                .location(location)
+                .description(description)
+                .urgent(urgent)
+                .status(status)
                 .reporter(reporter)
-                .reportedAt(LocalDateTime.now())
+                .site(reporter.getSite()) // User가 Site에 속해있을 경우 자동 연결
                 .build();
 
         hazardRepository.save(hazard);
+
+        fileService.saveFiles(files, "HAZARD", hazard.getId());
     }
 
     // userId를 통한 위험요소 신고 목록 조회
@@ -75,36 +87,27 @@ public class HazardService {
                 .toList();
     }
 
-    // 상세 조회 (현장관리자)
+    // 위험요소 신고 상세 조회
     public HazardDetailResponse getHazardDetail(Long hazardId) {
         Hazard hazard = hazardRepository.findById(hazardId)
-                .orElseThrow(() -> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다.(getHazardDetail) hazardId:" + hazardId));
 
-        return HazardDetailResponse.builder()
-                .id(hazard.getId())
-                .hazardType(hazard.getHazardType())
-                .reporter(hazard.getReporter().getName())
-                .location(hazard.getLocation())
-                .description(hazard.getDescription())
-                .fileUrl(hazard.getFileUrl())
-                .isUrgent(hazard.isUrgent())
-                .status(hazard.getStatus().name())
-                .reportedAt(hazard.getReportedAt()
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")))
-                .build();
+        // 파일 조회
+        List<File> files = fileService.getFilesByTarget("HAZARD", hazardId);
+
+        return new HazardDetailResponse(hazard,files);
     }
 
-    // 상태 수정
-    public Hazard updateStatus(Long id, HazardStatus newStatus) {
-        Hazard hazard = hazardRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 위험요소를 찾을 수 없습니다. id=" + id));
+    // 위험요소 신고 상태 수정
+    public Hazard updateStatus(Long hazardId, HazardStatus newStatus) {
+        Hazard hazard = hazardRepository.findById(hazardId)
+                .orElseThrow(() -> new NoSuchElementException("해당 위험요소 신고를 찾을 수 없습니다.(updateStatus) hazardId:" + hazardId));
 
         hazard = Hazard.builder()
                 .id(hazard.getId())
                 .hazardType(hazard.getHazardType())
                 .location(hazard.getLocation())
                 .description(hazard.getDescription())
-                .fileUrl(hazard.getFileUrl())
                 .urgent(hazard.isUrgent())
                 .status(newStatus)
                 .reportedAt(hazard.getReportedAt())
@@ -114,11 +117,15 @@ public class HazardService {
         return hazardRepository.save(hazard);
     }
 
-    // 삭제
-    public void deleteHazard(Long id) {
-        if (!hazardRepository.existsById(id)) {
-            throw new NoSuchElementException("해당 위험요소를 찾을 수 없습니다. id=" + id);
-        }
-        hazardRepository.deleteById(id);
+    // 위험요소 신고 삭제
+    public void deleteHazard(Long hazardId) {
+        Hazard hazard = hazardRepository.findById(hazardId)
+                .orElseThrow(()-> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다.(deleteHazard) hazardId:" + hazardId));
+
+        // 위험요소 신고에 연결된 파일 삭제
+        fileService.deleteFilesByTarget("HAZARD", hazardId);
+
+        // 위험요소 신고 삭제
+        hazardRepository.deleteById(hazardId);
     }
 }
