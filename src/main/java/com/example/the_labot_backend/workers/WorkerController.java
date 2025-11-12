@@ -1,6 +1,6 @@
-package com.example.the_labot_backend.worker;
+package com.example.the_labot_backend.workers;
 
-import com.example.the_labot_backend.worker.dto.WorkerUpdateRequest;
+import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

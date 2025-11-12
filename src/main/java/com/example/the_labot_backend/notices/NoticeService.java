@@ -34,7 +34,7 @@ public class NoticeService {
 
         // 해당 User 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getNoticesByUser) userId:" + userId));
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
@@ -57,7 +57,7 @@ public class NoticeService {
     // noticeId를 통해 공지사항 상세 조회
     public NoticeDetailResponse getNoticeDetail(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(getNoticeDetail) noticeId:" + noticeId));
 
         List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
 
@@ -65,12 +65,15 @@ public class NoticeService {
     }
 
     // 공지사항 작성
-    public void createNotice(String title, String content, NoticeCategory category,
-                                       boolean urgent, boolean pinned, List<MultipartFile> files , Long writerId) {
-
-        User writer = userRepository.findById(writerId)
-                .orElseThrow(() -> new RuntimeException("작성자 정보를 찾을 수 없습니다."));
-
+    public void createNotice(String title,
+                             String content,
+                             NoticeCategory category,
+                             boolean urgent,
+                             boolean pinned,
+                             List<MultipartFile> files,
+                             Long userId)   {
+        User writer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(createNotice) userId:" + userId));
 
         Site site = writer.getSite();
 
@@ -102,7 +105,7 @@ public class NoticeService {
 
         // 기존 공지사항 조회
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(updateNotice) noticeId:" + noticeId));
 
         // 내용 수정
         notice.update(title, content, category, urgent, pinned);
@@ -125,7 +128,7 @@ public class NoticeService {
     // 공지사항 삭제
     public void deleteNotice(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(deleteNotice) noticeId:" + noticeId));
 
         // 공지사항에 연결된 파일 모두 삭제
         fileService.deleteFilesByTarget("NOTICE", noticeId);

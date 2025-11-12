@@ -1,8 +1,8 @@
-package com.example.the_labot_backend.worker;
+package com.example.the_labot_backend.workers;
 
 
 import com.example.the_labot_backend.users.User;
-import com.example.the_labot_backend.worker.dto.WorkerDetailResponse;
+import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

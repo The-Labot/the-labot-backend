@@ -60,9 +60,9 @@ public class ManagerNoticeController {
             @RequestParam(required = false) List<MultipartFile> files
     ) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long writerId = Long.parseLong(auth.getName());
+        Long userId = Long.parseLong(auth.getName());
 
-        noticeService.createNotice(title, content, category, urgent, pinned, files, writerId);
+        noticeService.createNotice(title, content, category, urgent, pinned, files, userId);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "공지사항이 등록되었습니다."

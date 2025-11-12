@@ -1,10 +1,9 @@
-package com.example.the_labot_backend.worker;
+package com.example.the_labot_backend.workers;
 
-import com.example.the_labot_backend.enums.WorkerStatus;
 import com.example.the_labot_backend.users.UserRepository;
-import com.example.the_labot_backend.worker.dto.WorkerDetailResponse;
-import com.example.the_labot_backend.worker.dto.WorkerListResponse;
-import com.example.the_labot_backend.worker.dto.WorkerUpdateRequest;
+import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
+import com.example.the_labot_backend.workers.dto.WorkerListResponse;
+import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

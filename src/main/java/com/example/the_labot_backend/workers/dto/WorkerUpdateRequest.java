@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.worker.dto;
+package com.example.the_labot_backend.workers.dto;
 
 import com.example.the_labot_backend.enums.WorkerStatus;
 import lombok.Getter;

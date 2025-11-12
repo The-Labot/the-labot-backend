@@ -12,14 +12,14 @@ import java.util.List;
 @Getter
 public class NoticeDetailResponse {
 
-    private Long id;
-    private String title;
-    private String content;
-    private NoticeCategory category;
-    private boolean urgent;
-    private boolean pinned;
-    private LocalDateTime createdAt;
-    private List<FileResponse> files;
+    private final Long id;
+    private final String title;
+    private final String content;
+    private final NoticeCategory category;
+    private final boolean urgent;
+    private final boolean pinned;
+    private final LocalDateTime createdAt;
+    private final List<FileResponse> files;
 
     public NoticeDetailResponse(Notice notice, List<File> files) {
         this.id = notice.getId();

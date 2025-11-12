@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.worker;
+package com.example.the_labot_backend.workers;
 
 
 import com.example.the_labot_backend.enums.WorkerStatus;

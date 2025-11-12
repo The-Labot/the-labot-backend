@@ -2,7 +2,7 @@ package com.example.the_labot_backend.users;
 
 import com.example.the_labot_backend.enums.Role;
 import com.example.the_labot_backend.sites.Site;
-import com.example.the_labot_backend.worker.Worker;
+import com.example.the_labot_backend.workers.Worker;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +26,7 @@ public class User {
 
     private String name;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "site_id")
     private Site site;  // 소속 현장
 

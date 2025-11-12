@@ -1,10 +1,10 @@
-package com.example.the_labot_backend.worker;
+package com.example.the_labot_backend.workers;
 
 import com.example.the_labot_backend.global.config.SecurityConfig;
 import com.example.the_labot_backend.enums.WorkerStatus;
 import com.example.the_labot_backend.global.config.JwtAuthenticationFilter;
-import com.example.the_labot_backend.worker.dto.WorkerDetailResponse;
-import com.example.the_labot_backend.worker.dto.WorkerListResponse;
+import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
+import com.example.the_labot_backend.workers.dto.WorkerListResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

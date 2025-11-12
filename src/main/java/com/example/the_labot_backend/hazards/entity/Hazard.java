@@ -26,7 +26,6 @@ public class Hazard {
     private String hazardType; // 위험 유형
     private String location; // 위치
     private String description; // 설명
-    private String fileUrl; // 파일
     private boolean urgent; // 긴급 여부
     
     @Enumerated(EnumType.STRING)
@@ -41,5 +40,12 @@ public class Hazard {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
     private User reporter;// 신고자
+
+
+    // 최초 저장 시 자동으로 생성일 설정
+    @PrePersist // 처음 저장 시 reportedAt 자동 세팅
+    public void prePersist() {
+        this.reportedAt = LocalDateTime.now();
+    }
 }
 
