@@ -9,8 +9,6 @@ import com.example.the_labot_backend.users.dto.HazardStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +34,7 @@ public class ManagerHazardController {
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "위험요소 신고 목록 조회 성공",
-                "data", response
+                "data", list
         ));
     }
 
@@ -44,6 +42,7 @@ public class ManagerHazardController {
     @GetMapping("/{hazardId}")
     public ResponseEntity<?> getHazardDetail(@PathVariable Long hazardId) {
         HazardDetailResponse response = hazardService.getHazardDetail(hazardId);
+
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "위험요소 신고 상세 조회 성공",
@@ -52,17 +51,17 @@ public class ManagerHazardController {
     }
 
     // 위험요소 신고 상태 변경
-    @PatchMapping("/{hazardId}/status")
-    public ResponseEntity<?> updateStatusHazard(
-            @PathVariable Long hazardId,
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(
+            @PathVariable Long id,
             @RequestBody HazardStatusUpdateRequest request
     ) {
-        Hazard updated = hazardService.updateStatus(hazardId, request.getStatus());
+        Hazard updated = hazardService.updateStatus(id, request.getStatus());
         return ResponseEntity.ok().body(
                 java.util.Map.of(
                         "status", 200,
                         "message", "위험요소 상태 수정 성공",
-                        "data", Map.of(
+                        "data", java.util.Map.of(
                                 "hazardId", updated.getId(),
                                 "status", updated.getStatus()
                         )
@@ -71,13 +70,15 @@ public class ManagerHazardController {
     }
 
     // 위험요소 신고 삭제
-    @DeleteMapping("/{hazardId}")
-    public ResponseEntity<?> deleteHazard(@PathVariable Long hazardId) {
-        hazardService.deleteHazard(hazardId);
-        return ResponseEntity.ok(Map.of(
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteHazard(@PathVariable Long id) {
+        hazardService.deleteHazard(id);
+        return ResponseEntity.ok().body(
+                java.util.Map.of(
                         "status", 200,
                         "message", "위험요소 삭제 성공"
-        ));
+                )
+        );
     }
 
 }
