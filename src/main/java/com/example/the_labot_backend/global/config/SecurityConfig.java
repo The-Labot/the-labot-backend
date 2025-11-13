@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 "/swagger-resources",
                                 "/webjars/**"
                         ).permitAll()
+                        .requestMatchers("/api/register/**").permitAll() //ocr이용을 위해11/13일 박찬홍 추가
                         .anyRequest().authenticated()
                 )
                 //요청이 들어오면 필터를 여러개 거쳐 검증

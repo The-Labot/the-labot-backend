@@ -3,6 +3,7 @@ package com.example.the_labot_backend.users;
 import com.example.the_labot_backend.enums.Role;
 import com.example.the_labot_backend.sites.Site;
 import com.example.the_labot_backend.workers.Worker;
+import com.fasterxml.jackson.annotation.JsonIgnore; //user와 worker간의 루프를 해결하기 위해 생성 11/13 7시반
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,5 +36,6 @@ public class User {
     private Role role; // ex) ROLE_USER, ROLE_ADMIN
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL) // 1대1 대응, mappedBy: 연관관계의 반대편 변수 이름 (user로 되어있음), cascade: 삭제전략
+    @JsonIgnore//user와 worker간의 루프를 해결하기 위해 생성 11/13 7시반 박찬홍 추가
     private Worker worker;  // 근로자 전용 정보 연결
 }
