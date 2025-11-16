@@ -1,5 +1,8 @@
 package com.example.the_labot_backend.workers;
 
+import com.example.the_labot_backend.attendance.Attendance;
+import com.example.the_labot_backend.attendance.AttendanceRepository;
+import com.example.the_labot_backend.attendance.dto.AttendanceUpdateRequestDto;
 import com.example.the_labot_backend.users.UserRepository;
 import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import com.example.the_labot_backend.workers.dto.WorkerListResponse;
@@ -7,6 +10,7 @@ import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +20,7 @@ public class WorkerService {
 
     private final WorkerRepository workerRepository;
     private final UserRepository userRepository;
+    private final AttendanceRepository attendanceRepository;// 워크서비스에서 attendace클래스를 변경가능하게끔 함.  11/16박찬홍
 
     // 근로자 목록 조회
     public List<WorkerListResponse> getWorkers() {
@@ -69,5 +74,31 @@ public class WorkerService {
         worker.setPosition(dto.getPosition());
         worker.setStatus(dto.getStatus());
         workerRepository.save(worker);
+    }
+
+    // 박찬홍 11/16일 추가
+    @Transactional
+    public void updateAttendanceRecord(Long attendanceId, AttendanceUpdateRequestDto dto) {
+
+        // 1. ID로 수정할 출퇴근 기록을 찾음
+        Attendance record = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 출퇴근 기록을 찾을 수 없습니다. ID: " + attendanceId));
+
+        // 2. DTO에 값이 있으면, 그 값으로 덮어씀
+        if (dto.getClockInTime() != null) {
+            record.setClockInTime(dto.getClockInTime());
+        }
+        if (dto.getClockOutTime() != null) {
+            record.setClockOutTime(dto.getClockOutTime());
+        }
+        if (dto.getStatus() != null) {
+            record.setStatus(dto.getStatus());
+        }
+
+        // 3. [★네 요청★] 이의제기를 확인했으니, 이의제기 메시지 필드를 null로 변경
+        record.setObjectionMessage(null);
+
+        // 4. DB에 최종 저장
+        attendanceRepository.save(record);
     }
 }
