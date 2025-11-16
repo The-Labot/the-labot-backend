@@ -1,7 +1,6 @@
 package com.example.the_labot_backend.workers;
 
 
-import com.example.the_labot_backend.enums.WorkerStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

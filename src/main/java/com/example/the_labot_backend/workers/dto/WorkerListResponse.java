@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.workers.dto;
 
-import com.example.the_labot_backend.enums.WorkerStatus;
+import com.example.the_labot_backend.workers.WorkerStatus;
 import lombok.*;
 
 // 근로자 목록 조회 DTO

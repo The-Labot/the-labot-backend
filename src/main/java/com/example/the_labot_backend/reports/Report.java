@@ -1,11 +1,10 @@
 package com.example.the_labot_backend.reports;
 
 import com.example.the_labot_backend.sites.Site;
-import com.example.the_labot_backend.users.User;
+import com.example.the_labot_backend.users.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

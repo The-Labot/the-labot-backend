@@ -2,24 +2,16 @@ package com.example.the_labot_backend.hazards;
 
 import com.example.the_labot_backend.files.File;
 import com.example.the_labot_backend.files.FileService;
-import com.example.the_labot_backend.hazards.dto.HazardCreateRequest;
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;
 import com.example.the_labot_backend.hazards.entity.HazardStatus;
-import com.example.the_labot_backend.notices.entity.Notice;
-import com.example.the_labot_backend.users.User;
+import com.example.the_labot_backend.users.entity.User;
 import com.example.the_labot_backend.users.UserRepository;
-import com.example.the_labot_backend.users.dto.HazardStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 

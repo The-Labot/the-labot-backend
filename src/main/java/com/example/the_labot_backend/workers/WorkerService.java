@@ -1,12 +1,18 @@
 package com.example.the_labot_backend.workers;
 
+import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
+import com.example.the_labot_backend.sites.Site;
 import com.example.the_labot_backend.users.UserRepository;
+import com.example.the_labot_backend.users.entity.Role;
+import com.example.the_labot_backend.users.entity.User;
 import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import com.example.the_labot_backend.workers.dto.WorkerListResponse;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +22,47 @@ public class WorkerService {
 
     private final WorkerRepository workerRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    
+    // 근로자 등록
+    @Transactional
+    public void createWorker(Long managerId, WorkerCreateRequest request) {
+
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + managerId));
+
+        Site site = manager.getSite();
+
+        if (manager.getRole() != Role.ROLE_MANAGER) {
+            throw new RuntimeException("현장관리자만 근로자를 등록할 수 있습니다.");
+        }
+
+        // 전화번호 중복 체크
+        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
+            throw new RuntimeException("이미 존재하는 전화번호입니다.");
+        }
+
+        // 임시 비밀번호 생성
+        String tempPw = "1234"; // 또는 랜덤 생성 가능
+
+        // User 생성 (ROLE_WORKER)
+        User workerUser = User.builder()
+                .phoneNumber(request.getPhoneNumber())
+                .password(passwordEncoder.encode(tempPw))
+                .name(request.getName())
+                .role(Role.ROLE_WORKER)
+                .site(site)
+                .build();
+
+        userRepository.save(workerUser);
+
+        // Worker 상세정보 생성
+        Worker worker = Worker.builder()
+                .user(workerUser)
+                .build();
+
+        workerRepository.save(worker);
+    }
 
     // 근로자 목록 조회
     public List<WorkerListResponse> getWorkers() {

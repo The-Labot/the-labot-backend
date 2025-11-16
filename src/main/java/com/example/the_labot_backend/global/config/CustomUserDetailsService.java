@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.global.config;
 
-import com.example.the_labot_backend.users.User;
+import com.example.the_labot_backend.users.entity.User;
 import com.example.the_labot_backend.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.AuthorityUtils;

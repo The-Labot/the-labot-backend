@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.workers;
 
 
-import com.example.the_labot_backend.users.User;
+import com.example.the_labot_backend.users.entity.User;
 import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

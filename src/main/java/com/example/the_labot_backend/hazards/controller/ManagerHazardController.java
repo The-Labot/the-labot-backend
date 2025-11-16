@@ -5,7 +5,7 @@ import com.example.the_labot_backend.hazards.HazardService;
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;
-import com.example.the_labot_backend.users.dto.HazardStatusUpdateRequest;
+import com.example.the_labot_backend.hazards.dto.HazardStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,7 +43,9 @@ public class ManagerHazardController {
     // 위험요소 신고 상세 조회
     @GetMapping("/{hazardId}")
     public ResponseEntity<?> getHazardDetail(@PathVariable Long hazardId) {
+
         HazardDetailResponse response = hazardService.getHazardDetail(hazardId);
+
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "위험요소 신고 상세 조회 성공",

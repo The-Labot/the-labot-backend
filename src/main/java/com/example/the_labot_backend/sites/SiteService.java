@@ -1,17 +1,14 @@
 package com.example.the_labot_backend.sites;
 
-import com.example.the_labot_backend.notices.dto.NoticeListResponse;
-import com.example.the_labot_backend.notices.entity.Notice;
 import com.example.the_labot_backend.sites.dto.SiteListResponse;
 import com.example.the_labot_backend.sites.dto.SiteRequest;
 import com.example.the_labot_backend.sites.dto.SiteResponse;
-import com.example.the_labot_backend.users.User;
+import com.example.the_labot_backend.users.entity.User;
 import com.example.the_labot_backend.users.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

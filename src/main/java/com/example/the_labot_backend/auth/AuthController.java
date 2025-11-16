@@ -1,14 +1,16 @@
 package com.example.the_labot_backend.auth;
 
-
-import com.example.the_labot_backend.auth.dto.SignupRequest;
-import com.example.the_labot_backend.users.dto.LoginRequest;
+import com.example.the_labot_backend.auth.dto.AdminSignupRequest;
+import com.example.the_labot_backend.auth.dto.LoginRequest;
+import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,19 +19,20 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // 로그인
-    // 토큰값 반환
+    // 로그인, 토큰값 반환
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        String token = authService.login(request);
         return ResponseEntity.ok()
-                .body("Bearer " + token);
+                .body(authService.login(request));
     }
 
-    // 임시 회원가입
-    @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
-        authService.signup(request);
-        return ResponseEntity.ok("회원가입 성공");
+    // 본사관리자 회원가입
+    @PostMapping("/signup/admin")
+    public ResponseEntity<?> signupAdmin(@RequestBody AdminSignupRequest request) {
+        authService.signupAdmin(request);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "본사관리자 회원가입 성공"
+        ));
     }
 }

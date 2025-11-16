@@ -1,7 +1,6 @@
 package com.example.the_labot_backend.workers;
 
 import com.example.the_labot_backend.global.config.SecurityConfig;
-import com.example.the_labot_backend.enums.WorkerStatus;
 import com.example.the_labot_backend.global.config.JwtAuthenticationFilter;
 import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import com.example.the_labot_backend.workers.dto.WorkerListResponse;

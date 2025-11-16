@@ -1,17 +1,20 @@
 package com.example.the_labot_backend.auth;
 
-
-import com.example.the_labot_backend.enums.Role;
+import com.example.the_labot_backend.admins.Admin;
+import com.example.the_labot_backend.auth.dto.*;
+import com.example.the_labot_backend.headoffice.HeadOffice;
+import com.example.the_labot_backend.headoffice.HeadOfficeRepository;
+import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
+import com.example.the_labot_backend.users.entity.Role;
 import com.example.the_labot_backend.global.config.JwtTokenProvider;
-import com.example.the_labot_backend.auth.dto.SignupRequest;
 import com.example.the_labot_backend.sites.Site;
 import com.example.the_labot_backend.sites.SiteRepository;
-import com.example.the_labot_backend.users.User;
+import com.example.the_labot_backend.users.entity.User;
 import com.example.the_labot_backend.users.UserRepository;
-import com.example.the_labot_backend.users.dto.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +24,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final HeadOfficeRepository headOfficeRepository;
 
     // 로그인
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
+        
+        // 전화번호로 User 찾기
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new RuntimeException("해당 전화번호가 존재하지 않습니다."));
 
-        // 테스트용 비밀번호 조회 하지 않도록 설정
+        // 테스트용 임시 주석 처리
+        // 비밀번호 조회
 //        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 //
 //            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
@@ -35,37 +42,68 @@ public class AuthService {
 //            throw new RuntimeException("비밀번호가 올바르지 않습니다.");
 //        }
 
-        return jwtTokenProvider.generateToken(user.getId(),user.getRole().name());
+        // clientType 값 체크
+        if (request.getClientType() == null) {
+            throw new RuntimeException("clientType(APP/WEB)이 필요합니다.");
+        }
+
+        String type = request.getClientType().toUpperCase();
+        Role role = user.getRole();
+
+        // APP → 본사관리자(Admin) 로그인 금지
+        if (request.getClientType().equalsIgnoreCase("APP")
+                && user.getRole() == Role.ROLE_ADMIN) {
+            throw new RuntimeException("본사관리자는 앱에서 로그인할 수 없습니다.");
+        }
+
+        // WEB → Admin 이외의 사용자 로그인 금지
+        if (request.getClientType().equalsIgnoreCase("WEB")
+                && user.getRole() != Role.ROLE_ADMIN) {
+            throw new RuntimeException("현장관리자/근로자는 웹에서 로그인할 수 없습니다.");
+        }
+        String token = jwtTokenProvider.generateToken(user.getId(),user.getRole().name());
+
+        return LoginResponse.builder()
+                .token("Bearer " + token)
+                .role(user.getRole().name())
+                .userId(user.getId())
+                .name(user.getName())
+                .build();
     }
 
-    // 임시 회원가입
-    public void signup(SignupRequest request) {
-        // 중복 전화번호 검사
+    // 본사관리자 회원가입
+    @Transactional
+    public void signupAdmin(AdminSignupRequest request) {
+
+        // 전화번호 중복 체크
         if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
             throw new RuntimeException("이미 존재하는 전화번호입니다.");
         }
 
-        // 현장Id로 현장 찾기
-        Site site = siteRepository.findById(request.getSiteId())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 현장입니다."));
+        // 본사코드로 본사 존재 여부 검증
+        HeadOffice headOffice = headOfficeRepository
+                .findBySecretCode(request.getSecretCode())
+                .orElseThrow(() -> new RuntimeException("비밀코드가 올바르지 않거나 존재하지 않는 본사입니다."));
 
-
-        // 비밀번호 암호화 후 저장
+        // 패스워드 암호화
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        
-//        // 테스트용도 비밀번호 해쉬하지 않고 저장. 추후 개발 종료시 삭제
-//        String encodedPassword = request.getPassword();
-        
+
         User user = User.builder()
                 .phoneNumber(request.getPhoneNumber())
                 .password(encodedPassword)
                 .name(request.getName())
-                .site(site)
-                .role(request.getRole() != null ? request.getRole() : Role.ROLE_WORKER)
+                .role(Role.ROLE_ADMIN)   // 본사관리자 역할
+                .headOffice(headOffice)
                 .build();
 
-        userRepository.save(user);
-        System.out.println("[회원가입 완료] 저장된 비밀번호 = " + encodedPassword);
-    }
+        Admin admin = Admin.builder()
+                .email(request.getEmail())
+                .address(request.getAddress())
+                .user(user)
+                .build();
 
+        user.setAdmin(admin);
+
+        userRepository.save(user);
+    }
 }
