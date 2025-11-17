@@ -43,4 +43,7 @@ public class Site {
     @Column(nullable = false)
     private Double longitude; // 현장 경도 (기준점)
     //
+    @Column(name = "site_map_url")
+    private String siteMapUrl;
+    //근로자가 site의 지도를 보기위한 url 필드 추가 11/17일 박찬홍
 }
