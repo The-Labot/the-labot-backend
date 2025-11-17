@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.attendance;
 
+
 public enum AttendanceStatus {
     PRESENT, //정상
     LATE, //지각
