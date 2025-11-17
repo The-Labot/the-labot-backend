@@ -1,11 +1,20 @@
 package com.example.the_labot_backend.ocr.service;
 
+<<<<<<< HEAD
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.users.UserRepository;
 import com.example.the_labot_backend.users.entity.User;
 import com.example.the_labot_backend.workers.Worker;
 import com.example.the_labot_backend.workers.WorkerRepository;
 import com.example.the_labot_backend.workers.WorkerStatus;
+=======
+import com.example.the_labot_backend.enums.WorkerStatus;
+import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
+import com.example.the_labot_backend.users.User;
+import com.example.the_labot_backend.users.UserRepository;
+import com.example.the_labot_backend.workers.Worker;
+import com.example.the_labot_backend.workers.WorkerRepository;
+>>>>>>> main
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+<<<<<<< HEAD
 
+=======
+import static org.junit.jupiter.api.Assertions.*;
+>>>>>>> main
 @SpringBootTest
 @Transactional
 public class RegistrationServiceTest {
