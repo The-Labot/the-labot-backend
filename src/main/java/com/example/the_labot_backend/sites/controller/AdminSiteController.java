@@ -1,9 +1,9 @@
 package com.example.the_labot_backend.sites.controller;
 
-import com.example.the_labot_backend.sites.SiteService;
 import com.example.the_labot_backend.sites.dto.SiteListResponse;
 import com.example.the_labot_backend.sites.dto.SiteRequest;
 import com.example.the_labot_backend.sites.dto.SiteResponse;
+import com.example.the_labot_backend.sites.service.SiteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

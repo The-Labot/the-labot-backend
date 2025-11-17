@@ -1,12 +1,12 @@
 package com.example.the_labot_backend.ocr.service;
 
-import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
 import com.example.the_labot_backend.authUser.entity.Role;
 import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.workers.Worker;
-import com.example.the_labot_backend.workers.WorkerRepository;
-import com.example.the_labot_backend.workers.WorkerStatus;
+import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
+import com.example.the_labot_backend.workers.entity.Worker;
+import com.example.the_labot_backend.workers.entity.WorkerStatus;
+import com.example.the_labot_backend.workers.repository.WorkerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,13 +1,12 @@
 package com.example.the_labot_backend.ocr.controller;
 
 import com.example.the_labot_backend.ocr.dto.ContractDataDto;
-
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.ocr.dto.IdCardDataDto;
 import com.example.the_labot_backend.ocr.service.ContractOcrService;
 import com.example.the_labot_backend.ocr.service.IdCardOcrService;
 import com.example.the_labot_backend.ocr.service.RegistrationService;
-import com.example.the_labot_backend.workers.Worker;
+import com.example.the_labot_backend.workers.entity.Worker;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.headoffice.dto;
 
-import com.example.the_labot_backend.headoffice.HeadOffice;
+import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import lombok.Builder;
 import lombok.Getter;
 

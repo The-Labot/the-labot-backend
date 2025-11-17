@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.reports.dto;
 
-import com.example.the_labot_backend.reports.Report;
+import com.example.the_labot_backend.reports.entity.Report;
 import lombok.Builder;
 import lombok.Getter;
 

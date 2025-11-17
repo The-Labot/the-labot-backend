@@ -1,11 +1,10 @@
 package com.example.the_labot_backend.hazards.controller;
 
-
-import com.example.the_labot_backend.hazards.HazardService;
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
-import com.example.the_labot_backend.hazards.entity.Hazard;
 import com.example.the_labot_backend.hazards.dto.HazardStatusUpdateRequest;
+import com.example.the_labot_backend.hazards.entity.Hazard;
+import com.example.the_labot_backend.hazards.service.HazardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

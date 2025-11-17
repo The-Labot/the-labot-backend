@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.workers.dto;
 
-import com.example.the_labot_backend.sites.Site;
+import com.example.the_labot_backend.sites.entity.Site;
 import lombok.Builder;
 import lombok.Getter;
 

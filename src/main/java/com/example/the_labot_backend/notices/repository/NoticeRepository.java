@@ -1,8 +1,7 @@
-package com.example.the_labot_backend.notices;
+package com.example.the_labot_backend.notices.repository;
 
 import com.example.the_labot_backend.notices.entity.Notice;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 

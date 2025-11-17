@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.educations.entity;
 
-import com.example.the_labot_backend.sites.Site;
 import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.sites.entity.Site;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,18 +1,18 @@
 package com.example.the_labot_backend.attendance.service;
 
-import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
 import com.example.the_labot_backend.attendance.dto.ClockInOutRequestDto;
+import com.example.the_labot_backend.attendance.dto.ClockInOutResponseDto;
 import com.example.the_labot_backend.attendance.dto.ObjectionRequestDto;
 import com.example.the_labot_backend.attendance.entity.Attendance;
 import com.example.the_labot_backend.attendance.entity.AttendanceStatus;
-import com.example.the_labot_backend.sites.Site;
+import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
 import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.workers.Worker;
+import com.example.the_labot_backend.sites.entity.Site;
+import com.example.the_labot_backend.workers.entity.Worker;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.the_labot_backend.attendance.dto.ClockInOutResponseDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,7 +34,6 @@ public class AttendanceService {
 
     @Transactional
     public ClockInOutResponseDto recordClockInOut(User user, ClockInOutRequestDto dto) {
-
 
         Worker worker = user.getWorker();
         if (worker == null) {

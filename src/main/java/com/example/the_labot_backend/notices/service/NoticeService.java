@@ -1,14 +1,16 @@
-package com.example.the_labot_backend.notices;
+package com.example.the_labot_backend.notices.service;
 
-import com.example.the_labot_backend.files.File;
-import com.example.the_labot_backend.files.FileService;
-import com.example.the_labot_backend.notices.dto.*;
-import com.example.the_labot_backend.notices.entity.Notice;
-import com.example.the_labot_backend.notices.entity.NoticeCategory;
-import com.example.the_labot_backend.sites.Site;
-import com.example.the_labot_backend.sites.SiteRepository;
 import com.example.the_labot_backend.authUser.entity.User;
 import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.files.entity.File;
+import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.notices.dto.NoticeDetailResponse;
+import com.example.the_labot_backend.notices.dto.NoticeListResponse;
+import com.example.the_labot_backend.notices.entity.Notice;
+import com.example.the_labot_backend.notices.entity.NoticeCategory;
+import com.example.the_labot_backend.notices.repository.NoticeRepository;
+import com.example.the_labot_backend.sites.entity.Site;
+import com.example.the_labot_backend.sites.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

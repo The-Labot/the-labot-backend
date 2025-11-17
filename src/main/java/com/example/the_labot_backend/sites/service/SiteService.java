@@ -1,10 +1,12 @@
-package com.example.the_labot_backend.sites;
+package com.example.the_labot_backend.sites.service;
 
+import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authUser.repository.UserRepository;
 import com.example.the_labot_backend.sites.dto.SiteListResponse;
 import com.example.the_labot_backend.sites.dto.SiteRequest;
 import com.example.the_labot_backend.sites.dto.SiteResponse;
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.sites.entity.Site;
+import com.example.the_labot_backend.sites.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

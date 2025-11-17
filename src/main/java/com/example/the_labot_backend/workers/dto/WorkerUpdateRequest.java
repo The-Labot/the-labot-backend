@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.workers.dto;
 
-import com.example.the_labot_backend.workers.WorkerStatus;
+import com.example.the_labot_backend.workers.entity.WorkerStatus;
 import lombok.Getter;
 import lombok.Setter;
 

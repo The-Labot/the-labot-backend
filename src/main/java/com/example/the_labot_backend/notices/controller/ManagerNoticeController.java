@@ -1,8 +1,9 @@
 package com.example.the_labot_backend.notices.controller;
 
-import com.example.the_labot_backend.notices.NoticeService;
-import com.example.the_labot_backend.notices.dto.*;
+import com.example.the_labot_backend.notices.dto.NoticeDetailResponse;
+import com.example.the_labot_backend.notices.dto.NoticeListResponse;
 import com.example.the_labot_backend.notices.entity.NoticeCategory;
+import com.example.the_labot_backend.notices.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

@@ -1,5 +1,7 @@
-package com.example.the_labot_backend.files;
+package com.example.the_labot_backend.files.service;
 
+import com.example.the_labot_backend.files.entity.File;
+import com.example.the_labot_backend.files.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

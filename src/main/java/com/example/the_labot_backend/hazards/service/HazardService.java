@@ -1,13 +1,14 @@
-package com.example.the_labot_backend.hazards;
+package com.example.the_labot_backend.hazards.service;
 
-import com.example.the_labot_backend.files.File;
-import com.example.the_labot_backend.files.FileService;
+import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.files.entity.File;
+import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;
 import com.example.the_labot_backend.hazards.entity.HazardStatus;
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.hazards.repository.HazardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

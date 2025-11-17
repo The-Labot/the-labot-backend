@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.attendance.entity;
 
-import com.example.the_labot_backend.workers.Worker;
+import com.example.the_labot_backend.workers.entity.Worker;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

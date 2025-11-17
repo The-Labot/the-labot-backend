@@ -1,15 +1,15 @@
 package com.example.the_labot_backend.hazards.controller;
 
-import com.example.the_labot_backend.hazards.HazardService;
-import com.example.the_labot_backend.hazards.dto.HazardCreateRequest;
 import com.example.the_labot_backend.hazards.entity.HazardStatus;
-import com.example.the_labot_backend.notices.entity.NoticeCategory;
+import com.example.the_labot_backend.hazards.service.HazardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

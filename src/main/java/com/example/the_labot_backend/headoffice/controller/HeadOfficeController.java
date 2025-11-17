@@ -1,9 +1,10 @@
-package com.example.the_labot_backend.headoffice;
+package com.example.the_labot_backend.headoffice.controller;
 
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeCheckResponse;
-import com.example.the_labot_backend.headoffice.dto.SecretCodeRequest;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeRequest;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeResponse;
+import com.example.the_labot_backend.headoffice.dto.SecretCodeRequest;
+import com.example.the_labot_backend.headoffice.service.HeadOfficeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

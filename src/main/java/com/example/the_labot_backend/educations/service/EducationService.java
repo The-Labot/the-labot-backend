@@ -1,13 +1,13 @@
 package com.example.the_labot_backend.educations.service;
 
+import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authUser.repository.UserRepository;
 import com.example.the_labot_backend.educations.dto.EducationListResponse;
 import com.example.the_labot_backend.educations.dto.EducationRequest;
 import com.example.the_labot_backend.educations.dto.EducationResponse;
 import com.example.the_labot_backend.educations.entity.Education;
 import com.example.the_labot_backend.educations.repository.EducationRepository;
-import com.example.the_labot_backend.sites.Site;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.sites.entity.Site;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
