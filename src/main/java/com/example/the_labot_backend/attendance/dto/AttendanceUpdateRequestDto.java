@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.attendance.dto;
 
-import com.example.the_labot_backend.attendance.AttendanceStatus;
+import com.example.the_labot_backend.attendance.entity.AttendanceStatus;
 import lombok.Data;
 
 import java.time.LocalTime;
