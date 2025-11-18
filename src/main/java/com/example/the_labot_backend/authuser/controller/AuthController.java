@@ -1,10 +1,10 @@
-package com.example.the_labot_backend.authUser.controller;
+package com.example.the_labot_backend.authuser.controller;
 
-import com.example.the_labot_backend.authUser.dto.AdminSignupRequest;
-import com.example.the_labot_backend.authUser.dto.LoginRequest;
-import com.example.the_labot_backend.authUser.dto.ResetPasswordRequest;
-import com.example.the_labot_backend.authUser.service.AuthService;
-import com.example.the_labot_backend.authUser.service.UserService;
+import com.example.the_labot_backend.authuser.dto.AdminSignupRequest;
+import com.example.the_labot_backend.authuser.dto.LoginRequest;
+import com.example.the_labot_backend.authuser.dto.ResetPasswordRequest;
+import com.example.the_labot_backend.authuser.service.AuthService;
+import com.example.the_labot_backend.authuser.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

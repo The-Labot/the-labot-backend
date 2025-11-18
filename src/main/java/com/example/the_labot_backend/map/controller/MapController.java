@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.map.controller;
 
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authuser.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

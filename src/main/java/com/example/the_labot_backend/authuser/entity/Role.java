@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.authUser.entity;
+package com.example.the_labot_backend.authuser.entity;
 
 public enum Role {
     ROLE_MANAGER,

@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.authUser.entity;
+package com.example.the_labot_backend.authuser.entity;
 
 import com.example.the_labot_backend.admins.entity.Admin;
 import com.example.the_labot_backend.headoffice.entity.HeadOffice;

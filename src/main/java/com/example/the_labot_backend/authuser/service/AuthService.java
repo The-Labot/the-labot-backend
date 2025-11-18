@@ -1,12 +1,12 @@
-package com.example.the_labot_backend.authUser.service;
+package com.example.the_labot_backend.authuser.service;
 
 import com.example.the_labot_backend.admins.entity.Admin;
-import com.example.the_labot_backend.authUser.dto.AdminSignupRequest;
-import com.example.the_labot_backend.authUser.dto.LoginRequest;
-import com.example.the_labot_backend.authUser.dto.LoginResponse;
-import com.example.the_labot_backend.authUser.entity.Role;
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.authuser.dto.AdminSignupRequest;
+import com.example.the_labot_backend.authuser.dto.LoginRequest;
+import com.example.the_labot_backend.authuser.dto.LoginResponse;
+import com.example.the_labot_backend.authuser.entity.Role;
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.global.config.JwtTokenProvider;
 import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.headoffice.repository.HeadOfficeRepository;

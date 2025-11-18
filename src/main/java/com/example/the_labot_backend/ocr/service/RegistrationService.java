@@ -1,8 +1,8 @@
 package com.example.the_labot_backend.ocr.service;
 
-import com.example.the_labot_backend.authUser.entity.Role;
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.authuser.entity.Role;
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.workers.entity.Worker;
 import com.example.the_labot_backend.workers.entity.WorkerStatus;

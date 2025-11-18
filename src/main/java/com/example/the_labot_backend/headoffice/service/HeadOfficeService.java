@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.headoffice.service;
 
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeCheckResponse;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeRequest;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeResponse;

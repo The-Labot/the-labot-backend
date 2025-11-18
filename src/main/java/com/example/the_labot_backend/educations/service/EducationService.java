@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.educations.service;
 
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.educations.dto.EducationListResponse;
 import com.example.the_labot_backend.educations.dto.EducationRequest;
 import com.example.the_labot_backend.educations.dto.EducationResponse;

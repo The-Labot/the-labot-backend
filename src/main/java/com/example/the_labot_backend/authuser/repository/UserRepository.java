@@ -1,6 +1,6 @@
-package com.example.the_labot_backend.authUser.repository;
+package com.example.the_labot_backend.authuser.repository;
 
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authuser.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

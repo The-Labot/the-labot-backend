@@ -6,7 +6,7 @@ import com.example.the_labot_backend.attendance.dto.ObjectionRequestDto;
 import com.example.the_labot_backend.attendance.entity.Attendance;
 import com.example.the_labot_backend.attendance.entity.AttendanceStatus;
 import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.workers.entity.Worker;
 import jakarta.persistence.EntityNotFoundException;

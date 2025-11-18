@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.reports.service;
 
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.reports.dto.ReportListResponse;
 import com.example.the_labot_backend.reports.dto.ReportRequest;
 import com.example.the_labot_backend.reports.dto.ReportResponse;

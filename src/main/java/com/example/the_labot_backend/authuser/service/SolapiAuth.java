@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.authUser.service;
+package com.example.the_labot_backend.authuser.service;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

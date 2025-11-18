@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.reports.entity;
 
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.sites.entity.Site;
 import jakarta.persistence.*;
 import lombok.*;

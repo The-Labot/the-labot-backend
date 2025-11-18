@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.authUser.service;
+package com.example.the_labot_backend.authuser.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
