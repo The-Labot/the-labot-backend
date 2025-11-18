@@ -35,12 +35,12 @@ public class AuthService {
 
         // 테스트용 임시 주석 처리
         // 비밀번호 조회
-//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-//
-//            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
-//            System.out.println("암호화된 비밀번호: " + user.getPassword());
-//            throw new RuntimeException("비밀번호가 올바르지 않습니다.");
-//        }
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+
+            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
+            System.out.println("암호화된 비밀번호: " + user.getPassword());
+            throw new RuntimeException("비밀번호가 올바르지 않습니다.");
+        }
 
         // clientType 값 체크
         if (request.getClientType() == null) {
@@ -50,17 +50,18 @@ public class AuthService {
         String type = request.getClientType().toUpperCase();
         Role role = user.getRole();
 
-        // APP → 본사관리자(Admin) 로그인 금지
+        // APP 본사관리자(Admin) 로그인 금지
         if (request.getClientType().equalsIgnoreCase("APP")
                 && user.getRole() == Role.ROLE_ADMIN) {
             throw new RuntimeException("본사관리자는 앱에서 로그인할 수 없습니다.");
         }
 
-        // WEB → Admin 이외의 사용자 로그인 금지
+        // WEB Admin 이외의 사용자 로그인 금지
         if (request.getClientType().equalsIgnoreCase("WEB")
                 && user.getRole() != Role.ROLE_ADMIN) {
             throw new RuntimeException("현장관리자/근로자는 웹에서 로그인할 수 없습니다.");
         }
+
         String token = jwtTokenProvider.generateToken(user.getId(),user.getRole().name());
 
         return LoginResponse.builder()
