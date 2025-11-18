@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // auth관련 api 로그인, 회원가입 허용
                         .requestMatchers("/api/auth/**").permitAll()
-
+                        .requestMatchers("/api/user/**").hasAnyRole("WORKER", "MANAGER", "ADMIN")
                         // security에서는 사용자 권한이 ROLE_XXX 형태로 저장됨.
                         // hasRole("XXX") 하면 Role_XXX로 붙여 검사
                         // XXX의 권한을 가지고 있어야 접근 가능
