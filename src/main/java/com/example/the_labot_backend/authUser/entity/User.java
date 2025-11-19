@@ -3,7 +3,7 @@ package com.example.the_labot_backend.authUser.entity;
 import com.example.the_labot_backend.admins.entity.Admin;
 import com.example.the_labot_backend.headoffice.HeadOffice;
 import com.example.the_labot_backend.sites.Site;
-import com.example.the_labot_backend.workers.Worker;
+import com.example.the_labot_backend.workers.entity.Worker;
 import com.fasterxml.jackson.annotation.JsonIgnore; //user와 worker간의 루프를 해결하기 위해 생성 11/13 7시반
 import jakarta.persistence.*;
 import lombok.*;

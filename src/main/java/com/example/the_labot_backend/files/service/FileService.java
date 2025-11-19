@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.files.service; //패키지 이름 잘못되어있어서 .service추가함. 11/19 6:39박찬홍
 
-import com.example.the_labot_backend.files.File;
+import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

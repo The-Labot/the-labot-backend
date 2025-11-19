@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.notices.service;
 
-import com.example.the_labot_backend.files.File;
+import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.notices.dto.*;
 import com.example.the_labot_backend.notices.entity.Notice;

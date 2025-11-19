@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.files;
+package com.example.the_labot_backend.files.entity;
 
 import com.example.the_labot_backend.notices.entity.Notice;
 import jakarta.persistence.*;

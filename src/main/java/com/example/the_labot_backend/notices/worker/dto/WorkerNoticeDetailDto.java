@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.notices.worker.dto;
 
-import com.example.the_labot_backend.files.File;
+import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.notices.entity.Notice;
 import com.example.the_labot_backend.notices.entity.NoticeCategory;
 import lombok.Builder;
