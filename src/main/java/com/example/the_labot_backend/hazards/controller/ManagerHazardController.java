@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.hazards.controller;
 
 
-import com.example.the_labot_backend.hazards.HazardService;
+import com.example.the_labot_backend.hazards.service.HazardService; //위치 잘못됨
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;

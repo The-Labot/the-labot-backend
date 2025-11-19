@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.notices.controller;
 
-import com.example.the_labot_backend.notices.NoticeService;
+import com.example.the_labot_backend.notices.service.NoticeService;
 import com.example.the_labot_backend.notices.dto.*;
 import com.example.the_labot_backend.notices.entity.NoticeCategory;
 import lombok.RequiredArgsConstructor;

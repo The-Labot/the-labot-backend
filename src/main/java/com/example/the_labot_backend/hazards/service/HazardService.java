@@ -1,7 +1,8 @@
-package com.example.the_labot_backend.hazards;
+package com.example.the_labot_backend.hazards.service; //패키지 이름 잘못되어있어서 .service추가함. 11/19 6:39박찬홍
 
 import com.example.the_labot_backend.files.File;
-import com.example.the_labot_backend.files.FileService;
+import com.example.the_labot_backend.files.service.FileService; //패키지 이름 잘못되어있어서 .service추가함. 11/19 6:39박찬홍
+import com.example.the_labot_backend.hazards.HazardRepository; //패키지수정하면서 Repository와 다른 패키지로 이동했기에 추가  11/19 6:39박찬홍
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;

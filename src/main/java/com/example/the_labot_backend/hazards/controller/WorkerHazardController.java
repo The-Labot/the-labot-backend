@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.hazards.controller;
 
-import com.example.the_labot_backend.hazards.HazardService;
+import com.example.the_labot_backend.hazards.service.HazardService;
 import com.example.the_labot_backend.hazards.dto.HazardCreateRequest;
 import com.example.the_labot_backend.hazards.entity.HazardStatus;
 import com.example.the_labot_backend.notices.entity.NoticeCategory;
