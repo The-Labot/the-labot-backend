@@ -1,14 +1,14 @@
-package com.example.the_labot_backend.hazards.service; //패키지 이름 잘못되어있어서 .service추가함. 11/19 6:39박찬홍
+package com.example.the_labot_backend.hazards.service;
 
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.entity.File;
-import com.example.the_labot_backend.files.service.FileService; //패키지 이름 잘못되어있어서 .service추가함. 11/19 6:39박찬홍
-import com.example.the_labot_backend.hazards.HazardRepository; //패키지수정하면서 Repository와 다른 패키지로 이동했기에 추가  11/19 6:39박찬홍
+import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;
 import com.example.the_labot_backend.hazards.entity.HazardStatus;
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.hazards.repository.HazardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

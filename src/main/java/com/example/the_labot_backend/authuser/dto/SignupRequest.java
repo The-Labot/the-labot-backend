@@ -1,6 +1,6 @@
-package com.example.the_labot_backend.authUser.dto;
+package com.example.the_labot_backend.authuser.dto;
 
-import com.example.the_labot_backend.authUser.entity.Role;
+import com.example.the_labot_backend.authuser.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,9 +1,9 @@
 package com.example.the_labot_backend.notices.worker.service;
 
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.service.FileService;
-import com.example.the_labot_backend.notices.NoticeRepository;
+import com.example.the_labot_backend.notices.repository.NoticeRepository;
 import com.example.the_labot_backend.notices.entity.Notice;
 import com.example.the_labot_backend.notices.entity.NoticeCategory;
 import com.example.the_labot_backend.notices.worker.dto.WorkerNoticeDetailDto;

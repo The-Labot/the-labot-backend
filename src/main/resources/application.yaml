@@ -28,3 +28,9 @@ ncp:
         url: ${NCP_OCR_IDCARD_URL}
       secret:
         key: ${NCP_OCR_IDCARD_KEY}
+
+solapi:
+  api-key: ${SOLAPI_API_KEY}
+  api-secret: ${SOLAPI_API_SECRET}
+  sender-number: ${SOLAPI_SENDER_NUMBER}
+  api-url: ${SOLAPI_API_URL}

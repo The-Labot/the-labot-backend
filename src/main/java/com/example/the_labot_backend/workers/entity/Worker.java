@@ -1,8 +1,8 @@
 package com.example.the_labot_backend.workers.entity;
 
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.attendance.entity.Attendance;
-import com.example.the_labot_backend.workers.WorkerStatus;
+import com.example.the_labot_backend.workers.entity.WorkerStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

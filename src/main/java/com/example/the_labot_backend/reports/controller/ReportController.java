@@ -1,8 +1,9 @@
-package com.example.the_labot_backend.reports;
+package com.example.the_labot_backend.reports.controller;
 
 import com.example.the_labot_backend.reports.dto.ReportListResponse;
 import com.example.the_labot_backend.reports.dto.ReportRequest;
 import com.example.the_labot_backend.reports.dto.ReportResponse;
+import com.example.the_labot_backend.reports.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

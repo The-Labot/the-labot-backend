@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.headoffice;
+package com.example.the_labot_backend.headoffice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

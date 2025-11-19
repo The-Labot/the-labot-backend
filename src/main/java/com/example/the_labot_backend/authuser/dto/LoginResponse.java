@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.authUser.dto;
+package com.example.the_labot_backend.authuser.dto;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -3,7 +3,7 @@ package com.example.the_labot_backend.attendance.controller;
 import com.example.the_labot_backend.attendance.dto.ClockInOutRequestDto;
 import com.example.the_labot_backend.attendance.dto.ObjectionRequestDto;
 import com.example.the_labot_backend.attendance.service.AttendanceService;
-import com.example.the_labot_backend.authUser.entity.User;
+import com.example.the_labot_backend.authuser.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

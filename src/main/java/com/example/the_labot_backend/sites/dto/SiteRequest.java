@@ -16,4 +16,6 @@ public class SiteRequest {
     private String constructionType;
     private String client;
     private String contractor;
+    private Double latitude;
+    private Double longitude;
 }

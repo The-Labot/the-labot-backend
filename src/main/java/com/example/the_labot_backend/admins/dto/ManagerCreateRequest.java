@@ -1,6 +1,5 @@
 package com.example.the_labot_backend.admins.dto;
 
-
 import lombok.Getter;
 import lombok.Setter;
 

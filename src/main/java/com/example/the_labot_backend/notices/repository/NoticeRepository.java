@@ -1,4 +1,4 @@
-package com.example.the_labot_backend.notices;
+package com.example.the_labot_backend.notices.repository;
 
 import com.example.the_labot_backend.notices.entity.Notice;
 import com.example.the_labot_backend.notices.entity.NoticeCategory;

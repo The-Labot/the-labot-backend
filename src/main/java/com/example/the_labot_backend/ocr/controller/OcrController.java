@@ -1,7 +1,6 @@
 package com.example.the_labot_backend.ocr.controller;
 
 import com.example.the_labot_backend.ocr.dto.ContractDataDto;
-
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.ocr.dto.IdCardDataDto;
 import com.example.the_labot_backend.ocr.service.ContractOcrService;

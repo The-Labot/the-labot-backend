@@ -4,8 +4,8 @@ import com.example.the_labot_backend.notices.worker.dto.WorkerNoticeDetailDto;
 import com.example.the_labot_backend.notices.worker.dto.WorkerNoticeListDto;
 import com.example.the_labot_backend.notices.worker.service.WorkerNoticeService;
 // ▼▼▼ [★ 수정된 부분] User와 UserRepository 경로 변경 ▼▼▼
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository; // [테스트용]
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository; // [테스트용]
 // ▲▲▲ [★ 수정된 부분] ▲▲▲
 import jakarta.persistence.EntityNotFoundException; // [테스트용]
 import lombok.RequiredArgsConstructor;

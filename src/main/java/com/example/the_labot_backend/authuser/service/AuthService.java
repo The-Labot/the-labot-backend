@@ -1,14 +1,16 @@
-package com.example.the_labot_backend.authUser.service;
+package com.example.the_labot_backend.authuser.service;
 
 import com.example.the_labot_backend.admins.entity.Admin;
-import com.example.the_labot_backend.authUser.dto.*;
-import com.example.the_labot_backend.headoffice.HeadOffice;
-import com.example.the_labot_backend.headoffice.HeadOfficeRepository;
-import com.example.the_labot_backend.authUser.entity.Role;
+import com.example.the_labot_backend.authuser.dto.AdminSignupRequest;
+import com.example.the_labot_backend.authuser.dto.LoginRequest;
+import com.example.the_labot_backend.authuser.dto.LoginResponse;
+import com.example.the_labot_backend.authuser.entity.Role;
+import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.global.config.JwtTokenProvider;
-import com.example.the_labot_backend.sites.SiteRepository;
-import com.example.the_labot_backend.authUser.entity.User;
-import com.example.the_labot_backend.authUser.repository.UserRepository;
+import com.example.the_labot_backend.headoffice.entity.HeadOffice;
+import com.example.the_labot_backend.headoffice.repository.HeadOfficeRepository;
+import com.example.the_labot_backend.sites.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,8 +33,8 @@ public class AuthService {
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new RuntimeException("해당 전화번호가 존재하지 않습니다."));
 
-        // 테스트용 임시 주석 처리
-        // 비밀번호 조회
+//        // 테스트용 임시 주석 처리
+//        // 비밀번호 조회
 //        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 //
 //            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
@@ -48,17 +50,18 @@ public class AuthService {
         String type = request.getClientType().toUpperCase();
         Role role = user.getRole();
 
-        // APP → 본사관리자(Admin) 로그인 금지
+        // APP 본사관리자(Admin) 로그인 금지
         if (request.getClientType().equalsIgnoreCase("APP")
                 && user.getRole() == Role.ROLE_ADMIN) {
             throw new RuntimeException("본사관리자는 앱에서 로그인할 수 없습니다.");
         }
 
-        // WEB → Admin 이외의 사용자 로그인 금지
+        // WEB Admin 이외의 사용자 로그인 금지
         if (request.getClientType().equalsIgnoreCase("WEB")
                 && user.getRole() != Role.ROLE_ADMIN) {
             throw new RuntimeException("현장관리자/근로자는 웹에서 로그인할 수 없습니다.");
         }
+
         String token = jwtTokenProvider.generateToken(user.getId(),user.getRole().name());
 
         return LoginResponse.builder()
