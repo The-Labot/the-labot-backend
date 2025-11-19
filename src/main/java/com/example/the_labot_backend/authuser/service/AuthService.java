@@ -8,7 +8,6 @@ import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.global.config.JwtTokenProvider;
-import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.headoffice.repository.HeadOfficeRepository;
 import com.example.the_labot_backend.sites.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
@@ -81,11 +80,6 @@ public class AuthService {
             throw new RuntimeException("이미 존재하는 전화번호입니다.");
         }
 
-        // 본사코드로 본사 존재 여부 검증
-        HeadOffice headOffice = headOfficeRepository
-                .findBySecretCode(request.getSecretCode())
-                .orElseThrow(() -> new RuntimeException("비밀코드가 올바르지 않거나 존재하지 않는 본사입니다."));
-
         // 패스워드 암호화
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
@@ -94,7 +88,6 @@ public class AuthService {
                 .password(encodedPassword)
                 .name(request.getName())
                 .role(Role.ROLE_ADMIN)   // 본사관리자 역할
-                .headOffice(headOffice)
                 .build();
 
         Admin admin = Admin.builder()

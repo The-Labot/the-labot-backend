@@ -31,7 +31,7 @@ public class HeadOfficeController {
     }
 
     // 본사코드로 본사조회
-    @GetMapping("/auth/head-office/check")
+    @PostMapping("/auth/head-office/check")
     public ResponseEntity<?> checkHeadOffice(@RequestBody SecretCodeRequest request) {
         HeadOfficeCheckResponse response = headOfficeService.checkHeadOffice(request.getSecretCode());
         return ResponseEntity.ok(Map.of(

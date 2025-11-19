@@ -11,5 +11,4 @@ public class AdminSignupRequest {
     private String name;
     private String email; // Admin 정보
     private String address; // Admin 정보
-    private String secretCode; // 본사 비밀 코드
 }
