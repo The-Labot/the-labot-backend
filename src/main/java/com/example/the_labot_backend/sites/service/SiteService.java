@@ -1,15 +1,21 @@
 package com.example.the_labot_backend.sites.service;
 
+import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.headoffice.entity.HeadOffice;
+import com.example.the_labot_backend.sites.dto.DashboardResponse;
 import com.example.the_labot_backend.sites.dto.SiteListResponse;
-import com.example.the_labot_backend.sites.dto.SiteRequest;
 import com.example.the_labot_backend.sites.dto.SiteResponse;
 import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.sites.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -18,34 +24,119 @@ public class SiteService {
 
     private final SiteRepository siteRepository;
     private final UserRepository userRepository;
+    private final FileService fileService;
 
     // 현장 등록
-    public void createSite(SiteRequest request) {
+    @Transactional
+    public void createSite(Long userId,
+                           String siteName,
+                           String siteAddress,
+                           String description,
+                           LocalDate startDate,
+                           LocalDate endDate,
+                           String constructionType,
+                           String client,
+                           String contractor,
+                           Double latitude,
+                           Double longitude,
+                           List<MultipartFile> files) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(dashboard): " + userId));
+
+        HeadOffice headOffice = user.getHeadOffice();
+
         Site site = Site.builder()
-                .siteName(request.getSiteName())
-                .siteAddress(request.getSiteAddress())
-                .description(request.getDescription())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .constructionType(request.getConstructionType())
-                .client(request.getClient())
-                .contractor(request.getContractor())
+                .siteName(siteName)
+                .siteAddress(siteAddress)
+                .description(description)
+                .startDate(startDate)
+                .endDate(endDate)
+                .constructionType(constructionType)
+                .client(client)
+                .contractor(contractor)
+                .latitude(latitude)
+                .longitude(longitude)
+                .headOffice(headOffice)
                 .build();
 
-        Site saved = siteRepository.save(site);
+        siteRepository.save(site);
+
+        // 파일 업로드 (로컬 or S3)
+        fileService.saveFiles(files, "SITE_MAP", site.getId());
     }
 
-    // 전체 현장 조회 ( 응답 값 아직 미정 )
-    public List<SiteListResponse> getAllSites() {
+    // 현장 대시보드 조회
+    public DashboardResponse getDashboard(Long userId) {
 
-        List<Site> sites = siteRepository.findAll();
-        return sites.stream()
-                .map(site -> SiteListResponse.builder()
-                        .id(site.getId())
-                        .siteName(site.getSiteName())
-                        .build())
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(dashboard): " + userId));
+
+        Long headOfficeId = user.getHeadOffice().getId();
+
+        // 본사의 현장 리스트 
+        List<Site> siteList = siteRepository.findAllByHeadOffice_Id(headOfficeId);
+        
+        // 본사의 현장 수
+        int totalSiteCount = siteList.size();
+
+        // 본사 전체 근로자 수
+        int activeWorkerCount = userRepository.countByHeadOffice_IdAndRole(headOfficeId, Role.ROLE_WORKER);
+
+        // 현장별 목록 생성
+        List<SiteListResponse> sites = siteList.stream()
+                .map(site -> {
+
+                    // 관리자 수
+                    int managerCount = userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_MANAGER);
+
+                    // 근로자 수
+                    int workerCount = userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_WORKER);
+
+//                    // 최근 보고일자 (작업현황 기준) (미정)
+//                    LocalDate lastReportDate = reportRepository
+//                            .findTopBySite_IdOrderByCreatedAtDesc(site.getId())
+//                            .map(r -> r.getCreatedAt().toLocalDate())
+//                            .orElse(null);
+
+                    return SiteListResponse.builder()
+                            .siteId(site.getId())
+                            .siteName(site.getSiteName())
+                            .siteAddress(site.getSiteAddress())
+                            .managerCount(managerCount)
+                            .workerCount(workerCount)
+//                            .lastReportDate(lastReportDate != null ? lastReportDate.toString() : null)
+                            .build();
+                })
                 .toList();
+
+        return DashboardResponse.builder()
+                .totalSiteCount(totalSiteCount)
+                .activeWorkerCount(activeWorkerCount)
+                .siteList(sites)
+                .build();
     }
+
+//    // userId를 통해 해당 본사의 현장 목록 조회 (보류: 필요없음)
+//    public List<SiteListResponse> getSitesByUser(Long userId) {
+//
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getSitesByUser) userId:" + userId));
+//
+//        // user로 headOfficeId 찾기
+//        Long headOfficeId = user.getHeadOffice().getId();
+//
+//        List<Site> sites = siteRepository.findAllByHeadOffice_Id(headOfficeId);
+//
+//        return sites.stream()
+//                .map(site -> SiteListResponse.builder()
+//                        .siteName(site.getSiteName())
+//                        .siteAddress(site.getSiteAddress())
+//                        .managerCount(userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_MANAGER))
+//                        .workerCount(userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_WORKER))
+//                        .build())
+//                .toList();
+//    }
 
     // siteId로 현장 상세 조회
     public SiteResponse getSiteBySiteId(Long siteId) {
@@ -54,33 +145,83 @@ public class SiteService {
         return toResponse(site);
     }
 
-    // userId로 현장 상세 조회
-    public SiteResponse getSiteByUserId(Long userId) {
+    // userId로 현장 상세 조회 (현장관리자)
+    public SiteResponse getSiteDetail(Long userId) {
+
+        // 1) 유저 → 본사 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
 
-        Long siteId = user.getSite().getId();
+        Site site = user.getSite();
 
+        return toResponse(site);
+    }
+
+    // siteId로 현장 상세 조회 (본사관리자)
+    public SiteResponse getSiteDetail(Long userId, Long siteId) {
+
+        // 1) 유저 → 본사 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
+        Long headOfficeId = user.getHeadOffice().getId();
+
+        // 2) 해당 본사의 현장인지 확인
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new IllegalArgumentException("현장을 찾을 수 없습니다. ID: " + siteId));
+                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다. siteId:" + siteId));
+
+        if (!site.getHeadOffice().getId().equals(headOfficeId)) {
+            throw new RuntimeException("해당 현장은 당신의 본사 소속이 아닙니다. 접근 불가");
+        }
+
         return toResponse(site);
     }
 
     // 현장 수정
-    public SiteResponse updateSite(Long siteId, SiteRequest request) {
-        Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new IllegalArgumentException("현장을 찾을 수 없습니다. ID: " + siteId));
+    @Transactional
+    public SiteResponse updateSite(Long userId,
+                                   Long siteId,
+                                   String siteName,
+                                   String siteAddress,
+                                   String description,
+                                   LocalDate startDate,
+                                   LocalDate endDate,
+                                   String constructionType,
+                                   String client,
+                                   String contractor,
+                                   Double latitude,
+                                   Double longitude,
+                                   List<MultipartFile> files) {
 
-        site.setSiteName(request.getSiteName());
-        site.setSiteAddress(request.getSiteAddress());
-        site.setDescription(request.getDescription());
-        site.setStartDate(request.getStartDate());
-        site.setEndDate(request.getEndDate());
-        site.setConstructionType(request.getConstructionType());
-        site.setClient(request.getClient());
-        site.setContractor(request.getContractor());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
+
+        Long headOfficeId = user.getHeadOffice().getId();
+
+        Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다. siteId:" + siteId));
+
+        if (!site.getHeadOffice().getId().equals(headOfficeId)) {
+            throw new RuntimeException("해당 현장은 당신의 본사 소속이 아닙니다. 접근 불가");
+        }
+
+        site.setSiteName(siteName);
+        site.setSiteAddress(siteAddress);
+        site.setDescription(description);
+        site.setStartDate(startDate);
+        site.setEndDate(endDate);
+        site.setConstructionType(constructionType);
+        site.setClient(client);
+        site.setContractor(contractor);
+        site.setLatitude(latitude);
+        site.setLongitude(longitude);
 
         Site updated = siteRepository.save(site);
+
+        // 기존 파일 전체 삭제
+        fileService.deleteFilesByTarget("SITE_MAP", site.getId());
+
+        fileService.saveFiles(files, "SITE_MAP", site.getId());
+
         return toResponse(updated);
     }
 
@@ -101,6 +242,8 @@ public class SiteService {
                 .constructionType(site.getConstructionType())
                 .client(site.getClient())
                 .contractor(site.getContractor())
+                .latitude(site.getLatitude())
+                .longitude(site.getLongitude())
                 .build();
     }
 }

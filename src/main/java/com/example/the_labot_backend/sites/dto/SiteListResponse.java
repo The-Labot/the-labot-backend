@@ -4,19 +4,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Builder
 @Getter
 @Setter
 public class SiteListResponse {
-    private Long id;
+    private Long siteId;
     private String siteName;
-//    private String siteAddress;
-//    private String description;
-//    private LocalDate startDate;
-//    private LocalDate endDate;
-//    private String constructionType;
-//    private String client;
-//    private String contractor;
+    private String siteAddress;
+    private int managerCount;
+    private int workerCount;
+    // 최근 작업 일자
 }

@@ -24,9 +24,9 @@ public class ManagerSiteController {
     public ResponseEntity<?> getSite() {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long id = Long.parseLong(auth.getName());
+        Long userId = Long.parseLong(auth.getName());
 
-        SiteResponse response = siteService.getSiteByUserId(id);
+        SiteResponse response = siteService.getSiteDetail(userId);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "공지사항이 등록되었습니다.",

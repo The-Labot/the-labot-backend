@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.sites.entity;
 
+import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,12 +13,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-//임시 현장 클래스
 public class Site {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 현장 ID
+
+    @ManyToOne
+    @JoinColumn(name = "headoffice_id")
+    private HeadOffice headOffice;
 
     @Column(nullable = false)
     private String siteName; // 현장명
@@ -41,8 +45,4 @@ public class Site {
 
     @Column(nullable = false)
     private Double longitude; // 현장 경도 (기준점)
-    //
-    @Column(name = "site_map_url")
-    private String siteMapUrl;
-    //근로자가 site의 지도를 보기위한 url 필드 추가 11/17일 박찬홍
 }
