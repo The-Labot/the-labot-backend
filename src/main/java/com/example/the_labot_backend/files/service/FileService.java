@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.files.service;
 
+import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
@@ -91,6 +92,11 @@ public class FileService {
     // targetType와 targetId로 파일 목록 조회
     public List<File> getFilesByTarget(String targetType, Long targetId) {
         return fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
+    }
+
+    public List<FileResponse> getFilesResponseByTarget(String targetType, Long targetId) {
+        List<File> files = fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
+        return FileResponse.fromList(files);
     }
 
     // 특정 타겟에 연결된 파일 전부 삭제
