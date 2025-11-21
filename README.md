@@ -17,21 +17,3 @@ spring:
     password: {본인_DB_비밀번호}
     driver-class-name: com.mysql.cj.jdbc.Driver
 ```
-
----
-
-## 도커 개발 환경 실행    
-
-- 컨테이너 실행
-```
-docker-compose up -d --build
-```
-
-- 컨테이너 종료
-```
-docker-compose down
-```
-
-- 로컬 환경에서 컨테이너 MySQL 접속 시 3307 포트 사용
-
----
