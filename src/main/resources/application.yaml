@@ -3,34 +3,3 @@ spring:
     active: local
   application:
     name: the-labot-backend
-
-  jpa:
-    hibernate:
-      ddl-auto: update #배포 시에는 validate 권장
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-# Jwt 토큰
-jwt:
-  secret: ${JWT_SECRET_KEY}
-  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY}
-
-ncp:
-  ocr:
-    invoke:
-      url: ${NCP_OCR_INVOKE_URL}
-    secret:
-      key: ${NCP_OCR_SECRET_KEY}
-    idcard:
-      invoke:
-        url: ${NCP_OCR_IDCARD_URL}
-      secret:
-        key: ${NCP_OCR_IDCARD_KEY}
-
-solapi:
-  api-key: ${SOLAPI_API_KEY}
-  api-secret: ${SOLAPI_API_SECRET}
-  sender-number: ${SOLAPI_SENDER_NUMBER}
-  api-url: ${SOLAPI_API_URL}

@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:mysql://db:3306/the_labot
+    username: root
+    password: ${MYSQL_ROOT_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update #처음 한번만? none으로 하면 자동으로 db생성 안해줌
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+ncp:
+  ocr:
+    invoke:
+      url: ${NCP_OCR_INVOKE_URL}
+    secret:
+      key: ${NCP_OCR_SECRET_KEY}
+    idcard:
+      invoke:
+        url: ${NCP_OCR_IDCARD_URL}
+      secret:
+        key: ${NCP_OCR_IDCARD_KEY}
+
+solapi:
+  api-key: ${SOLAPI_API_KEY}
+  api-secret: ${SOLAPI_API_SECRET}
+  sender-number: ${SOLAPI_SENDER_NUMBER}
+  api-url: ${SOLAPI_API_URL}
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY}

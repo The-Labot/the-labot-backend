@@ -1,28 +1,34 @@
-#version: '3.8' #이제 표기 안해도 되는듯
-
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: labot-mysql
+  backend:
+    #build는 CD에서 할거여서 필요없음 image 가져오면됨
+    container_name: backend
+    image: rmsckd1640/the-labot-backend:latest
+    restart: always #죽었을때나 재부팅할때 자동으로 재시작 (일부로 멈추는건 재시작 안함)
     environment:
-      MYSQL_DATABASE: labot_test_db
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3307:3306" #local환경에서 보기위해 3307 사용
-    volumes:
-      - mysql-data:/var/lib/mysql
-
-  spring-app:
-    build: . #현재 디렉토리에서 도커파일 찾아라
-    container_name: labot-backend
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker #application-{docker}.yaml {}프로필 켜라는 뜻
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY} # JWT 시크릿 키 전달
-      JWT_ACCESS_TOKEN_VALIDITY: ${JWT_ACCESS_TOKEN_VALIDITY} # JWT 유효기간 전달
+      - SPRING_PROFILES_ACTIVE=prod
+    env_file:
+      - .env
     depends_on:
-      - mysql #먼저
+      - db # db가 켜져야 스프링이 켜지도록 설정. 당연한 설정임
+    networks:
+      - the-labot-network
 
-volumes:
-  mysql-data:
+  db:
+    container_name: db
+    image: mysql:8.0
+    restart: always
+    env_file:
+      - .env
+    #한글 깨짐 방지 필수 나중에 후회함
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    #데이터 영구 저장
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      - the-labot-network
+
+networks:
+  the-labot-network:
+    external: true
