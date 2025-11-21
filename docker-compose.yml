@@ -9,7 +9,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db # db가 켜져야 스프링이 켜지도록 설정. 당연한 설정임
+      db: # db가 켜져야 스프링이 켜지도록 설정. 당연한 설정임
+        condition: service_healthy #db서비스가 healthcheck에 통과할때까지 기다려라
     networks:
       - the-labot-network
 
@@ -23,6 +24,12 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     #데이터 영구 저장
     volumes:
       - ./db_data:/var/lib/mysql
