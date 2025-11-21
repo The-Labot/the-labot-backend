@@ -40,15 +40,33 @@ public class HeadOfficeService {
         return HeadOfficeResponse.from(office);
     }
 
-    // 본사코드로 본사 조회
+    // 본사코드로 본사 등록
     // 본사가 존재할 경우 true와 본사명 반환
     // 본사가 없을경우 false 반환
-    public HeadOfficeCheckResponse checkHeadOffice(String secretCode) {
+    @Transactional
+    public HeadOfficeCheckResponse checkHeadOffice(Long userId, String secretCode) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
+
+        HeadOffice office = headOfficeRepository.findBySecretCode(secretCode)
+                .orElseThrow(() -> new RuntimeException("본사를 찾을 수 없습니다."));
+
+        user.setHeadOffice(office);
 
         return headOfficeRepository
                 .findBySecretCode(secretCode)
                 .map(ho -> new HeadOfficeCheckResponse(true, ho.getName()))
                 .orElseGet(() -> new HeadOfficeCheckResponse(false, null));
+    }
+
+    // 본사가 등록되어 있는 지 여부 확인 로직
+    public boolean hasHeadOffice(Long userId) {
+        // 방법 A: HeadOffice 테이블에 관리자(Admin) ID로 매핑되어 있는 경우
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
+
+        return user.getHeadOffice() != null;
     }
 
     // userId를 통해 본사 상세 조회

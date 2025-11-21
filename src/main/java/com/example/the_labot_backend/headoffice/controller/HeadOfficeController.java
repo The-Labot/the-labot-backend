@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/admin/head-office")
 @RequiredArgsConstructor
 public class HeadOfficeController {
     private final HeadOfficeService headOfficeService;
 
     // 본사 등록
-    @PostMapping("/auth/head-office")
+    @PostMapping
     public ResponseEntity<?> create(@RequestBody HeadOfficeRequest request) {
         HeadOfficeResponse response = headOfficeService.createHeadOffice(request);
         return ResponseEntity.ok(Map.of(
@@ -30,10 +30,15 @@ public class HeadOfficeController {
         ));
     }
 
-    // 본사코드로 본사조회
-    @PostMapping("/auth/head-office/check")
+    // 본사코드로 본사 선택
+    @PostMapping("/select")
     public ResponseEntity<?> checkHeadOffice(@RequestBody SecretCodeRequest request) {
-        HeadOfficeCheckResponse response = headOfficeService.checkHeadOffice(request.getSecretCode());
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        HeadOfficeCheckResponse response = headOfficeService.checkHeadOffice(userId, request.getSecretCode());
+
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "본사 조회 성공",
@@ -41,8 +46,23 @@ public class HeadOfficeController {
         ));
     }
 
+    // 본사 존재 여부 확인 (True/False)
+    @GetMapping("/exists")
+    public ResponseEntity<?> hasHeadOffice() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        boolean exists = headOfficeService.hasHeadOffice(userId);
+
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "본사 존재 여부 확인 성공",
+                "data", Map.of("hasHeadOffice", exists)
+        ));
+    }
+
     // 본사 상세 조회
-    @GetMapping("/admin/head-office")
+    @GetMapping
     public ResponseEntity<?> detail() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
@@ -56,7 +76,7 @@ public class HeadOfficeController {
     }
 
     // 본사 수정
-    @PutMapping("/admin/head-office")
+    @PutMapping
     public ResponseEntity<?> update(@RequestBody HeadOfficeRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
