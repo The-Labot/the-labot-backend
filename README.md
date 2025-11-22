@@ -1,3 +1,5 @@
+# the-labot-frontend
+
 ## 로컬 개발 환경 설정
 
 로컬 MySQL 환경에서 Spring Boot를 실행하려면 아래 설정 파일을 직접 생성해야 합니다.
