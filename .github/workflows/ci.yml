@@ -28,7 +28,7 @@ jobs:
 
       #gradle caching - 캐싱을 통한 빌드 시간 향상 거의 필수!
       - name: gradle caching
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       #gradle 실행 권한 추가
       - name: gradle permission
