@@ -59,10 +59,9 @@ public class ClovaOcrClient {
             message.put("requestId", UUID.randomUUID().toString());
             message.put("timestamp", System.currentTimeMillis());
 
-            // ▼▼▼▼▼▼▼▼▼▼ [★ 수정 ★] ▼▼▼▼▼▼▼▼▼▼
-            // 파일 형식(format)을 ContentType 대신 파일명(확장자)에서 추출
+
             String format = getFileExtension(imageFile.getOriginalFilename());
-            // ▲▲▲▲▲▲▲▲▲▲ [★ 수정 ★] ▲▲▲▲▲▲▲▲▲▲
+
 
             Map<String, String> imageInfo = new HashMap<>();
             imageInfo.put("format", format); // ★ 수정된 format 사용
@@ -96,18 +95,6 @@ public class ClovaOcrClient {
         }
     }
 
-    // vvvvvvvvvv ★ [신규] 2. 신분증 전용 API 호출용 vvvvvvvvvv
-    /**
-     * [★ 신규 ★] 2. 신분증 전용(Document API) 호출용
-     * @param imageFile 신분증 이미지
-     * @return Clova API의 원본 JSON 응답 (String)
-     */
-    // vvvvvvvvvv ★ [수정된] 2. 신분증 전용 API 호출용 vvvvvvvvvv
-    /**
-     * [★ 신규 ★] 2. 신분증 전용(Document API) 호출용
-     * @param imageFile 신분증 이미지
-     * @return Clova API의 원본 JSON 응답 (String)
-     */
     public String callIdCardApi(MultipartFile imageFile) {
         try {
             // 1. HTTP 헤더 설정
@@ -124,10 +111,8 @@ public class ClovaOcrClient {
             message.put("requestId", UUID.randomUUID().toString());
             message.put("timestamp", System.currentTimeMillis());
 
-            // ▼▼▼▼▼▼▼▼▼▼ [★ 수정 ★] ▼▼▼▼▼▼▼▼▼▼
-            // 파일 형식(format)을 ContentType 대신 파일명(확장자)에서 추출
+
             String format = getFileExtension(imageFile.getOriginalFilename());
-            // ▲▲▲▲▲▲▲▲▲▲ [★ 수정 ★] ▲▲▲▲▲▲▲▲▲▲
 
             Map<String, String> imageInfo = new HashMap<>();
             imageInfo.put("format", format); // ★ 수정된 format 사용

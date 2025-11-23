@@ -4,10 +4,13 @@ import com.example.the_labot_backend.attendance.dto.ClockInOutRequestDto;
 import com.example.the_labot_backend.attendance.dto.ObjectionRequestDto;
 import com.example.the_labot_backend.attendance.service.AttendanceService;
 import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.authuser.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.example.the_labot_backend.attendance.dto.ClockInOutResponseDto;
 
@@ -18,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AttendanceController {
     private final AttendanceService attendanceService;
+    private final UserRepository userRepository;
 
     /**
      * [★ 신규 ★]
@@ -25,10 +29,8 @@ public class AttendanceController {
      * (GPS 좌표를 받아 서버에서 검증)
      */
     @PostMapping("/clock-in-out")
-    public ResponseEntity<?> clockInOut(
-            // [★] 현재 로그인한 유저 정보를 자동으로 가져옴
-            @AuthenticationPrincipal User user,
-            @RequestBody ClockInOutRequestDto dto) { // [★] 현재 GPS 좌표
+    public ResponseEntity<?> clockInOut(@RequestBody ClockInOutRequestDto dto) { // [★] 현재 GPS 좌표
+        User user = getCurrentUser();
 
         try {
             ClockInOutResponseDto resultDto = attendanceService.recordClockInOut(user, dto);
@@ -50,7 +52,7 @@ public class AttendanceController {
             ));
         }
     }
-    // ▼▼▼▼▼ [★ 2. 이 메서드 블록 전체를 추가 ★] ▼▼▼▼▼
+
     /**
      * [신규] 근로자가 특정 출퇴근 기록에 "이의제기" 제출
      *
@@ -59,9 +61,9 @@ public class AttendanceController {
      */
     @PatchMapping("/{attendanceId}/object") // (PATCH /api/worker/attendance/101/object)
     public ResponseEntity<?> submitObjection(
-            @AuthenticationPrincipal User user, // 현재 로그인한 근로자
             @PathVariable Long attendanceId,
             @RequestBody ObjectionRequestDto dto) {
+        User user = getCurrentUser();
 
         try {
             attendanceService.submitObjection(user, attendanceId, dto);
@@ -76,5 +78,20 @@ public class AttendanceController {
             ));
         }
     }
-    // ▲▲▲▲▲ [★ 2. 여기까지 추가 ★] ▲▲▲▲▲
+    private User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // (혹시 모를 예외 처리)
+        if (auth == null || auth.getName() == null) {
+            throw new RuntimeException("인증 정보가 없습니다.");
+        }
+
+        try {
+            Long userId = Long.parseLong(auth.getName()); // 토큰의 subject(ID) 파싱
+            return userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다. ID: " + userId));
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("유효하지 않은 토큰 ID 형식입니다.");
+        }
+    }
 }

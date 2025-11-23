@@ -13,7 +13,14 @@ public class ClovaOcrResponseDto {
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Image {
+        private MatchedTemplate matchedTemplate; // 템플릿 이름 확인용 월정제 or not
         private List<Field> fields;
+    }
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class MatchedTemplate {
+
+        private String name; // 예: "월정제_근로계약서" 또는 "일반_근로계약서"
     }
 
     @Data

@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/register")
+@RequestMapping("/api/manager/register")
 public class OcrController {
     private final ContractOcrService contractOcrService;
     private final IdCardOcrService idCardOcrService;
