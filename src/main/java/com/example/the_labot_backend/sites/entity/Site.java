@@ -1,7 +1,7 @@
 package com.example.the_labot_backend.sites.entity;
 
 import com.example.the_labot_backend.headoffice.entity.HeadOffice;
-import com.example.the_labot_backend.sites.entity.embeddable.BankAccount;
+import com.example.the_labot_backend.sites.entity.embeddable.PayrollBankAccount;
 import com.example.the_labot_backend.sites.entity.embeddable.SiteSocialIns;
 import jakarta.persistence.*;
 import lombok.*;
@@ -78,7 +78,7 @@ public class Site {
     // 4. 노무비 구분관리제 (전용 계좌)
     // ==========================================
     @Embedded
-    private BankAccount laborCostAccount; // 자재비와 분리된 인건비 전용 통장 정보
+    private PayrollBankAccount laborCostAccount; // 자재비와 분리된 인건비 전용 통장 정보
 
     // ==========================================
     // 5. 4대 보험 및 행정 정보

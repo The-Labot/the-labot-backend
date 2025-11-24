@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.sites.dto;
 
+import com.example.the_labot_backend.sites.entity.SeveranceType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -71,6 +72,7 @@ public class SiteSocialInsDto {
     // 5. 퇴직공제 (Severance Deduction)
     // ===========================================
     private Boolean severanceTarget;          // true/false
+    private SeveranceType severanceType; // 퇴직공제 의무인지 임의인지
     private String severanceDeductionNum;
     private LocalDate severanceJoinDate;
 

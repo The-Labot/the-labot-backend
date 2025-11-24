@@ -2,7 +2,7 @@ package com.example.the_labot_backend.sites.dto;
 
 import com.example.the_labot_backend.sites.entity.ContractType;
 import com.example.the_labot_backend.sites.entity.InsuranceResponsibility;
-import com.example.the_labot_backend.sites.entity.embeddable.BankAccount;
+import com.example.the_labot_backend.sites.entity.embeddable.PayrollBankAccount;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +36,7 @@ public class SiteCreateRequest {
     private String laborCostBankName;
     private String laborCostAccountNumber;
     private String laborCostAccountHolder;
+    private String informPhoneNumber;
 
     // 설정 및 책임
     private InsuranceResponsibility insuranceResponsibility;
@@ -45,11 +46,12 @@ public class SiteCreateRequest {
     // 포함된 사회보험 정보 DTO
     private SiteSocialInsDto socialIns;
 
-    public BankAccount toBankAccount() {
-        return BankAccount.builder()
+    public PayrollBankAccount toBankAccount() {
+        return PayrollBankAccount.builder()
                 .bankName(laborCostBankName)
                 .accountNumber(laborCostAccountNumber)
                 .accountHolder(laborCostAccountHolder)
+                .informPhoneNumber(informPhoneNumber)
                 .build();
     }
 }

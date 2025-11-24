@@ -1,7 +1,10 @@
 package com.example.the_labot_backend.sites.entity.embeddable;
 
+import com.example.the_labot_backend.sites.entity.SeveranceType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -97,7 +100,11 @@ public class SiteSocialIns {
     // ============================================================
     // 5. 퇴직공제 (Severance Deduction) - 구조 다름 (단일 관리)
     // ============================================================
-    private boolean isSeveranceTarget; // 퇴직공제 가입 의무 여부 (Check)
+    private boolean isSeveranceTarget; // 퇴직공제 가입 의무 여부
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private SeveranceType severanceType; // 퇴직공제 의무인지 임의인지
 
     @Column(length = 20)
     private String severanceDeductionNum; // 퇴직공제번호

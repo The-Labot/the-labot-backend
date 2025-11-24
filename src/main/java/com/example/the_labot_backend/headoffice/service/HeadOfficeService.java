@@ -22,6 +22,7 @@ public class HeadOfficeService {
     private final UserRepository userRepository;
 
     // 본사 등록
+    @Transactional
     public HeadOfficeResponse createHeadOffice(Long userId, HeadOfficeRequest request) {
 
         User user = userRepository.findById(userId)
@@ -45,7 +46,7 @@ public class HeadOfficeService {
     // 본사코드로 본사 등록
     // 본사가 존재할 경우 true와 본사명 반환
     // 본사가 없을경우 false 반환
-    @Transactional
+    @Transactional(readOnly = true)
     public HeadOfficeCheckResponse checkHeadOffice(Long userId, String secretCode) {
 
         User user = userRepository.findById(userId)
@@ -63,8 +64,9 @@ public class HeadOfficeService {
     }
 
     // 본사가 등록되어 있는 지 여부 확인 로직
+    @Transactional(readOnly = true)
     public boolean hasHeadOffice(Long userId) {
-        // 방법 A: HeadOffice 테이블에 관리자(Admin) ID로 매핑되어 있는 경우
+        // HeadOffice 테이블에 관리자(Admin) ID로 매핑되어 있는 경우
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
@@ -72,6 +74,7 @@ public class HeadOfficeService {
     }
 
     // userId를 통해 본사 상세 조회
+    @Transactional(readOnly = true)
     public HeadOfficeResponse getHeadOffice(Long userId) {
 
         User user = userRepository.findById(userId)
@@ -86,6 +89,7 @@ public class HeadOfficeService {
     }
 
     // 본사 수정
+    @Transactional
     public HeadOfficeResponse updateHeadOffice(Long userId, HeadOfficeRequest request){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));

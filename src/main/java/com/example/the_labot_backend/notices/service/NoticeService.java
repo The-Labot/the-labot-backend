@@ -20,7 +20,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional // ??? 공부하기
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
@@ -29,6 +28,7 @@ public class NoticeService {
     private final SiteRepository siteRepository;
 
     // userId를 통해 현장별 공지사항 목록 조회
+    @Transactional(readOnly = true)
     public List<NoticeListResponse> getNoticesByUser(Long userId) {
 
         // 해당 User 찾기
@@ -54,6 +54,7 @@ public class NoticeService {
     }
 
     // noticeId를 통해 공지사항 상세 조회
+    @Transactional(readOnly = true)
     public NoticeDetailResponse getNoticeDetail(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(getNoticeDetail) noticeId:" + noticeId));
@@ -64,6 +65,7 @@ public class NoticeService {
     }
 
     // 공지사항 작성
+    @Transactional
     public void createNotice(String title,
                              String content,
                              NoticeCategory category,
@@ -94,6 +96,7 @@ public class NoticeService {
     }
 
     // 공지사항 수정
+    @Transactional
     public NoticeDetailResponse updateNotice(Long noticeId,
                                              String title,
                                              String content,
@@ -125,6 +128,7 @@ public class NoticeService {
     }
 
     // 공지사항 삭제
+    @Transactional
     public void deleteNotice(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다.(deleteNotice) noticeId:" + noticeId));

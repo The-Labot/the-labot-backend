@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class EducationService {
 
@@ -24,6 +23,7 @@ public class EducationService {
     private final UserRepository userRepository;
 
     // 안전교육일지 등록
+    @Transactional
     public EducationResponse createEducation(Long userId, EducationRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + userId));
@@ -47,6 +47,7 @@ public class EducationService {
     }
 
     // userId를 통해 현장별 안전교육일지 목록 조회
+    @Transactional(readOnly = true)
     public List<EducationListResponse> getEducationByUser(Long userId) {
 
         // 해당 User 찾기
@@ -63,6 +64,7 @@ public class EducationService {
     }
 
     // 안전교육일지 상세 조회
+    @Transactional(readOnly = true)
     public EducationResponse getEducationDetail(Long eduId) {
         Education edu = educationRepository.findById(eduId)
                 .orElseThrow(() -> new RuntimeException("교육일지를 찾을 수 없습니다."));
@@ -71,6 +73,7 @@ public class EducationService {
     }
 
     // 안전교육일지 수정
+    @Transactional
     public EducationResponse updateEducation(Long eduId, EducationRequest request) {
 
         Education edu = educationRepository.findById(eduId)
@@ -89,6 +92,7 @@ public class EducationService {
     }
 
     // 안전교육일지 삭제
+    @Transactional
     public void delete(Long eduId) {
         educationRepository.deleteById(eduId);
     }

@@ -31,6 +31,7 @@ public class SiteUpdateRequest {
     private String laborCostBankName;
     private String laborCostAccountNumber;
     private String laborCostAccountHolder;
+    private String informPhoneNumber;
 
     // 보험/행정
     private InsuranceResponsibility insuranceResponsibility;

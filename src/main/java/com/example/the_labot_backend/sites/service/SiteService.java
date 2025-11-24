@@ -74,6 +74,7 @@ public class SiteService {
     }
 
     // 현장 대시보드 조회
+    @Transactional(readOnly = true)
     public DashboardResponse getDashboard(Long userId) {
 
         User user = userRepository.findById(userId)
@@ -158,6 +159,7 @@ public class SiteService {
 //    }
 //
     // siteId로 현장 상세 조회 (본사관리자)
+    @Transactional(readOnly = true)
     public SiteDetailResponse getSiteDetail(Long userId, Long siteId) {
 
         // 1) 유저 → 본사 조회
@@ -177,6 +179,7 @@ public class SiteService {
     }
 
     // siteId로 현장 상세 조회 (현장관리자)
+    @Transactional(readOnly = true)
     public SiteDetailResponse getSiteDetail(Long userId) {
 
         // 1) 유저 → 본사 조회
@@ -315,6 +318,7 @@ public class SiteService {
 
                 // 5. 퇴직공제
                 .isSeveranceTarget(dto.getSeveranceTarget() != null ? dto.getSeveranceTarget() : false)
+                .severanceType(dto.getSeveranceType())
                 .severanceDeductionNum(dto.getSeveranceDeductionNum())
                 .severanceJoinDate(dto.getSeveranceJoinDate())
                 .dailyDeductionAmount(dto.getDailyDeductionAmount())
@@ -557,6 +561,9 @@ public class SiteService {
         // -------------------------------
         if (dto.getSeveranceTarget() != null)
             ins.setSeveranceTarget(dto.getSeveranceTarget());
+
+        if(dto.getSeveranceType() != null)
+            ins.setSeveranceType(dto.getSeveranceType());
 
         if (dto.getSeveranceDeductionNum() != null)
             ins.setSeveranceDeductionNum(dto.getSeveranceDeductionNum());

@@ -26,6 +26,7 @@ public class AuthService {
     private final HeadOfficeRepository headOfficeRepository;
 
     // 로그인
+    @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
         
         // 전화번호로 User 찾기

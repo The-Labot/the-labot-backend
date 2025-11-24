@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.sites.dto;
 
+import com.example.the_labot_backend.sites.entity.SeveranceType;
 import com.example.the_labot_backend.sites.entity.embeddable.SiteSocialIns;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,6 +63,7 @@ public class SiteSocialInsResponse {
 
     // 5. 퇴직공제 (Severance)
     private boolean severanceTarget;
+    private SeveranceType severanceType; // 퇴직공제 의무인지 임의인지
     private String severanceDeductionNum;
     private String severanceJoinDate;
     private Integer dailyDeductionAmount;
@@ -131,6 +133,7 @@ public class SiteSocialInsResponse {
 
                 // 5. 퇴직공제
                 .severanceTarget(ins.isSeveranceTarget())
+                .severanceType(ins.getSeveranceType())
                 .severanceDeductionNum(ins.getSeveranceDeductionNum())
                 .severanceJoinDate(dateToString(ins.getSeveranceJoinDate()))
                 .dailyDeductionAmount(ins.getDailyDeductionAmount())

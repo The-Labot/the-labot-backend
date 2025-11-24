@@ -5,6 +5,7 @@ import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class FileService {
     private final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
 
     // 파일 저장
+    @Transactional
     public void saveFiles(List<MultipartFile> multipartFiles, String targetType, Long targetId) {
         List<File> savedFiles = new ArrayList<>();
 
@@ -75,6 +77,7 @@ public class FileService {
     }
 
     // 파일 삭제
+    @Transactional
     public void deleteFile(Long fileId) {
         File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. id=" + fileId));
@@ -90,16 +93,20 @@ public class FileService {
     }
 
     // targetType와 targetId로 파일 목록 조회
+    @Transactional(readOnly = true)
     public List<File> getFilesByTarget(String targetType, Long targetId) {
         return fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
     }
 
+
+    @Transactional(readOnly = true)
     public List<FileResponse> getFilesResponseByTarget(String targetType, Long targetId) {
         List<File> files = fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
         return FileResponse.fromList(files);
     }
 
     // 특정 타겟에 연결된 파일 전부 삭제
+    @Transactional
     public void deleteFilesByTarget(String targetType, Long targetId) {
         List<File> files = fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
 

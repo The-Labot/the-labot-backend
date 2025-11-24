@@ -71,6 +71,7 @@ public class WorkerService {
     }
 
     // 근로자 목록 조회
+    @Transactional(readOnly = true)
     public List<WorkerListResponse> getWorkers() {
         List<Worker> workers = workerRepository.findAll();
 
@@ -96,6 +97,7 @@ public class WorkerService {
 
     // 근로자 상세 조회
     // 추후 출퇴근기록 등 기능 추가
+    @Transactional(readOnly = true)
     public WorkerDetailResponse getWorkerDetail(Long workerId) {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new RuntimeException("해당 근로자를 찾을 수 없습니다."));
@@ -113,7 +115,8 @@ public class WorkerService {
                 .build();
     }
 
-    // 근로자 정보 수정 
+    // 근로자 정보 수정
+    @Transactional(readOnly = true)
     public void updateWorker(Long id, WorkerUpdateRequest dto) {
         Worker worker = workerRepository.findById(id)
                 // 해당하는 id가 없을경우 예외를 던짐
