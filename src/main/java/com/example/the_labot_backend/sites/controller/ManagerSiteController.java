@@ -1,6 +1,6 @@
 package com.example.the_labot_backend.sites.controller;
 
-import com.example.the_labot_backend.sites.dto.SiteResponse;
+import com.example.the_labot_backend.sites.dto.SiteDetailResponse;
 import com.example.the_labot_backend.sites.service.SiteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +26,10 @@ public class ManagerSiteController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 
-        SiteResponse response = siteService.getSiteDetail(userId);
+        SiteDetailResponse response = siteService.getSiteDetail(userId);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
-                "message", "공지사항이 등록되었습니다.",
+                "message", "현장 상세 조회 성공",
                 "data", response
         ));
     }

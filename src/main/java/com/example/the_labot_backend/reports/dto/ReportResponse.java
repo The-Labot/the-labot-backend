@@ -26,7 +26,7 @@ public class ReportResponse {
         return ReportResponse.builder()
                 .id(report.getId())
                 .writerName(report.getWriter().getName())
-                .siteName(report.getSite().getSiteName())
+                .siteName(report.getSite().getProjectName())
                 .createdAt(report.getCreatedAt())
                 .workType(report.getWorkType())
                 .todayWork(report.getTodayWork())

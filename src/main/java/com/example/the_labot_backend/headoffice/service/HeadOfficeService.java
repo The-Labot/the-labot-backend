@@ -22,18 +22,20 @@ public class HeadOfficeService {
     private final UserRepository userRepository;
 
     // 본사 등록
-    public HeadOfficeResponse createHeadOffice(HeadOfficeRequest request) {
+    public HeadOfficeResponse createHeadOffice(Long userId, HeadOfficeRequest request) {
 
-        // 본사코드 8자리 생성
-        String code = UUID.randomUUID().toString().substring(0, 8);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
         HeadOffice office = HeadOffice.builder()
                 .name(request.getName())
                 .address(request.getAddress())
                 .phoneNumber(request.getPhoneNumber())
                 .representative(request.getRepresentative())
-                .secretCode(code)
+                .secretCode(createSecretCode())
                 .build();
+
+        user.setHeadOffice(office);
 
         headOfficeRepository.save(office);
 
@@ -99,6 +101,12 @@ public class HeadOfficeService {
         office.setPhoneNumber(request.getPhoneNumber());
 
         return HeadOfficeResponse.from(headOfficeRepository.save(office));
+    }
+
+    // 본사코드 재생성
+    public String createSecretCode(){
+        // 본사코드 8자리 생성
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 
 }

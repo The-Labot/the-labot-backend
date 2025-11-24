@@ -32,7 +32,7 @@ public class AuthService {
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new RuntimeException("해당 전화번호가 존재하지 않습니다."));
 
-//        // 테스트용 임시 주석 처리
+//        // **테스트용 임시 주석 처리
 //        // 비밀번호 조회
 //        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 //

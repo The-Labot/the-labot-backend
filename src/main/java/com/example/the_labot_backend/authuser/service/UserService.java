@@ -43,6 +43,7 @@ public class UserService {
 
         System.out.println(tempPassword);
 
+        // 테스트용 임시 SMS 전송 주석
 //        // SMS 전송
 //        smsService.sendSms(
 //                phoneNumber,
@@ -50,6 +51,7 @@ public class UserService {
 //        );
     }
 
+    // 임시 비밀번호 생성
     private String generateTempPassword() {
         int length = 8;
         String chars = "abcdefghijklmnopqrstuvwxyz0123456789"; // 사용할 문자 정의
@@ -64,6 +66,7 @@ public class UserService {
         return sb.toString();
     }
 
+    // 비밀번호 변경
     @Transactional
     public void changePassword(Long userId, String oldPassword, String newPassword) {
 
