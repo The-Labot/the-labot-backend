@@ -6,12 +6,15 @@ import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
 import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.sites.entity.Site;
-import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
+
 import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import com.example.the_labot_backend.workers.dto.WorkerListResponse;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import com.example.the_labot_backend.workers.entity.Worker;
+import com.example.the_labot_backend.workers.entity.WorkerStatus;
+import com.example.the_labot_backend.workers.entity.embeddable.WorkerBankAccount;
 import com.example.the_labot_backend.workers.repository.WorkerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -32,7 +37,7 @@ public class WorkerService {
 
     // 근로자 등록
     @Transactional
-    public void createWorker(Long managerId, WorkerCreateRequest request) {
+    public void createWorker(Long managerId, FinalSaveDto request) {
 
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + managerId));
@@ -62,12 +67,58 @@ public class WorkerService {
 
         userRepository.save(workerUser);
 
-        // Worker 상세정보 생성
+
+        // 4. 주민번호로 성별/생년월일 추출
+        String rrn = request.getResidentIdNumber();
+        String gender = determineGender(rrn);
+        LocalDate birthDate = determineBirthDate(rrn);
+
+        // 5. BankAccount (계좌 정보) 생성
+        WorkerBankAccount bankAccount = WorkerBankAccount.builder()
+                .bankName(request.getBankName())
+                .accountNumber(request.getAccountNumber())
+                .accountHolder(request.getAccountHolder())
+                .build();
+
+        // 6. Worker 생성 (OCR 상세 정보 매핑)
         Worker worker = Worker.builder()
                 .user(workerUser)
+                .address(request.getAddress())
+                .gender(gender)
+                .birthDate(birthDate)
+                .nationality(request.getNationality())
+                .position(request.getJobType()) // 직종
+                .siteName(request.getSiteName()) // 텍스트로도 저장
+
+                // [★ 계약서 정보]
+                .contractType(request.getContractType())
+                .salary(request.getSalary())
+                .emergencyNumber(request.getEmergencyNumber()) // [★] 비상연락처 저장
+                .payReceive(request.getPayReceive())
+                .wageStartDate(request.getWageStartDate())
+                .wageEndDate(request.getWageEndDate())
+                .bankAccount(bankAccount) // 계좌 정보 내장
+
+                .status(WorkerStatus.WAITING) // 기본값 대기중
                 .build();
 
         workerRepository.save(worker);
+    }
+    // --- 헬퍼 메서드 ---
+    private String determineGender(String rrn) {
+        if (rrn == null || rrn.length() < 8) return null;
+        char genderDigit = rrn.charAt(7);
+        return (genderDigit == '1' || genderDigit == '3') ? "남성" : "여성";
+    }
+
+    private LocalDate determineBirthDate(String rrn) {
+        if (rrn == null || rrn.length() < 8) return null;
+        try {
+            String birthStr = rrn.substring(0, 6);
+            char genderDigit = rrn.charAt(7);
+            String prefix = (genderDigit == '3' || genderDigit == '4') ? "20" : "19";
+            return LocalDate.parse(prefix + birthStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+        } catch (Exception e) { return null; }
     }
 
     // 근로자 목록 조회
