@@ -12,54 +12,46 @@ public class SiteSocialInsResponse {
     // 1. 국민연금 (National Pension)
     private String pensionDailyBizSymbol;
     private String pensionDailyJoinDate;
-    private Long pensionDailyFee;
-    private Long pensionDailyPaid;
-    private Double pensionDailyRate;
 
     private String pensionRegularBizSymbol;
     private String pensionRegularJoinDate;
-    private Long pensionRegularFee;
-    private Long pensionRegularPaid;
-    private Double pensionRegularRate;
+
+    private Long pensionFee;
+    private Long pensionPaid;
+    private Double pensionRate;
 
     // 2. 건강보험 (Health Insurance)
     private String healthDailyBizSymbol;
     private String healthDailyJoinDate;
-    private Long healthDailyFee;
-    private Long healthDailyPaid;
-    private Double healthDailyRate;
 
     private String healthRegularBizSymbol;
     private String healthRegularJoinDate;
-    private Long healthRegularFee;
-    private Long healthRegularPaid;
-    private Double healthRegularRate;
+
+    private Long healthFee;
+    private Long healthPaid;
+    private Double healthRate;
 
     // 3. 고용보험 (Employment Insurance)
     private String employDailyMgmtNum;
     private String employDailyJoinDate;
-    private Long employDailyFee;
-    private Long employDailyPaid;
-    private Double employDailyRate;
 
     private String employRegularMgmtNum;
     private String employRegularJoinDate;
-    private Long employRegularFee;
-    private Long employRegularPaid;
-    private Double employRegularRate;
+
+    private Long employFee;
+    private Long employPaid;
+    private Double employRate;
 
     // 4. 산재보험 (Industrial Accident)
     private String accidentDailyMgmtNum;
     private String accidentDailyJoinDate;
-    private Long accidentDailyFee;
-    private Long accidentDailyPaid;
-    private Double accidentDailyRate;
 
     private String accidentRegularMgmtNum;
     private String accidentRegularJoinDate;
-    private Long accidentRegularFee;
-    private Long accidentRegularPaid;
-    private Double accidentRegularRate;
+
+    private Long accidentFee;
+    private Long accidentPaid;
+    private Double accidentRate;
 
     // 5. 퇴직공제 (Severance)
     private boolean severanceTarget;
@@ -82,54 +74,46 @@ public class SiteSocialInsResponse {
                 // 1. 국민연금
                 .pensionDailyBizSymbol(ins.getPensionDailyBizSymbol())
                 .pensionDailyJoinDate(dateToString(ins.getPensionDailyJoinDate()))
-                .pensionDailyFee(ins.getPensionDailyFee())
-                .pensionDailyPaid(ins.getPensionDailyPaid())
-                .pensionDailyRate(ins.getPensionDailyRate())
 
                 .pensionRegularBizSymbol(ins.getPensionRegularBizSymbol())
                 .pensionRegularJoinDate(dateToString(ins.getPensionRegularJoinDate()))
-                .pensionRegularFee(ins.getPensionRegularFee())
-                .pensionRegularPaid(ins.getPensionRegularPaid())
-                .pensionRegularRate(ins.getPensionRegularRate())
+
+                .pensionFee(ins.getPensionFee())
+                .pensionPaid(ins.getPensionPaid())
+                .pensionRate(ins.getPensionRate())
 
                 // 2. 건강보험
                 .healthDailyBizSymbol(ins.getHealthDailyBizSymbol())
                 .healthDailyJoinDate(dateToString(ins.getHealthDailyJoinDate()))
-                .healthDailyFee(ins.getHealthDailyFee())
-                .healthDailyPaid(ins.getHealthDailyPaid())
-                .healthDailyRate(ins.getHealthDailyRate())
 
                 .healthRegularBizSymbol(ins.getHealthRegularBizSymbol())
                 .healthRegularJoinDate(dateToString(ins.getHealthRegularJoinDate()))
-                .healthRegularFee(ins.getHealthRegularFee())
-                .healthRegularPaid(ins.getHealthRegularPaid())
-                .healthRegularRate(ins.getHealthRegularRate())
+
+                .healthFee(ins.getHealthFee())
+                .healthPaid(ins.getHealthPaid())
+                .healthRate(ins.getHealthRate())
 
                 // 3. 고용보험
                 .employDailyMgmtNum(ins.getEmployDailyMgmtNum())
                 .employDailyJoinDate(dateToString(ins.getEmployDailyJoinDate()))
-                .employDailyFee(ins.getEmployDailyFee())
-                .employDailyPaid(ins.getEmployDailyPaid())
-                .employDailyRate(ins.getEmployDailyRate())
 
                 .employRegularMgmtNum(ins.getEmployRegularMgmtNum())
                 .employRegularJoinDate(dateToString(ins.getEmployRegularJoinDate()))
-                .employRegularFee(ins.getEmployRegularFee())
-                .employRegularPaid(ins.getEmployRegularPaid())
-                .employRegularRate(ins.getEmployRegularRate())
+
+                .employFee(ins.getEmployFee())
+                .employPaid(ins.getEmployPaid())
+                .employRate(ins.getEmployRate())
 
                 // 4. 산재보험
                 .accidentDailyMgmtNum(ins.getAccidentDailyMgmtNum())
                 .accidentDailyJoinDate(dateToString(ins.getAccidentDailyJoinDate()))
-                .accidentDailyFee(ins.getAccidentDailyFee())
-                .accidentDailyPaid(ins.getAccidentDailyPaid())
-                .accidentDailyRate(ins.getAccidentDailyRate())
 
                 .accidentRegularMgmtNum(ins.getAccidentRegularMgmtNum())
                 .accidentRegularJoinDate(dateToString(ins.getAccidentRegularJoinDate()))
-                .accidentRegularFee(ins.getAccidentRegularFee())
-                .accidentRegularPaid(ins.getAccidentRegularPaid())
-                .accidentRegularRate(ins.getAccidentRegularRate())
+
+                .accidentFee(ins.getAccidentFee())
+                .accidentPaid(ins.getAccidentPaid())
+                .accidentRate(ins.getAccidentRate())
 
                 // 5. 퇴직공제
                 .severanceTarget(ins.isSeveranceTarget())
@@ -142,7 +126,6 @@ public class SiteSocialInsResponse {
 
                 .build();
     }
-
 
     private static String dateToString(java.time.LocalDate date) {
         return (date == null) ? null : date.toString();

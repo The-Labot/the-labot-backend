@@ -3,16 +3,21 @@ package com.example.the_labot_backend.sites.service;
 import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
-import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.global.exception.ForbiddenException;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.sites.dto.*;
 import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.sites.entity.embeddable.SiteSocialIns;
 import com.example.the_labot_backend.sites.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.example.the_labot_backend.authuser.entity.Role.ROLE_MANAGER;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +25,17 @@ public class SiteService {
 
     private final SiteRepository siteRepository;
     private final UserRepository userRepository;
-    private final FileService fileService;
 
     /**
      * 현장 등록
-     * @param userId 로그인한 본사관리자 userID
      * @param request 등록 폼 데이터
      * @return 등록된 현장 ID
      */
     @Transactional
-    public Long createSite(Long userId, SiteCreateRequest request) {
+    public Long createSite(SiteCreateRequest request) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
 
         // 1. 본사 조회
         User user = userRepository.findById(userId)
@@ -59,6 +65,7 @@ public class SiteService {
                 .laborCostAccount(request.toBankAccount()) // 계좌 정보 변환
 
                 .insuranceResponsibility(request.getInsuranceResponsibility())
+                .employmentInsuranceSiteNum(request.getEmploymentInsuranceSiteNum())
                 .primeContractorMgmtNum(request.getPrimeContractorMgmtNum())
                 .isKisconReportTarget(request.isKisconReportTarget())
 
@@ -96,7 +103,7 @@ public class SiteService {
                 .map(site -> {
 
                     // 관리자 수
-                    int managerCount = userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_MANAGER);
+                    int managerCount = userRepository.countBySite_IdAndRole(site.getId(), ROLE_MANAGER);
 
                     // 근로자 수
                     int workerCount = userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_WORKER);
@@ -164,29 +171,38 @@ public class SiteService {
 
         // 1) 유저 → 본사 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다. userId:" + userId));
         Long headOfficeId = user.getHeadOffice().getId();
 
         // 2) 해당 본사의 현장인지 확인
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다. siteId:" + siteId));
+                .orElseThrow(() -> new NotFoundException("현장을 찾을 수 없습니다. siteId:" + siteId));
 
         if (!site.getHeadOffice().getId().equals(headOfficeId)) {
-            throw new RuntimeException("해당 현장은 당신의 본사 소속이 아닙니다. 접근 불가");
+            throw new ForbiddenException("해당 현장은 당신의 본사 소속이 아닙니다. 접근 불가");
         }
 
         return SiteDetailResponse.from(site);
     }
 
-    // siteId로 현장 상세 조회 (현장관리자)
+    // userId로 현장 상세 조회 (현장관리자)
     @Transactional(readOnly = true)
     public SiteDetailResponse getSiteDetail(Long userId) {
-
         // 1) 유저 → 본사 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
-        Site site = user.getSite();
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다. userId:" + userId));
 
+        if (user.getRole() != ROLE_MANAGER) {
+            throw new ForbiddenException("현장 관리자만 현장 상세정보를 조회할 수 있습니다.");
+        }
+
+
+        Site site = user.getSite();
+        if (site == null) {
+            throw new NotFoundException("해당 사용자에게 배정된 현장이 없습니다.");
+        }
+        System.out.println(userId);
+        System.out.println(site.getProjectName());
         return SiteDetailResponse.from(site);
     }
 
@@ -194,12 +210,40 @@ public class SiteService {
     @Transactional
     public SiteDetailResponse updateSite(Long siteId, SiteUpdateRequest req) {
 
+        // 1) 로그인 사용자 ID 가져오기 (SecurityContextHolder)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        // 2) 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다. userId=" + userId));
+
+        // 3) 수정할 Site 조회
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다. id=" + siteId));
+                .orElseThrow(() -> new NotFoundException("현장을 찾을 수 없습니다. id=" + siteId));
+
+        // 4) 권한 & 소속 검증
+        switch (user.getRole()) {
+            // 본사관리자 → 본인 본사의 현장만 수정 가능
+            case ROLE_ADMIN-> {
+                if (user.getHeadOffice() == null ||
+                        !user.getHeadOffice().getId().equals(site.getHeadOffice().getId())) {
+                    throw new ForbiddenException("해당 본사의 현장만 수정할 수 있습니다.");
+                }
+            }
+            // 현장관리자 → 자신에게 배정된 현장만 수정 가능
+            case ROLE_MANAGER -> {
+                if (user.getSite() == null || !user.getSite().getId().equals(siteId)) {
+                    throw new ForbiddenException("배정된 현장만 수정할 수 있습니다.");
+                }
+            }
+            default -> throw new ForbiddenException("현장을 수정할 권한이 없습니다.");
+        }
 
         // -------------------------
         // 기본 필드 수정
         // -------------------------
+
         if (req.getProjectName() != null) site.setProjectName(req.getProjectName());
         if (req.getContractType() != null) site.setContractType(req.getContractType());
         if (req.getSiteManagerName() != null) site.setSiteManagerName(req.getSiteManagerName());
@@ -230,6 +274,9 @@ public class SiteService {
         // 행정정보
         if (req.getInsuranceResponsibility() != null)
             site.setInsuranceResponsibility(req.getInsuranceResponsibility());
+
+        if (req.getEmploymentInsuranceSiteNum() != null)
+            site.setEmploymentInsuranceSiteNum(req.getEmploymentInsuranceSiteNum());
 
         if (req.getPrimeContractorMgmtNum() != null)
             site.setPrimeContractorMgmtNum(req.getPrimeContractorMgmtNum());
@@ -267,54 +314,42 @@ public class SiteService {
                 // 1. 국민연금
                 .pensionDailyBizSymbol(dto.getPensionDailyBizSymbol())
                 .pensionDailyJoinDate(dto.getPensionDailyJoinDate())
-                .pensionDailyFee(zero(dto.getPensionDailyFee()))
-                .pensionDailyPaid(zero(dto.getPensionDailyPaid()))
-                .pensionDailyRate(calcRate(dto.getPensionDailyFee(), dto.getPensionDailyPaid()))
 
                 .pensionRegularBizSymbol(dto.getPensionRegularBizSymbol())
                 .pensionRegularJoinDate(dto.getPensionRegularJoinDate())
-                .pensionRegularFee(zero(dto.getPensionRegularFee()))
-                .pensionRegularPaid(zero(dto.getPensionRegularPaid()))
-                .pensionRegularRate(calcRate(dto.getPensionRegularFee(), dto.getPensionRegularPaid()))
+                .pensionFee(zero(dto.getPensionFee()))
+                .pensionPaid(zero(dto.getPensionPaid()))
+                .pensionRate(calcRate(dto.getPensionFee(), dto.getPensionPaid()))
 
                 // 2. 건강보험
                 .healthDailyBizSymbol(dto.getHealthDailyBizSymbol())
                 .healthDailyJoinDate(dto.getHealthDailyJoinDate())
-                .healthDailyFee(zero(dto.getHealthDailyFee()))
-                .healthDailyPaid(zero(dto.getHealthDailyPaid()))
-                .healthDailyRate(calcRate(dto.getHealthDailyFee(), dto.getHealthDailyPaid()))
 
                 .healthRegularBizSymbol(dto.getHealthRegularBizSymbol())
                 .healthRegularJoinDate(dto.getHealthRegularJoinDate())
-                .healthRegularFee(zero(dto.getHealthRegularFee()))
-                .healthRegularPaid(zero(dto.getHealthRegularPaid()))
-                .healthRegularRate(calcRate(dto.getHealthRegularFee(), dto.getHealthRegularPaid()))
+                .healthFee(zero(dto.getHealthFee()))
+                .healthPaid(zero(dto.getHealthPaid()))
+                .healthRate(calcRate(dto.getHealthFee(), dto.getHealthPaid()))
 
                 // 3. 고용보험
                 .employDailyMgmtNum(dto.getEmployDailyMgmtNum())
                 .employDailyJoinDate(dto.getEmployDailyJoinDate())
-                .employDailyFee(zero(dto.getEmployDailyFee()))
-                .employDailyPaid(zero(dto.getEmployDailyPaid()))
-                .employDailyRate(calcRate(dto.getEmployDailyFee(), dto.getEmployDailyPaid()))
 
                 .employRegularMgmtNum(dto.getEmployRegularMgmtNum())
                 .employRegularJoinDate(dto.getEmployRegularJoinDate())
-                .employRegularFee(zero(dto.getEmployRegularFee()))
-                .employRegularPaid(zero(dto.getEmployRegularPaid()))
-                .employRegularRate(calcRate(dto.getEmployRegularFee(), dto.getEmployRegularPaid()))
+                .employFee(zero(dto.getEmployFee()))
+                .employPaid(zero(dto.getEmployPaid()))
+                .employRate(calcRate(dto.getEmployFee(), dto.getEmployPaid()))
 
                 // 4. 산재보험
                 .accidentDailyMgmtNum(dto.getAccidentDailyMgmtNum())
                 .accidentDailyJoinDate(dto.getAccidentDailyJoinDate())
-                .accidentDailyFee(zero(dto.getAccidentDailyFee()))
-                .accidentDailyPaid(zero(dto.getAccidentDailyPaid()))
-                .accidentDailyRate(calcRate(dto.getAccidentDailyFee(), dto.getAccidentDailyPaid()))
 
                 .accidentRegularMgmtNum(dto.getAccidentRegularMgmtNum())
                 .accidentRegularJoinDate(dto.getAccidentRegularJoinDate())
-                .accidentRegularFee(zero(dto.getAccidentRegularFee()))
-                .accidentRegularPaid(zero(dto.getAccidentRegularPaid()))
-                .accidentRegularRate(calcRate(dto.getAccidentRegularFee(), dto.getAccidentRegularPaid()))
+                .accidentFee(zero(dto.getAccidentFee()))
+                .accidentPaid(zero(dto.getAccidentPaid()))
+                .accidentRate(calcRate(dto.getAccidentFee(), dto.getAccidentPaid()))
 
                 // 5. 퇴직공제
                 .isSeveranceTarget(dto.getSeveranceTarget() != null ? dto.getSeveranceTarget() : false)
@@ -343,23 +378,6 @@ public class SiteService {
         if (dto.getPensionDailyJoinDate() != null)
             ins.setPensionDailyJoinDate(dto.getPensionDailyJoinDate());
 
-        if (dto.getPensionDailyFee() != null) {
-            ins.setPensionDailyFee(zero(dto.getPensionDailyFee()));
-            pensionDailyChanged = true;
-        }
-
-        if (dto.getPensionDailyPaid() != null) {
-            ins.setPensionDailyPaid(zero(dto.getPensionDailyPaid()));
-            pensionDailyChanged = true;
-        }
-
-        if (pensionDailyChanged) {
-            ins.setPensionDailyRate(
-                    calcRate(ins.getPensionDailyFee(), ins.getPensionDailyPaid())
-            );
-        }
-
-
         // -------------------------------
         // 국민연금 (Regular)
         // -------------------------------
@@ -371,19 +389,19 @@ public class SiteService {
         if (dto.getPensionRegularJoinDate() != null)
             ins.setPensionRegularJoinDate(dto.getPensionRegularJoinDate());
 
-        if (dto.getPensionRegularFee() != null) {
-            ins.setPensionRegularFee(zero(dto.getPensionRegularFee()));
+        if (dto.getPensionFee() != null) {
+            ins.setPensionFee(zero(dto.getPensionFee()));
             pensionRegularChanged = true;
         }
 
-        if (dto.getPensionRegularPaid() != null) {
-            ins.setPensionRegularPaid(zero(dto.getPensionRegularPaid()));
+        if (dto.getPensionPaid() != null) {
+            ins.setPensionPaid(zero(dto.getPensionPaid()));
             pensionRegularChanged = true;
         }
 
         if (pensionRegularChanged) {
-            ins.setPensionRegularRate(
-                    calcRate(ins.getPensionRegularFee(), ins.getPensionRegularPaid())
+            ins.setPensionRate(
+                    calcRate(ins.getPensionFee(), ins.getPensionPaid())
             );
         }
 
@@ -399,23 +417,6 @@ public class SiteService {
         if (dto.getHealthDailyJoinDate() != null)
             ins.setHealthDailyJoinDate(dto.getHealthDailyJoinDate());
 
-        if (dto.getHealthDailyFee() != null) {
-            ins.setHealthDailyFee(zero(dto.getHealthDailyFee()));
-            healthDailyChanged = true;
-        }
-
-        if (dto.getHealthDailyPaid() != null) {
-            ins.setHealthDailyPaid(zero(dto.getHealthDailyPaid()));
-            healthDailyChanged = true;
-        }
-
-        if (healthDailyChanged) {
-            ins.setHealthDailyRate(
-                    calcRate(ins.getHealthDailyFee(), ins.getHealthDailyPaid())
-            );
-        }
-
-
         // -------------------------------
         // 건강보험 Regular
         // -------------------------------
@@ -427,19 +428,19 @@ public class SiteService {
         if (dto.getHealthRegularJoinDate() != null)
             ins.setHealthRegularJoinDate(dto.getHealthRegularJoinDate());
 
-        if (dto.getHealthRegularFee() != null) {
-            ins.setHealthRegularFee(zero(dto.getHealthRegularFee()));
+        if (dto.getHealthFee() != null) {
+            ins.setHealthFee(zero(dto.getHealthFee()));
             healthRegularChanged = true;
         }
 
-        if (dto.getHealthRegularPaid() != null) {
-            ins.setHealthRegularPaid(zero(dto.getHealthRegularPaid()));
+        if (dto.getHealthPaid() != null) {
+            ins.setHealthPaid(zero(dto.getHealthPaid()));
             healthRegularChanged = true;
         }
 
         if (healthRegularChanged) {
-            ins.setHealthRegularRate(
-                    calcRate(ins.getHealthRegularFee(), ins.getHealthRegularPaid())
+            ins.setHealthRate(
+                    calcRate(ins.getHealthFee(), ins.getHealthPaid())
             );
         }
 
@@ -455,22 +456,6 @@ public class SiteService {
         if (dto.getEmployDailyJoinDate() != null)
             ins.setEmployDailyJoinDate(dto.getEmployDailyJoinDate());
 
-        if (dto.getEmployDailyFee() != null) {
-            ins.setEmployDailyFee(zero(dto.getEmployDailyFee()));
-            employDailyChanged = true;
-        }
-
-        if (dto.getEmployDailyPaid() != null) {
-            ins.setEmployDailyPaid(zero(dto.getEmployDailyPaid()));
-            employDailyChanged = true;
-        }
-
-        if (employDailyChanged) {
-            ins.setEmployDailyRate(
-                    calcRate(ins.getEmployDailyFee(), ins.getEmployDailyPaid())
-            );
-        }
-
 
         // -------------------------------
         // 고용보험 Regular
@@ -483,19 +468,19 @@ public class SiteService {
         if (dto.getEmployRegularJoinDate() != null)
             ins.setEmployRegularJoinDate(dto.getEmployRegularJoinDate());
 
-        if (dto.getEmployRegularFee() != null) {
-            ins.setEmployRegularFee(zero(dto.getEmployRegularFee()));
+        if (dto.getEmployFee() != null) {
+            ins.setEmployFee(zero(dto.getEmployFee()));
             employRegularChanged = true;
         }
 
-        if (dto.getEmployRegularPaid() != null) {
-            ins.setEmployRegularPaid(zero(dto.getEmployRegularPaid()));
+        if (dto.getEmployPaid() != null) {
+            ins.setEmployPaid(zero(dto.getEmployPaid()));
             employRegularChanged = true;
         }
 
         if (employRegularChanged) {
-            ins.setEmployRegularRate(
-                    calcRate(ins.getEmployRegularFee(), ins.getEmployRegularPaid())
+            ins.setEmployRate(
+                    calcRate(ins.getEmployFee(), ins.getEmployPaid())
             );
         }
 
@@ -511,23 +496,6 @@ public class SiteService {
         if (dto.getAccidentDailyJoinDate() != null)
             ins.setAccidentDailyJoinDate(dto.getAccidentDailyJoinDate());
 
-        if (dto.getAccidentDailyFee() != null) {
-            ins.setAccidentDailyFee(zero(dto.getAccidentDailyFee()));
-            accidentDailyChanged = true;
-        }
-
-        if (dto.getAccidentDailyPaid() != null) {
-            ins.setAccidentDailyPaid(zero(dto.getAccidentDailyPaid()));
-            accidentDailyChanged = true;
-        }
-
-        if (accidentDailyChanged) {
-            ins.setAccidentDailyRate(
-                    calcRate(ins.getAccidentDailyFee(), ins.getAccidentDailyPaid())
-            );
-        }
-
-
         // -------------------------------
         // 산재보험 Regular
         // -------------------------------
@@ -539,19 +507,19 @@ public class SiteService {
         if (dto.getAccidentRegularJoinDate() != null)
             ins.setAccidentRegularJoinDate(dto.getAccidentRegularJoinDate());
 
-        if (dto.getAccidentRegularFee() != null) {
-            ins.setAccidentRegularFee(zero(dto.getAccidentRegularFee()));
+        if (dto.getAccidentFee() != null) {
+            ins.setAccidentFee(zero(dto.getAccidentFee()));
             accidentRegularChanged = true;
         }
 
-        if (dto.getAccidentRegularPaid() != null) {
-            ins.setAccidentRegularPaid(zero(dto.getAccidentRegularPaid()));
+        if (dto.getAccidentPaid() != null) {
+            ins.setAccidentPaid(zero(dto.getAccidentPaid()));
             accidentRegularChanged = true;
         }
 
         if (accidentRegularChanged) {
-            ins.setAccidentRegularRate(
-                    calcRate(ins.getAccidentRegularFee(), ins.getAccidentRegularPaid())
+            ins.setAccidentRate(
+                    calcRate(ins.getAccidentFee(), ins.getAccidentPaid())
             );
         }
 

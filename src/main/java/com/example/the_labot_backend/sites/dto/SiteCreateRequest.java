@@ -40,6 +40,7 @@ public class SiteCreateRequest {
 
     // 설정 및 책임
     private InsuranceResponsibility insuranceResponsibility;
+    private String employmentInsuranceSiteNum;
     private String primeContractorMgmtNum;
     private boolean isKisconReportTarget;
 

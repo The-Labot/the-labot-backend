@@ -17,13 +17,12 @@ public class SiteSocialInsDto {
     // ===========================================
     private String pensionDailyBizSymbol;
     private LocalDate pensionDailyJoinDate;
-    private Long pensionDailyFee;     // 보험료 (입력 없으면 null → 0 처리)
-    private Long pensionDailyPaid;    // 납부액 (입력 없으면 null → 0 처리)
 
     private String pensionRegularBizSymbol;
     private LocalDate pensionRegularJoinDate;
-    private Long pensionRegularFee;
-    private Long pensionRegularPaid;
+
+    private Long pensionFee;     // 보험료 (입력 없으면 null → 0 처리)
+    private Long pensionPaid;    // 납부액 (입력 없으면 null → 0 처리)
 
 
     // ===========================================
@@ -31,13 +30,12 @@ public class SiteSocialInsDto {
     // ===========================================
     private String healthDailyBizSymbol;
     private LocalDate healthDailyJoinDate;
-    private Long healthDailyFee;
-    private Long healthDailyPaid;
 
     private String healthRegularBizSymbol;
     private LocalDate healthRegularJoinDate;
-    private Long healthRegularFee;
-    private Long healthRegularPaid;
+
+    private Long healthFee;
+    private Long healthPaid;
 
 
     // ===========================================
@@ -45,13 +43,12 @@ public class SiteSocialInsDto {
     // ===========================================
     private String employDailyMgmtNum;
     private LocalDate employDailyJoinDate;
-    private Long employDailyFee;
-    private Long employDailyPaid;
 
     private String employRegularMgmtNum;
     private LocalDate employRegularJoinDate;
-    private Long employRegularFee;
-    private Long employRegularPaid;
+
+    private Long employFee;
+    private Long employPaid;
 
 
     // ===========================================
@@ -59,13 +56,12 @@ public class SiteSocialInsDto {
     // ===========================================
     private String accidentDailyMgmtNum;
     private LocalDate accidentDailyJoinDate;
-    private Long accidentDailyFee;
-    private Long accidentDailyPaid;
 
     private String accidentRegularMgmtNum;
     private LocalDate accidentRegularJoinDate;
-    private Long accidentRegularFee;
-    private Long accidentRegularPaid;
+
+    private Long accidentFee;
+    private Long accidentPaid;
 
 
     // ===========================================

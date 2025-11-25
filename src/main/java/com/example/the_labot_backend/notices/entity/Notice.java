@@ -20,6 +20,17 @@ public class Notice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 공지사항 ID
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer_id", nullable = false)
+    private User writer; // 작성자
+
+    // 현장별 공지 연결
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id")
+    private Site site;
+    
+    // 필드
+    
     @Column(nullable = false, length = 100)
     private String title; // 제목
 
@@ -35,15 +46,6 @@ public class Notice {
 
     @Column(nullable = false)
     private boolean pinned; // 상단 고정 여부
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id", nullable = false)
-    private User writer; // 작성자
-
-    // 현장별 공지 연결
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
-    private Site site;
 
     private LocalDateTime createdAt; // 작성일시
     private LocalDateTime updatedAt; // 수정일시

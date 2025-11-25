@@ -27,6 +27,8 @@ public class Report {
     @JoinColumn(name = "site_id", nullable = false)
     private Site site; // 소속 현장
 
+    // 필드
+    
     @Column(nullable = false)
     private LocalDateTime createdAt; // 작성(보고)일자
 

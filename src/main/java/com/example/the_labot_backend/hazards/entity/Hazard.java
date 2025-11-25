@@ -22,6 +22,16 @@ public class Hazard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id")
+    private User reporter;// 신고자
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id")
+    private Site site;
+
+    // 필드
+    
     private String hazardType; // 위험 유형
     private String location; // 위치
     private String description; // 설명
@@ -31,15 +41,6 @@ public class Hazard {
     private HazardStatus status; // 상태: WAITING, IN_PROGRESS, RESOLVED
 
     private LocalDateTime reportedAt; // 신고 날짜
-
-    @ManyToOne
-    @JoinColumn(name = "site_id")
-    private Site site;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporter_id")
-    private User reporter;// 신고자
-
 
     // 최초 저장 시 자동으로 생성일 설정
     @PrePersist // 처음 저장 시 reportedAt 자동 세팅

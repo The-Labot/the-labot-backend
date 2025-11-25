@@ -1,6 +1,5 @@
 package com.example.the_labot_backend.hazards.controller;
 
-import com.example.the_labot_backend.hazards.entity.HazardStatus;
 import com.example.the_labot_backend.hazards.service.HazardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,6 @@ public class WorkerHazardController {
             @RequestParam String location,
             @RequestParam String description,
             @RequestParam boolean urgent,
-            @RequestParam HazardStatus status,
             @RequestParam(required = false) List<MultipartFile> files
     ) {
         //Jwt에서 인증된 사용자 ID 가져오기
@@ -38,7 +36,7 @@ public class WorkerHazardController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName()); // 식별자로 userId를 사용
 
-        hazardService.createHazard(hazardType, location, description, urgent, status, files, userId);
+        hazardService.createHazard(hazardType, location, description, urgent, files, userId);
 
         return ResponseEntity.ok(Map.of(
                 "status", 200,

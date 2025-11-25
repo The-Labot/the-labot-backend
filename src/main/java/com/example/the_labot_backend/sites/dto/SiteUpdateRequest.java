@@ -35,6 +35,7 @@ public class SiteUpdateRequest {
 
     // 보험/행정
     private InsuranceResponsibility insuranceResponsibility;
+    private String employmentInsuranceSiteNum;
     private String primeContractorMgmtNum;
     private Boolean kisconReportTarget;
 
