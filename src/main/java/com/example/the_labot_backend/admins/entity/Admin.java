@@ -16,9 +16,9 @@ public class Admin {
     @Id
     private Long id;            // 관리자 ID
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "user_id") // 외래키 컬럼명
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(nullable = false, unique = true, length = 100)

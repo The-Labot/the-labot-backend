@@ -24,10 +24,7 @@ public class AdminSiteController {
     @PostMapping
     public ResponseEntity<?> createSite(@RequestBody SiteCreateRequest request) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = Long.parseLong(auth.getName());
-
-        Long siteId = siteService.createSite(userId,request);
+        Long siteId = siteService.createSite(request);
 
         return ResponseEntity.ok(Map.of(
                 "status", 200,

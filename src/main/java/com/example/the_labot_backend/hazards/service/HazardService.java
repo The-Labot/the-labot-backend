@@ -33,7 +33,6 @@ public class HazardService {
                              String location,
                              String description,
                              boolean urgent,
-                             HazardStatus status,
                              List<MultipartFile> files,
                              Long userId)   {
         User reporter = userRepository.findById(userId)
@@ -45,7 +44,7 @@ public class HazardService {
                 .location(location)
                 .description(description)
                 .urgent(urgent)
-                .status(status)
+                .status(HazardStatus.WAITING)
                 .reporter(reporter)
                 .site(reporter.getSite()) // User가 Site에 속해있을 경우 자동 연결
                 .build();

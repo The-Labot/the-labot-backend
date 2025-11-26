@@ -30,6 +30,7 @@ public class SiteDetailResponse {
     private BankAccountResponse laborCostAccount;
 
     private String insuranceResponsibility;
+    private String employmentInsuranceSiteNum;
     private String primeContractorMgmtNum;
     private boolean isKisconReportTarget;
 
@@ -59,6 +60,7 @@ public class SiteDetailResponse {
                 .laborCostAccount(BankAccountResponse.from(site.getLaborCostAccount()))
 
                 .insuranceResponsibility(site.getInsuranceResponsibility().name())
+                .employmentInsuranceSiteNum(site.getEmploymentInsuranceSiteNum())
                 .primeContractorMgmtNum(site.getPrimeContractorMgmtNum())
                 .isKisconReportTarget(site.isKisconReportTarget())
 
