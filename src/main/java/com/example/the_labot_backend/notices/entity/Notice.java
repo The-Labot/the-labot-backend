@@ -62,12 +62,4 @@ public class Notice {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 수정 메서드
-    public void update(String title, String content, NoticeCategory category, boolean urgent, boolean pinned) {
-        this.title = title;
-        this.content = content;
-        this.category = category;
-        this.urgent = urgent;
-        this.pinned = pinned;
-    }
 }

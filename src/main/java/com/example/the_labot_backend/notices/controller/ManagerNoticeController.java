@@ -1,8 +1,8 @@
 package com.example.the_labot_backend.notices.controller;
 
+import com.example.the_labot_backend.notices.dto.NoticeCreateForm;
 import com.example.the_labot_backend.notices.dto.NoticeDetailResponse;
 import com.example.the_labot_backend.notices.dto.NoticeListResponse;
-import com.example.the_labot_backend.notices.entity.NoticeCategory;
 import com.example.the_labot_backend.notices.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +21,30 @@ public class ManagerNoticeController {
 
     private final NoticeService noticeService;
 
+    // 공지사항 작성
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<?> createNotice(
+            @ModelAttribute NoticeCreateForm form,
+            @RequestPart(required = false) List<MultipartFile> files
+    ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        noticeService.createNotice(userId, form, files);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "공지사항이 등록되었습니다."
+        ));
+    }
+
     // 현장별 공지사항 목록 조회 (현장관리자)
     @GetMapping
-    public ResponseEntity<?> getNoticeList() {
+    public ResponseEntity<?> getNoticeList(@RequestParam(required = false) String title) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 
-        List<NoticeListResponse> response = noticeService.getNoticesByUser(userId);
+        List<NoticeListResponse> response = noticeService.getNoticesByUser(userId, title);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "공지사항 목록 조회 성공",
@@ -47,40 +63,15 @@ public class ManagerNoticeController {
         ));
     }
 
-    // 공지사항 작성
-    @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<?> createNotice(
-            @RequestParam String title,
-            @RequestParam String content,
-            @RequestParam NoticeCategory category,
-            @RequestParam boolean urgent,
-            @RequestParam boolean pinned,
-            @RequestParam(required = false) List<MultipartFile> files
-    ) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = Long.parseLong(auth.getName());
-
-        noticeService.createNotice(title, content, category, urgent, pinned, files, userId);
-        return ResponseEntity.ok(Map.of(
-                "status", 200,
-                "message", "공지사항이 등록되었습니다."
-        ));
-    }
-
     // 공지사항 수정
     @PutMapping(value = "/{noticeId}", consumes = "multipart/form-data")
     public ResponseEntity<?> updateNotice(
             @PathVariable Long noticeId,
-            @RequestParam String title,
-            @RequestParam String content,
-            @RequestParam NoticeCategory category,
-            @RequestParam boolean urgent,
-            @RequestParam boolean pinned,
-            @RequestParam(required = false) List<Long> deleteFileIds,
+            @ModelAttribute NoticeCreateForm form,
             @RequestParam(required = false) List<MultipartFile> files
     ) {
         NoticeDetailResponse response = noticeService.updateNotice(
-                noticeId, title, content, category, urgent, pinned, files
+                noticeId, form, files
         );
 
         return ResponseEntity.ok(Map.of(

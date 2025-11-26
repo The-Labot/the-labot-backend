@@ -4,7 +4,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -62,11 +61,14 @@ public class GlobalExceptionHandler {
     // ========================================================================
     // 3) 인가(권한) 예외
     // ========================================================================
+    
+    // 필터체인 내에서 권한 접근 제한 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
-        return build(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 요청에 대한 권한이 없습니다.");
+        return build(HttpStatus.FORBIDDEN, "ACCESS_DENIED", ex.getMessage());
     }
 
+    // 비즈니스 내에서 접근할 수 없는 것에 접근한 예외
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleCustomForbidden(ForbiddenException ex) {
         return build(HttpStatus.FORBIDDEN, "FORBIDDEN", ex.getMessage());
@@ -75,20 +77,24 @@ public class GlobalExceptionHandler {
     // ========================================================================
     // 4) 비즈니스 예외 (NotFound / BadRequest / Conflict 등 필요시 확장 가능)
     // ========================================================================
+    
+    // 리소스 찾을 수 없음
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException ex) {
         return build(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
     }
 
+    // 잘못된 등록
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
         return build(HttpStatus.BAD_REQUEST, "BAD_REQUEST", ex.getMessage());
     }
 
-//    @ExceptionHandler(ConflictException.class)
-//    public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex) {
-//        return build(HttpStatus.CONFLICT, "CONFLICT", ex.getMessage());
-//    }
+    // 이미 리소스가 있는 경우 (중복 방지)
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex) {
+        return build(HttpStatus.CONFLICT, "CONFLICT", ex.getMessage());
+    }
 
 
     // ========================================================================

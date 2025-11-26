@@ -24,7 +24,7 @@ public class Site {
 
     @ManyToOne
     @JoinColumn(name = "headoffice_id")
-    private HeadOffice headOffice;
+    private HeadOffice headOffice; // 본사 ID
 
     // 입력 해야하는 값들
 

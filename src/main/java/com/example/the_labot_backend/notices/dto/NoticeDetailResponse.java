@@ -12,6 +12,7 @@ import java.util.List;
 public class NoticeDetailResponse {
 
     private final Long id;
+    private final String writerName;
     private final String title;
     private final String content;
     private final NoticeCategory category;
@@ -22,6 +23,7 @@ public class NoticeDetailResponse {
 
     public NoticeDetailResponse(Notice notice, List<File> files) {
         this.id = notice.getId();
+        this.writerName = notice.getWriter().getName();
         this.title = notice.getTitle();
         this.content = notice.getContent();
         this.category = notice.getCategory();

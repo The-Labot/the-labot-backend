@@ -12,8 +12,14 @@ import java.util.List;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     // 현장별 공지 조회 (작성자의 현장 기준)
-    // 고정된 것 먼저, 최신순 정렬
-    List<Notice> findAllBySite_IdOrderByPinnedDesc(Long siteId);
+    // 핀 기준 -> 긴급 기준 -> 최신순
+    List<Notice> findAllBySite_IdOrderByPinnedDescUrgentDescCreatedAtDesc(Long siteId);
+
+    // + 제목 정렬
+    List<Notice> findAllBySite_IdAndTitleContainingIgnoreCaseOrderByPinnedDescUrgentDescCreatedAtDesc(
+            Long siteId,
+            String title
+    );
 
     // ▼▼▼ [★ 1. 근로자용 필터링 조회 쿼리 추가 ★] ▼▼▼
     // 조건:
