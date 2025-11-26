@@ -1,10 +1,14 @@
 package com.example.the_labot_backend.global.config;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,27 +42,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        System.out.println("JwtFilter 실행됨: " + request.getRequestURI());
+        // 디버깅 용
+        System.out.println("JwtFilter 실행됨: " + request.getRequestURI() + "\n");
+
+        // 1) 인증 필요 없는 경로는 필터 통과
+        String path = request.getServletPath();
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         //토큰 추출
         String token = resolveToken(request);
 
-        //토큰 유효성 검증
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String id = jwtTokenProvider.getIdFromToken(token); // id 추출
-            String role = jwtTokenProvider.getRoleFromToken(token); // 역할 추출
+        if (token == null) {
+            throw new IllegalArgumentException("JWT 토큰이 존재하지 않습니다.");
+        }
 
-            // 여기서 인증 과정을 수행
-            // 항상 파라미터는 String 타입이어야 한다.
+        try {
+            if (!jwtTokenProvider.validateToken(token)) {
+                throw new MalformedJwtException("유효하지 않은 토큰입니다.");
+            }
+
+            String id = jwtTokenProvider.getIdFromToken(token);
+            String role = jwtTokenProvider.getRoleFromToken(token);
+
+            System.out.println(role);
+
             UserDetails userDetails = userDetailsService.loadUserByUsername(id);
 
-            // Authentication 객체 생성 (userId, 권한)
-            UsernamePasswordAuthenticationToken authentication =
+            Authentication authentication =
                     new UsernamePasswordAuthenticationToken(
                             userDetails, null, List.of(new SimpleGrantedAuthority(role)));
 
-            // SecurityContextHolder에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        } catch (ExpiredJwtException e) {
+            throw e;
+        } catch (SignatureException | MalformedJwtException e) {
+            throw e;
+        } catch (IllegalArgumentException e) {
+            throw e;
         }
 
         filterChain.doFilter(request, response);

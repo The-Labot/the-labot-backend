@@ -1,6 +1,7 @@
 package com.example.the_labot_backend.workers.controller;
 
 import com.example.the_labot_backend.attendance.dto.AttendanceUpdateRequestDto;
+import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import com.example.the_labot_backend.workers.service.WorkerService;
@@ -20,10 +21,8 @@ public class WorkerController {
     private final WorkerService workerService;
 
     // 근로자 등록
-    @PostMapping
-    public ResponseEntity<?> createWorker(
-            @RequestBody WorkerCreateRequest request
-    ) {
+    @PostMapping//박찬홍 11-24수정 오후 10시 50분
+    public ResponseEntity<?> createWorker(@RequestBody FinalSaveDto request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 

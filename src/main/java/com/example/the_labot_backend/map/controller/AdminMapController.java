@@ -21,6 +21,7 @@ public class AdminMapController {
     private final FileService fileService;
     private final MapService mapService;
 
+    // 지도 조회
     @GetMapping("/{siteId}/map")
     public ResponseEntity<?> getSiteMap(@PathVariable Long siteId) {
 

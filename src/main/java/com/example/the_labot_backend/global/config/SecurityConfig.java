@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.global.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -61,7 +64,12 @@ public class SecurityConfig {
                 //요청이 들어오면 필터를 여러개 거쳐 검증
                 //UsernamePasswordAuthenticationFilter는 로그인 요청을 처리하는 기본 필터
                 //따로 커스텀으로 jwtAuthenticationFilter를 추가
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler())
+                );
 
         return http.build();
     }
@@ -95,4 +103,27 @@ public class SecurityConfig {
 
     //회원가입 시 passwordEncoder.encode(rawPassword)로 저장
     //로그인 시 matches(raw,encoded)로 비교
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+
+            response.getWriter().write(
+                    "{ \"status\": 401, \"code\": \"UNAUTHORIZED\", \"message\": \"인증이 필요합니다.\" }"
+            );
+        };
+    }
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json;charset=UTF-8");
+
+            response.getWriter().write(
+                    "{ \"status\": 403, \"code\": \"ACCESS_DENIED\", \"message\": \"권한이 없습니다.\" }"
+            );
+        };
+    }
 }

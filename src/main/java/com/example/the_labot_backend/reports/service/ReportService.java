@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReportService {
 
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
 
     // 작업일보 등록
+    @Transactional
     public ReportResponse createReport(Long userId, ReportRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + userId));
@@ -71,6 +71,7 @@ public class ReportService {
     }
 
     // 작업일보 수정
+    @Transactional
     public ReportResponse updateReport(Long reportId, ReportRequest request) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("작업일보를 찾을 수 없습니다.(getReport) reportId:" + reportId));
@@ -87,6 +88,7 @@ public class ReportService {
     }
 
     // 작업일보 삭제
+    @Transactional
     public void deleteReport(Long reportId) {
         if (!reportRepository.existsById(reportId)) {
             throw new RuntimeException("작업일보를 찾을 수 없습니다.(getReport) reportId:" + reportId);

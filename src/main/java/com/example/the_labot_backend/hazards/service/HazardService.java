@@ -11,6 +11,7 @@ import com.example.the_labot_backend.hazards.entity.HazardStatus;
 import com.example.the_labot_backend.hazards.repository.HazardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -27,12 +28,11 @@ public class HazardService {
     private final FileService fileService;
 
     // 위험요소 신고 등록 (현장근로자)
-    // @Transactional
+    @Transactional
     public void createHazard(String hazardType,
                              String location,
                              String description,
                              boolean urgent,
-                             HazardStatus status,
                              List<MultipartFile> files,
                              Long userId)   {
         User reporter = userRepository.findById(userId)
@@ -44,7 +44,7 @@ public class HazardService {
                 .location(location)
                 .description(description)
                 .urgent(urgent)
-                .status(status)
+                .status(HazardStatus.WAITING)
                 .reporter(reporter)
                 .site(reporter.getSite()) // User가 Site에 속해있을 경우 자동 연결
                 .build();
@@ -55,6 +55,7 @@ public class HazardService {
     }
 
     // userId를 통한 위험요소 신고 목록 조회
+    @Transactional(readOnly = true)
     public List<HazardListResponse> getHazardsByUser(Long userId) {
 
         // 해당 User 찾기
@@ -81,6 +82,7 @@ public class HazardService {
     }
 
     // 위험요소 신고 상세 조회
+    @Transactional(readOnly = true)
     public HazardDetailResponse getHazardDetail(Long hazardId) {
         Hazard hazard = hazardRepository.findById(hazardId)
                 .orElseThrow(() -> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다.(getHazardDetail) hazardId:" + hazardId));
@@ -92,6 +94,7 @@ public class HazardService {
     }
 
     // 위험요소 신고 상태 수정
+    @Transactional
     public Hazard updateStatus(Long hazardId, HazardStatus newStatus) {
         Hazard hazard = hazardRepository.findById(hazardId)
                 .orElseThrow(() -> new NoSuchElementException("해당 위험요소 신고를 찾을 수 없습니다.(updateStatus) hazardId:" + hazardId));
@@ -111,6 +114,7 @@ public class HazardService {
     }
 
     // 위험요소 신고 삭제
+    @Transactional
     public void deleteHazard(Long hazardId) {
         Hazard hazard = hazardRepository.findById(hazardId)
                 .orElseThrow(()-> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다.(deleteHazard) hazardId:" + hazardId));

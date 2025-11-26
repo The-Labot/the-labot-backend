@@ -22,7 +22,11 @@ public class HeadOfficeController {
     // 본사 등록
     @PostMapping
     public ResponseEntity<?> create(@RequestBody HeadOfficeRequest request) {
-        HeadOfficeResponse response = headOfficeService.createHeadOffice(request);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        HeadOfficeResponse response = headOfficeService.createHeadOffice(userId,request);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "본사 생성 성공",
@@ -88,4 +92,16 @@ public class HeadOfficeController {
                 "data", response
         ));
     }
+
+    // 본사 코드 재생성
+    @GetMapping("/secret-code")
+    public ResponseEntity<?> getSecretCode() {
+        String response = headOfficeService.createSecretCode();
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "본사 코드 재생성 성공",
+                "data", response
+        ));
+    }
+
 }

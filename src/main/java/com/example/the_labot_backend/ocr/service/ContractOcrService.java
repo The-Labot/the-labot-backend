@@ -46,17 +46,8 @@ public class ContractOcrService {
         if (imageInfo.getMatchedTemplate() != null) {
             templateName = imageInfo.getMatchedTemplate().getName();
         }
-        boolean isMonthly = false; // 기본값은 일용직(일정제)
-        for (ClovaOcrResponseDto.Field field : fields) {
-            // 필드 이름이 contract_type이고, 내용에 "월정제"가 포함되어 있으면 -> 월정제로 판단
-            if ("contract_type".equals(field.getName())) {
-                String val = field.getInferText();
-                if (val != null && val.contains("월정제")) {
-                    isMonthly = true;
-                }
-                break; // 판단 끝났으면 루프 중단
-            }
-        }
+        boolean isMonthly = templateName.contains("monthly");
+
 
         log.info("월정제 여부 판단 결과: {}", isMonthly);
 
