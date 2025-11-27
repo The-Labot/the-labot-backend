@@ -23,7 +23,7 @@ public class WorkerDetailResponse {
     private String gender;
     private String nationality;
     private String position;
-    private Site site;
+    private String siteProjectName;
 
     private WorkerStatus status; // 근무중, 대기중 등
 

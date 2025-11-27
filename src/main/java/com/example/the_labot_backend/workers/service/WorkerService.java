@@ -8,6 +8,7 @@ import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.sites.entity.Site;
 
@@ -46,6 +47,7 @@ public class WorkerService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + managerId));
 
         Site site = manager.getSite();
+        HeadOffice headOffice = site.getHeadOffice();
 
         if (manager.getRole() != Role.ROLE_MANAGER) {
             throw new RuntimeException("현장관리자만 근로자를 등록할 수 있습니다.");
@@ -66,6 +68,7 @@ public class WorkerService {
                 .name(request.getName())
                 .role(Role.ROLE_WORKER)
                 .site(site)
+                .headOffice(headOffice) // [★ 추가] 본사 정보 직접 주입!
                 .build();
 
         userRepository.save(workerUser);
@@ -198,7 +201,7 @@ public class WorkerService {
                 .gender(worker.getGender())
                 .nationality(worker.getNationality())
                 .position(worker.getPosition())
-                .site(worker.getUser().getSite())
+                .siteProjectName(worker.getUser().getSite().getProjectName())//siteName만을 전달함
                 // --- [추가 1] 상태/프로필 ---
                 .status(worker.getStatus())
 

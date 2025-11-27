@@ -100,6 +100,7 @@ public class HazardService {
                 .orElseThrow(() -> new NoSuchElementException("해당 위험요소 신고를 찾을 수 없습니다.(updateStatus) hazardId:" + hazardId));
 
         hazard = Hazard.builder()
+                .site(hazard.getSite()) //site가 null이 되는거 해결!
                 .id(hazard.getId())
                 .hazardType(hazard.getHazardType())
                 .location(hazard.getLocation())
