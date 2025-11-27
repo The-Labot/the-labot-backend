@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +27,6 @@ public class FileService {
     // 파일 저장
     @Transactional
     public void saveFiles(List<MultipartFile> multipartFiles, String targetType, Long targetId) {
-        List<File> savedFiles = new ArrayList<>();
 
         //파일이 없으면 종료
         if (multipartFiles == null || multipartFiles.isEmpty()) {
@@ -67,29 +65,12 @@ public class FileService {
                         .build();
 
                 // DB에 저장 및 리스트에 추가
-                savedFiles.add(fileRepository.save(fileEntity));
+                fileRepository.save(fileEntity);
 
             } catch (IOException e) {
                 throw new RuntimeException("파일 저장 실패: " + originalName, e);
             }
         }
-        // return savedFiles; // 저장된 파일 리스트
-    }
-
-    // 파일 삭제
-    @Transactional
-    public void deleteFile(Long fileId) {
-        File file = fileRepository.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. id=" + fileId));
-
-        Path filePath = Paths.get(UPLOAD_DIR, file.getStoredFileName());
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException("파일 삭제 중 오류 발생: " + filePath, e);
-        }
-
-        fileRepository.delete(file);
     }
 
     // targetType와 targetId로 파일 목록 조회
@@ -98,7 +79,7 @@ public class FileService {
         return fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
     }
 
-
+    // targetType와 targetId로 파일 목록 조회
     @Transactional(readOnly = true)
     public List<FileResponse> getFilesResponseByTarget(String targetType, Long targetId) {
         List<File> files = fileRepository.findByTargetTypeAndTargetId(targetType, targetId);

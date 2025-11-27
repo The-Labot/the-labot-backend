@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -77,7 +79,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:3000");  // 리액트 개발 서버
+        config.setAllowedOrigins(Arrays.asList(
+
+                "https://the-labot.site",       // 배포된 도메인 (HTTPS) - 핵심!
+
+                "https://www.the-labot.site",   // www 도메인 (혹시 몰라서 추가)
+
+                "http://localhost:3000"         // 로컬 개발용 (React 기본 포트)
+
+        ));  // 리액트 개발 서버
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);

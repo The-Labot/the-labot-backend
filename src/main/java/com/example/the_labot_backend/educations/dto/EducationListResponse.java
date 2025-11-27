@@ -12,17 +12,17 @@ import java.time.LocalDate;
 public class EducationListResponse {
 
     private Long id;
-    private String subject;
+    private String educationTitle;
     private LocalDate educationDate;
-    private String instructor;
+    private String educationPlace;
     private EducationStatus status;
 
     public static EducationListResponse from(Education edu) {
         return EducationListResponse.builder()
                 .id(edu.getId())
-                .subject(edu.getSubject())
+                .educationTitle(edu.getEducationTitle())
                 .educationDate(edu.getEducationDate())
-                .instructor(edu.getInstructor())
+                .educationPlace(edu.getEducationPlace())
                 .status(edu.getStatus())
                 .build();
     }

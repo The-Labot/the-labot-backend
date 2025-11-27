@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "safety_education")
@@ -32,66 +31,31 @@ public class Education {
     private Site site;
 
     // 생성일
-    private LocalDateTime createdAt;
+    private LocalDate createdDate;
 
-    // 수정일
-    private LocalDateTime updatedAt;
+    // --- 교육 정보 ---
 
-    // 시행 날짜 (교육 실제 날짜)
-    @Column(nullable = false)
-    private LocalDate educationDate;
+    private String educationTitle;         // 교육 제목
+    private LocalDate educationDate;       // 교육일자
+    private String educationTime;          // 교육시간 (예: "09:00~10:00")
+    private String educationPlace;         // 교육장소
 
-    // 과정 (예: 정기교육, 특별교육)
-    @Column(nullable = false)
-    private String course;
-
-    // 인원 수
-    @Column(nullable = false)
-    private int participants;
-
-    // 과목
-    @Column(nullable = false)
-    private String subject;
-
-    // 내용
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
-
-    // 강사명
-    @Column(nullable = false)
-    private String instructor;
-
-    // 장소
-    @Column(nullable = false)
-    private String location;
-
-    // 특이사항
-    @Column(columnDefinition = "TEXT")
-    private String note;
-
-    // 예정 / 완료 여부
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EducationStatus status;
+    private EducationType educationType;   // 교육 구분 (과정)
 
-    // 완료일 (완료된 다음날 자동삭제 로직에서 사용)
-    private LocalDate completedAt;
+    private String instructor;             // 강사명
 
-    @PrePersist
-    public void onCreate() {
-        createdAt = LocalDateTime.now();
+    @Column(columnDefinition = "TEXT")
+    private String content;                // 교육 상세내용
 
-        // 시행일이 오늘 이후면 예정, 오늘 또는 과거면 완료
-        if (educationDate.isAfter(LocalDate.now())) {
-            status = EducationStatus.PLANNED;
-        } else {
-            status = EducationStatus.COMPLETED;
-            completedAt = educationDate;
-        }
-    }
+    @Enumerated(EnumType.STRING)
+    private EducationStatus status;        // 예정 / 완료 여부
 
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    // --- 특이사항 ---
+    @Column(length = 1000)
+    private String specialNote;            // 특이사항
+
+    // --- 교육 결과 ---
+    @Column(columnDefinition = "TEXT")
+    private String result;                 // 교육 결과 간단 기록 (추가된 필드)
 }

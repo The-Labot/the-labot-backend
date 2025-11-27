@@ -1,8 +1,8 @@
 package com.example.the_labot_backend.reports.controller;
 
+import com.example.the_labot_backend.reports.dto.ReportCreateRequest;
+import com.example.the_labot_backend.reports.dto.ReportDetailResponse;
 import com.example.the_labot_backend.reports.dto.ReportListResponse;
-import com.example.the_labot_backend.reports.dto.ReportRequest;
-import com.example.the_labot_backend.reports.dto.ReportResponse;
 import com.example.the_labot_backend.reports.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +21,17 @@ public class ReportController {
     private final ReportService reportService;
 
     // 작업일보 등록
+    // 작업일보를 등록하면 응답받은 reportId를 통해 바로 파일 등록 api 수행
     @PostMapping
-    public ResponseEntity<?> createReport(@RequestBody ReportRequest request) {
+    public ResponseEntity<?> createReport(@RequestBody ReportCreateRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 
-        ReportResponse response = reportService.createReport(userId, request);
+        Long response = reportService.createReport(userId, request);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "작업일보 등록 성공",
-                "data", response
+                "reportId", response
         ));
     }
 
@@ -52,7 +53,10 @@ public class ReportController {
     // 작업일보 상세조회
     @GetMapping("/{reportId}")
     public ResponseEntity<?> getReport(@PathVariable Long reportId) {
-        ReportResponse response = reportService.getReport(reportId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        ReportDetailResponse response = reportService.getReportDetail(userId,reportId);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "작업일보 상세 조회 성공",
@@ -63,19 +67,27 @@ public class ReportController {
     // 작업일보 수정
     @PutMapping("/{reportId}")
     public ResponseEntity<?> updateReport(@PathVariable Long reportId,
-                                          @RequestBody ReportRequest request) {
-        ReportResponse response = reportService.updateReport(reportId, request);
+                                          @RequestBody ReportCreateRequest request) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        Long response = reportService.updateReport(userId,reportId, request);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "작업일보 수정 성공",
-                "data", response
+                "reportId", response
         ));
     }
 
     // 작업일보 삭제
     @DeleteMapping("/{reportId}")
     public ResponseEntity<?> deleteReport(@PathVariable Long reportId) {
-        reportService.deleteReport(reportId);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = Long.parseLong(auth.getName());
+
+        reportService.deleteReport(userId,reportId);
         return ResponseEntity.ok(Map.of(
                 "status", 200,
                 "message", "작업일보 삭제 성공"

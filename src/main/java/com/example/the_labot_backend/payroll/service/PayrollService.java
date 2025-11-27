@@ -95,7 +95,7 @@ public class PayrollService {
                     .sum();
 
             // 기준단가: 첫 기록의 unitPrice 사용
-            Long unitPrice = workerRecords.getFirst().getUnitPrice();
+            Long unitPrice = workerRecords.get(0).getUnitPrice();
 
             // 지급합계 = 공수 × 기준단가 + 식대 등
             long calculatedTotalAmount =

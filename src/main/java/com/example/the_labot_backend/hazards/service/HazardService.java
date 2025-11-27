@@ -101,6 +101,7 @@ public class HazardService {
 
         hazard = Hazard.builder()
                 .id(hazard.getId())
+                .site(hazard.getSite())
                 .hazardType(hazard.getHazardType())
                 .location(hazard.getLocation())
                 .description(hazard.getDescription())

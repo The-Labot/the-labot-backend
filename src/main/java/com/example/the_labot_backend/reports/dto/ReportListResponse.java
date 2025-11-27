@@ -14,8 +14,7 @@ public class ReportListResponse {
     private String workType;       // 공종명
     private String writerName;     // 작성자 이름
     private LocalDateTime createdAt; // 작성일시
-    private int manpowerCount;     // 근로자 인원 수
-    private String specialNote;    // 특이사항
+    private String todayWork;
 
     public static ReportListResponse from(Report report) {
         return ReportListResponse.builder()
@@ -23,8 +22,7 @@ public class ReportListResponse {
                 .workType(report.getWorkType())
                 .writerName(report.getWriter().getName())
                 .createdAt(report.getCreatedAt())
-                .manpowerCount(report.getManpowerCount())
-                .specialNote(report.getSpecialNote())
+                .todayWork(report.getTodayWork())
                 .build();
     }
 }
