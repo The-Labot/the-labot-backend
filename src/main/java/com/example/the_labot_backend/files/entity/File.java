@@ -19,11 +19,12 @@ public class File {
     private String originalFileName;
 
     // 서버에 저장되는 실제 파일명 (UUID로 변환)
-    @Column(nullable = false)
+    //url 길이 넉넉히 잡기 (varchar)
+    @Column(nullable = false, length = 2048)
     private String storedFileName;
 
     // 접근 가능한 URL (ex. /uploads/uuid_파일명)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2048)
     private String fileUrl;
 
     private String contentType;  // MIME 타입

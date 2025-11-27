@@ -13,6 +13,22 @@ spring:
       hibernate:
         format_sql: true
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${IAM_ACCESS_KEY}
+        secret-key: ${IAM_SECRET_KEY}
+      region:
+        static: "ap-northeast-2" # 서울 리전
+      s3:
+        bucket: ${S3_BUCKET_NAME}
+
+  #파일 업로드 용량 늘려주기 (기본은 1MB)
+  servlet:
+    multipart:
+      max-file-size: 10MB #보내는거 파일 하나당
+      max-request-size: 10MB # 한번 총 요청하는 최대 크기
+
 ncp:
   ocr:
     invoke:
