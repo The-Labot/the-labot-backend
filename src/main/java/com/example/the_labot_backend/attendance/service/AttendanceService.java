@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,6 +99,28 @@ public class AttendanceService {
             Attendance savedRecord = attendanceRepository.save(record);
             return ClockInOutResponseDto.fromEntity(savedRecord);
         }
+    }
+
+
+
+    /**
+     * [신규] 로그인한 근로자의 모든 출퇴근 내역 조회 (최신순)
+     */
+    @Transactional(readOnly = true) // 조회 전용이므로 readOnly 권장
+    public List<ClockInOutResponseDto> getMyAttendanceHistory(User user) {
+
+        Worker worker = user.getWorker();
+        if (worker == null) {
+            throw new IllegalStateException("근로자 정보가 없는 유저입니다.");
+        }
+
+        // 1. Repository에서 근로자의 모든 기록을 최신순으로 가져옴
+        List<Attendance> history = attendanceRepository.findAllByWorkerOrderByDateDesc(worker);
+
+        // 2. Entity List -> DTO List 변환
+        return history.stream()
+                .map(ClockInOutResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
     // ▼▼▼▼▼ [★ 2. 이 메서드 전체를 추가 ★] ▼▼▼▼▼
     /**

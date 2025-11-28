@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.example.the_labot_backend.attendance.dto.ClockInOutResponseDto;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -54,6 +55,30 @@ public class AttendanceController {
     }
 
     /**
+     * [신규] 나의 출퇴근 내역 전체 조회
+     * GET /api/worker/attendance
+     */
+    @GetMapping
+    public ResponseEntity<?> getMyAttendanceHistory() {
+        User user = getCurrentUser(); // 현재 로그인한 유저(근로자) 정보
+
+        try {
+            List<ClockInOutResponseDto> history = attendanceService.getMyAttendanceHistory(user);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", 200,
+                    "message", "출퇴근 내역 조회 성공",
+                    "data", history
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(400).body(Map.of(
+                    "status", 400,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
      * [신규] 근로자가 특정 출퇴근 기록에 "이의제기" 제출
      *
      * @param attendanceId 수정할 출퇴근 기록의 고유 ID (PK)
@@ -78,6 +103,8 @@ public class AttendanceController {
             ));
         }
     }
+
+
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
