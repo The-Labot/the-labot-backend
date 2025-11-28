@@ -57,6 +57,9 @@ public class Worker {
     private LocalDate wageStartDate;
     private LocalDate wageEndDate;
 
+    private LocalDate contractStartDate;
+    private LocalDate contractEndDate;
+
     // [★] 계좌 정보 (내장 타입 사용)
     @Embedded
     private WorkerBankAccount bankAccount;

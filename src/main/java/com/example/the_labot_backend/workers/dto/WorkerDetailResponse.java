@@ -23,7 +23,7 @@ public class WorkerDetailResponse {
     private String gender;
     private String nationality;
     private String position;
-    private String siteProjectName;
+    private String siteName;
 
     private WorkerStatus status; // 근무중, 대기중 등
 
@@ -33,6 +33,8 @@ public class WorkerDetailResponse {
     private String payReceive;
     private LocalDate wageStartDate;
     private LocalDate wageEndDate;
+    private LocalDate contractStartDate;
+    private LocalDate contractEndDate;
     private String emergencyNumber; // 비상 연락처
 
     // [3] 금융 정보 (이게 있어야 .bankName()이 동작함)

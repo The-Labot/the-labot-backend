@@ -101,6 +101,9 @@ public class WorkerService {
                 .salary(request.getSalary())
                 .emergencyNumber(request.getEmergencyNumber()) // [★] 비상연락처 저장
                 .payReceive(request.getPayReceive())
+                // [★ 추가됨] 계약 시작일/종료일 매핑
+                .contractStartDate(request.getContractStartDate())
+                .contractEndDate(request.getContractEndDate())
                 .wageStartDate(request.getWageStartDate())
                 .wageEndDate(request.getWageEndDate())
                 .bankAccount(bankAccount) // 계좌 정보 내장
@@ -201,7 +204,7 @@ public class WorkerService {
                 .gender(worker.getGender())
                 .nationality(worker.getNationality())
                 .position(worker.getPosition())
-                .siteProjectName(worker.getUser().getSite().getProjectName())//siteName만을 전달함
+                .siteName(worker.getSiteName())
                 // --- [추가 1] 상태/프로필 ---
                 .status(worker.getStatus())
 
@@ -209,6 +212,9 @@ public class WorkerService {
                 .contractType(worker.getContractType())
                 .salary(worker.getSalary())
                 .payReceive(worker.getPayReceive())
+                // [★ 추가됨] 계약 시작일/종료일 매핑
+                .contractStartDate(worker.getContractStartDate())
+                .contractEndDate(worker.getContractEndDate())
                 .wageStartDate(worker.getWageStartDate())
                 .wageEndDate(worker.getWageEndDate())
                 .emergencyNumber(worker.getEmergencyNumber())
