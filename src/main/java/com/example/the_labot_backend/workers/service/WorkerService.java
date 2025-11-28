@@ -233,15 +233,21 @@ public class WorkerService {
     }
 
     // 근로자 정보 수정
-    @Transactional(readOnly = true)
+    @Transactional
     public void updateWorker(Long id, WorkerUpdateRequest dto) {
         Worker worker = workerRepository.findById(id)
                 // 해당하는 id가 없을경우 예외를 던짐
                 .orElseThrow(() -> new EntityNotFoundException("근로자를 찾을 수 없습니다."));
-        worker.setAddress(dto.getAddress());
-        worker.setPosition(dto.getPosition());
-        worker.setStatus(dto.getStatus());
-        workerRepository.save(worker);
+        if (dto.getAddress() != null) {
+            worker.setAddress(dto.getAddress());
+        }
+        if (dto.getPosition() != null) {
+            worker.setPosition(dto.getPosition());
+        }
+        if (dto.getStatus() != null) {
+            worker.setStatus(dto.getStatus());
+        }
+        //workerRepository.save(worker);
     }
 
     // 박찬홍 11/16일 추가
