@@ -16,4 +16,5 @@ public interface WorkerRepository extends JpaRepository<Worker, Long> {
             "JOIN FETCH u.site s " +
             "WHERE u.headOffice.id = :headOfficeId")
     List<Worker> findAllByHeadOfficeId(@Param("headOfficeId") Long headOfficeId);
+    List<Worker> findByUser_Site_IdAndStatusNot(Long siteId, WorkerStatus status);
 }

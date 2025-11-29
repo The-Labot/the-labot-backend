@@ -1,13 +1,16 @@
 package com.example.the_labot_backend.workers.controller;
 
 import com.example.the_labot_backend.attendance.dto.AttendanceUpdateRequestDto;
+import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
+import com.example.the_labot_backend.workers.dto.WorkerDashboardResponse;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import com.example.the_labot_backend.workers.service.WorkerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,14 +43,19 @@ public class WorkerController {
     // <?> -> 와일드카드: 아직 타입을 구체적으로 정하지 않음
     // Map을 반환하지만 나중에 String을 반환할 수 도 있음.
     public ResponseEntity<?> getAllWorkers() {
-        // ok는 HTTP 200 OK 응답을 만들어주는 정적 메소드
-        // Body에 Map을 담아서 보냄. Map을 반환하면 클라이언트에게 JSON으로 보냄.
-        // Map.of(...): 불변 Map을 간단하게 만듬.
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        Long managerId = Long.parseLong(auth.getName());
+
+       
+        WorkerDashboardResponse dashboardData = workerService.getWorkerDashboard(managerId);
+
+        // 4. 응답
         return ResponseEntity.ok(Map.of(
                 "status", 200,
-                "message", "근로자 목록 조회 성공",
-                "data", workerService.getWorkers()
+                "message", "근로자 목록 및 통계 조회 성공",
+                "data", dashboardData
         ));
         
         //실패 코드도 만들어야할듯

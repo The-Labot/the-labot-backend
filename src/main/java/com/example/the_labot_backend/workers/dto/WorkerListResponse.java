@@ -15,4 +15,5 @@ public class WorkerListResponse {
     private String profileImage;
     private String position;
     private WorkerStatus status;
+    private boolean hasObjection;
 }

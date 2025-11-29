@@ -12,6 +12,7 @@ import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.sites.entity.Site;
 
+import com.example.the_labot_backend.workers.dto.WorkerDashboardResponse;
 import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import com.example.the_labot_backend.workers.dto.WorkerListResponse;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
@@ -27,7 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -153,6 +156,54 @@ public class WorkerService {
                         .build())
                 // 스트림을 다시 리스트로 변환
                 .toList();
+    }
+    // [★ 신규] 대시보드용 근로자 목록 및 통계 조회 (퇴직자 제외)
+    @Transactional(readOnly = true)
+    public WorkerDashboardResponse getWorkerDashboard(Long managerId) {
+
+        // 1. 관리자 정보로 현장 ID 찾기
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new RuntimeException("관리자 정보 없음"));
+        Long siteId = manager.getSite().getId();
+
+        // 2. 퇴직자(RETIRED)를 제외한 현장 근로자 전체 조회
+        List<Worker> workers = workerRepository.findByUser_Site_IdAndStatusNot(siteId, WorkerStatus.RETIRED);
+
+        // 3. 이의제기가 있는 근로자 ID 목록 조회 -> Set으로 변환 (검색 속도 향상)
+        List<Long> objectionIds = attendanceRepository.findWorkerIdsWithObjection(siteId);
+        Set<Long> objectionSet = new HashSet<>(objectionIds);
+
+        // 4. 통계 계산
+        long activeCount = workers.stream().filter(w -> w.getStatus() == WorkerStatus.ACTIVE).count();
+        long waitingCount = workers.stream().filter(w -> w.getStatus() == WorkerStatus.WAITING).count();
+        long totalCount = workers.size(); // Active + Waiting (퇴직자 제외됨)
+
+        // 이의제기 수 계산 (현재 목록에 있는 사람 중에서만 카운트)
+        long objectionCount = workers.stream()
+                .filter(w -> objectionSet.contains(w.getId()))
+                .count();
+
+        // 5. DTO 변환 (WorkerListResponse 재사용)
+        List<WorkerListResponse> dtoList = workers.stream()
+                .map(w -> WorkerListResponse.builder()
+                        .id(w.getId())
+                        .name(w.getUser().getName())
+                        .profileImage(w.getProfileImage())
+                        .position(w.getPosition())
+                        .status(w.getStatus())
+                        // ★ 이의제기 여부 체크 (Set에 ID가 있으면 true)
+                        .hasObjection(objectionSet.contains(w.getId()))
+                        .build())
+                .toList();
+
+        // 6. 최종 응답 객체 빌드
+        return WorkerDashboardResponse.builder()
+                .totalCount(totalCount)
+                .activeCount(activeCount)
+                .waitingCount(waitingCount)
+                .objectionCount(objectionCount)
+                .workers(dtoList)
+                .build();
     }
 
     // 근로자 상세 조회
