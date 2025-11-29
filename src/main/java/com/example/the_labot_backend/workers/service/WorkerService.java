@@ -238,8 +238,8 @@ public class WorkerService {
         Worker worker = workerRepository.findById(id)
                 // 해당하는 id가 없을경우 예외를 던짐
                 .orElseThrow(() -> new EntityNotFoundException("근로자를 찾을 수 없습니다."));
-        if (dto.getAddress() != null) {
-            worker.setAddress(dto.getAddress());
+        if (dto.getSiteName() != null) {
+            worker.setSiteName(dto.getSiteName());
         }
         if (dto.getPosition() != null) {
             worker.setPosition(dto.getPosition());

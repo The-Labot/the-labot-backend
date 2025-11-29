@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class WorkerUpdateRequest {
-    private String address;
+    private String siteName;
     private String position;
     private WorkerStatus status;
 }
