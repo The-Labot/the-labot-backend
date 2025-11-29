@@ -3,35 +3,27 @@ package com.example.the_labot_backend.reports.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
-public class ReportDetailResponse {
-    private Long reportId;
+public class DailyReportListResponse {
 
-    // 기본 정보
+    private Long reportId;
     private Long siteId;
     private String siteName;
     private String writerName;
-    private LocalDate workDate;
+
     private String workType;
-    private String todayWork;
-    private String tomorrowPlan;
-    private int workerCount;
     private String workLocation;
+    private String todayWork;
+    private int workerCount;
     private String specialNote;
+    private LocalDateTime createdAt;
 
-    // 장비 목록
     private List<EquipmentInfo> equipmentList;
-
-    // 자재 목록
     private List<MaterialInfo> materialList;
-
-    // 사진 목록 (File 엔티티 활용)
-    private List<FileInfo> files;
-
 
     @Getter
     @Builder
@@ -39,7 +31,7 @@ public class ReportDetailResponse {
         private String equipmentName;
         private String spec;
         private String usingTime;
-        private Integer count;
+        private int count;
         private String vendorName;
     }
 
@@ -51,12 +43,5 @@ public class ReportDetailResponse {
         private String importTime;
         private String exportDetail;
     }
-
-    @Getter
-    @Builder
-    public static class FileInfo {
-        private Long fileId;
-        private String fileUrl;
-        private String originalFileName;
-    }
 }
+

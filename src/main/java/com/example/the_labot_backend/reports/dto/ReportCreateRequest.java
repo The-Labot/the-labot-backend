@@ -12,6 +12,7 @@ public class ReportCreateRequest {
     private LocalDate workDate;        // 작업 날짜
     private String todayWork;          // 금일 작업
     private String tomorrowPlan;       // 명일 작업 계획
+    private int workerCount;
     private String workLocation;       // 작업 위치
     private String specialNote;        // 특이사항
 
