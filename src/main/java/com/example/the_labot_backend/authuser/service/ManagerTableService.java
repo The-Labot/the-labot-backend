@@ -36,7 +36,7 @@ public class ManagerTableService {
         HeadOffice headOffice = currentManager.getHeadOffice();
         Site site = currentManager.getSite();
 
-        if (headOffice == null || site == null) {
+        if (site == null) {
             throw new RuntimeException("본사 또는 현장 정보가 배정되지 않은 관리자입니다.");
         }
 

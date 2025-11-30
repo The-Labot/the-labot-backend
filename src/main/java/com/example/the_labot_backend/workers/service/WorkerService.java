@@ -322,6 +322,26 @@ public class WorkerService {
 
         // 3. [★네 요청★] 이의제기를 확인했으니, 이의제기 메시지 필드를 null로 변경
         record.setObjectionMessage(null);
+        // 1) 상태값이 변경된 경우 처리
+        Worker worker = record.getWorker(); // 연관된 근로자 가져오기
+        if (dto.getStatus() != null) {
+            switch (dto.getStatus()) {
+                case PRESENT:      // 정상 출근 -> 근무중
+                case LATE:         // 지각 -> 근무중
+                    worker.setStatus(WorkerStatus.ACTIVE);
+                    break;
+                case EARLY_LEAVE:  // 조퇴 -> 대기중(퇴근)
+                case ABSENT:       // 결석 -> 대기중
+                    worker.setStatus(WorkerStatus.WAITING);
+                    break;
+            }
+        }
+
+        // 2) [방어 로직] 관리자가 '퇴근 시간'을 입력했다면 무조건 대기중(퇴근) 처리
+        // (상태가 PRESENT여도 퇴근 시간이 찍히면 일 끝난 거니까요)
+        if (dto.getClockOutTime() != null) {
+            worker.setStatus(WorkerStatus.WAITING);
+        }
 
         // 4. DB에 최종 저장
         attendanceRepository.save(record);
