@@ -22,4 +22,11 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             "WHERE a.worker.user.site.id = :siteId " +
             "AND a.objectionMessage IS NOT NULL")
     List<Long> findWorkerIdsWithObjection(@Param("siteId") Long siteId);
+
+
+    // 1. 오늘 출근한 근로자 수
+    long countByWorker_User_Site_IdAndDate(Long siteId, LocalDate date);
+
+    // 2. 최신 출근 기록 5개 조회 (오늘 날짜 기준, 출근시간 내림차순)
+    List<Attendance> findTop5ByWorker_User_Site_IdAndDateOrderByClockInTimeDesc(Long siteId, LocalDate date);
 }
