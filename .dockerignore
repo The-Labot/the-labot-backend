@@ -1,0 +1,27 @@
+# 1. 빌드 결과물 (가장 중요! ★)
+# 로컬에서 빌드된 jar 파일이나 클래스 파일들은 필요 없음
+# 도커 안에서 깨끗하게 새로 빌드해야 함
+build
+out
+target
+
+# 2. 그레이들(Gradle) 캐시 & 설정
+# .gradle 폴더는 로컬 캐시라 용량이 큼. 가져가면 안 됨.
+.gradle
+
+# 3. 환경 변수 (보안! ★)
+# 서버에는 EC2에 따로 만든 .env가 있으니 로컬 껀 가져가면 안 됨
+.env
+.env.*
+
+# 4. 버전 관리 & IDE 설정
+.git
+.github
+.vscode
+.idea
+*.iml
+
+# 5. 도커 관련 파일
+Dockerfile
+docker-compose.yml
+.dockerignore

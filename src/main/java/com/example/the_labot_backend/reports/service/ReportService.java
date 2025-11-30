@@ -6,24 +6,25 @@ import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.global.exception.ForbiddenException;
 import com.example.the_labot_backend.global.exception.NotFoundException;
+import com.example.the_labot_backend.reports.dto.DailyReportListResponse;
 import com.example.the_labot_backend.reports.dto.ReportCreateRequest;
 import com.example.the_labot_backend.reports.dto.ReportDetailResponse;
 import com.example.the_labot_backend.reports.dto.ReportListResponse;
 import com.example.the_labot_backend.reports.entity.Report;
 import com.example.the_labot_backend.reports.entity.ReportEquipment;
 import com.example.the_labot_backend.reports.entity.ReportMaterial;
-import com.example.the_labot_backend.reports.entity.ReportWorker;
 import com.example.the_labot_backend.reports.repository.ReportEquipmentRepository;
 import com.example.the_labot_backend.reports.repository.ReportMaterialRepository;
 import com.example.the_labot_backend.reports.repository.ReportRepository;
-import com.example.the_labot_backend.reports.repository.ReportWorkerRepository;
 import com.example.the_labot_backend.sites.entity.Site;
-import com.example.the_labot_backend.workers.entity.Worker;
+import com.example.the_labot_backend.sites.repository.SiteRepository;
 import com.example.the_labot_backend.workers.repository.WorkerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +37,9 @@ public class ReportService {
     private final FileService fileService;
 
     private final ReportRepository reportRepository;
-    private final ReportWorkerRepository reportWorkerRepository;
     private final ReportEquipmentRepository reportEquipmentRepository;
     private final ReportMaterialRepository reportMaterialRepository;
+    private final SiteRepository siteRepository;
 
     // 작업일보 등록
     @Transactional
@@ -61,23 +62,6 @@ public class ReportService {
                         .specialNote(request.getSpecialNote())
                         .build()
         );
-
-        // 2) 작업 참여 근로자 저장
-        if (request.getWorkers() != null) {
-            for (Long workerId : request.getWorkers()) {
-
-                Worker worker = workerRepository.findById(workerId)
-                        .orElseThrow(() -> new NotFoundException("근로자를 찾을 수 없습니다: " + workerId));
-
-                ReportWorker reportWorker =
-                        ReportWorker.builder()
-                                .report(report)
-                                .worker(worker)
-                                .build();
-
-                reportWorkerRepository.save(reportWorker);
-            }
-        }
 
         // 3) 장비 저장
         request.getEquipmentList().forEach(e ->
@@ -142,7 +126,6 @@ public class ReportService {
         }
 
         // 2) 근로자 목록
-        List<ReportWorker> workers = reportWorkerRepository.findByReportId(reportId);
 
         // 3) 장비 목록
         List<ReportEquipment> equipmentList = reportEquipmentRepository.findByReportId(reportId);
@@ -165,22 +148,6 @@ public class ReportService {
                 .tomorrowPlan(report.getTomorrowPlan())
                 .workLocation(report.getWorkLocation())
                 .specialNote(report.getSpecialNote())
-
-                // 근로자 변환
-                .workers(
-                        workers.stream().map(w -> {
-                            // workerId로 Worker 엔티티 조회
-                            Worker worker = workerRepository.findById(w.getWorker().getId())
-                                    .orElseThrow(() -> new NotFoundException("근로자를 찾을 수 없습니다. ID=" + w.getWorker().getId()));
-
-                            return ReportDetailResponse.WorkerInfo.builder()
-                                    .workerId(worker.getId())
-                                    .workerName(worker.getUser().getName())   // 이름 매핑
-                                    .birthDate(worker.getBirthDate() != null ? worker.getBirthDate() : null)
-                                    .position(worker.getPosition() != null ? worker.getPosition() : null)
-                                    .build();
-                        }).toList()
-                )
 
                 // 장비 변환
                 .equipmentList(
@@ -246,26 +213,8 @@ public class ReportService {
         report.setSpecialNote(request.getSpecialNote());
 
         // 3) 기존 연관 데이터 삭제
-        reportWorkerRepository.deleteByReportId(reportId);
         reportEquipmentRepository.deleteByReportId(reportId);
         reportMaterialRepository.deleteByReportId(reportId);
-
-        // 4) 새 workers 저장
-        if (request.getWorkers() != null) {
-            for (Long workerId : request.getWorkers()) {
-
-                Worker worker = workerRepository.findById(workerId)
-                        .orElseThrow(() -> new NotFoundException("근로자를 찾을 수 없습니다: " + workerId));
-
-                ReportWorker reportWorker =
-                        ReportWorker.builder()
-                                .report(report)
-                                .worker(worker)
-                                .build();
-
-                reportWorkerRepository.save(reportWorker);
-            }
-        }
 
         // 5) 새 equipment 저장
         if (request.getEquipmentList() != null) {
@@ -319,7 +268,6 @@ public class ReportService {
             throw new ForbiddenException("해당 안전교육일지에 접근할 권한이 없습니다.");
         }
 
-        reportWorkerRepository.deleteByReportId(reportId);
         reportEquipmentRepository.deleteByReportId(reportId);
         reportMaterialRepository.deleteByReportId(reportId);
         reportRepository.deleteById(reportId);
@@ -327,5 +275,73 @@ public class ReportService {
         // 관련 파일 삭제
         fileService.deleteFilesByTarget("REPORT",reportId);
 
+    }
+
+    //
+    @Transactional(readOnly = true)
+    public List<DailyReportListResponse> getTodayReports(Long siteId, Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
+
+        Site site = siteRepository.findById(siteId)
+                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다."));
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end   = today.plusDays(1).atStartOfDay();
+
+        // 오늘 날짜의 모든 보고서를 가져옴
+        List<Report> reports = reportRepository
+                .findBySiteIdAndCreatedAtBetween(siteId, start, end);
+
+        return reports.stream()
+                .map(report -> {
+
+                    // 여기서 각 보고서 id로 장비/자재 조회
+                    List<ReportEquipment> equipmentList =
+                            reportEquipmentRepository.findByReportId(report.getId());
+
+                    List<ReportMaterial> materialList =
+                            reportMaterialRepository.findByReportId(report.getId());
+
+                    return DailyReportListResponse.builder()
+                            .reportId(report.getId())
+                            .siteId(report.getSite().getId())
+                            .siteName(report.getSite().getProjectName())
+                            .writerName(report.getWriter().getName())
+                            .workType(report.getWorkType())
+                            .workLocation(report.getWorkLocation())
+                            .todayWork(report.getTodayWork())
+                            .workerCount(report.getWorkerCount())
+                            .specialNote(report.getSpecialNote())
+                            .createdAt(report.getCreatedAt())
+
+                            .equipmentList(
+                                    equipmentList.stream().map(e ->
+                                            DailyReportListResponse.EquipmentInfo.builder()
+                                                    .equipmentName(e.getEquipmentName())
+                                                    .spec(e.getSpec())
+                                                    .usingTime(e.getUsingTime())
+                                                    .count(e.getCount())
+                                                    .vendorName(e.getVendorName())
+                                                    .build()
+                                    ).toList()
+                            )
+
+                            .materialList(
+                                    materialList.stream().map(m ->
+                                            DailyReportListResponse.MaterialInfo.builder()
+                                                    .materialName(m.getMaterialName())
+                                                    .specAndQuantity(m.getSpecAndQuantity())
+                                                    .importTime(m.getImportTime())
+                                                    .exportDetail(m.getExportDetail())
+                                                    .build()
+                                    ).toList()
+                            )
+
+                            .build();
+                })
+                .toList();
     }
 }

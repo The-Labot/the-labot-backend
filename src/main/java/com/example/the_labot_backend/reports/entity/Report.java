@@ -53,6 +53,8 @@ public class Report {
     private String tomorrowPlan;
     // 명일 작업 예정 사항 (예: "거푸집 설치 및 잔여 철근 배근 예정")
 
+    private int workerCount;
+
     private String workLocation;
     // 작업 위치 (층/동/구역 등)
 

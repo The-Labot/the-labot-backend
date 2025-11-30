@@ -4,9 +4,17 @@ import com.example.the_labot_backend.reports.entity.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
+
+    List<Report> findBySiteIdAndCreatedAtBetween(
+            Long siteId,
+            LocalDateTime start,
+            LocalDateTime end
+    );
+
     List<Report> findAllBySite_IdOrderByCreatedAtDesc(Long siteId);
 
     // 1. 오늘 날짜의 작업일보 수

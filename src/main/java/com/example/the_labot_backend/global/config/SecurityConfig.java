@@ -85,7 +85,9 @@ public class SecurityConfig {
 
                 "https://www.the-labot.site",   // www 도메인 (혹시 몰라서 추가)
 
-                "http://localhost:3000"         // 로컬 개발용 (React 기본 포트)
+                "http://localhost:3000"  ,       // 로컬 개발용 (React 기본 포트)
+
+                "http://localhost:5173"
 
         ));  // 리액트 개발 서버
         config.addAllowedHeader("*");
