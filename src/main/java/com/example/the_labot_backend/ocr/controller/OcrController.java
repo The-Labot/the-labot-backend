@@ -7,6 +7,7 @@ import com.example.the_labot_backend.ocr.service.ContractOcrService;
 import com.example.the_labot_backend.ocr.service.IdCardOcrService;
 import com.example.the_labot_backend.ocr.service.RegistrationService;
 import com.example.the_labot_backend.workers.entity.Worker;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,11 +31,11 @@ public class OcrController {
 
      * 앱에서 사진 파일(file)을 이 API로 전송
      */
-    @PostMapping("/upload-contract")
-    public ResponseEntity<ContractDataDto> uploadContract(@RequestParam("file") MultipartFile file) {
+    @PostMapping(value = "/upload-contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ContractDataDto> uploadContract(@RequestPart("contractFile") MultipartFile contractFile) {
         try {
 
-            ContractDataDto extractedData = contractOcrService.processContract(file);
+            ContractDataDto extractedData = contractOcrService.processContract(contractFile);
             return ResponseEntity.ok(extractedData);
 
         } catch (Exception e) {
