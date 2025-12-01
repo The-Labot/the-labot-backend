@@ -8,12 +8,15 @@ import com.example.the_labot_backend.workers.dto.WorkerDashboardResponse;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import com.example.the_labot_backend.workers.service.WorkerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,12 +27,16 @@ public class WorkerController {
     private final WorkerService workerService;
 
     // 근로자 등록
-    @PostMapping//박찬홍 11-24수정 오후 10시 50분
-    public ResponseEntity<?> createWorker(@RequestBody FinalSaveDto request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createWorker(
+            @RequestPart(value = "data") FinalSaveDto request,
+            @RequestPart(value = "files", required = false) List<MultipartFile> contractFiles) {
+        // 1. JSON 데이터 받기 (key: "data")
+        // 2. 파일 데이터 받기 (key: "files") - 파일은 없을 수도 있으니 required=false
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 
-        workerService.createWorker(userId, request);
+        workerService.createWorker(userId, request,contractFiles);
 
         return ResponseEntity.ok(Map.of(
                 "status", 200,

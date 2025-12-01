@@ -16,6 +16,7 @@ public class WorkerMyPageResponse {
     // --- 1. 기본 인적 사항 ---
     private String name;            // [User] 이름
     private String phone;           // [User] 전화번호
+    private String emergencyNumber; // 비상연락처
 
     private String jobRole;         // [Worker] 직종 (position)
     private String siteName;        // [Worker] 상세 근무 현장명
@@ -50,7 +51,7 @@ public class WorkerMyPageResponse {
                 // [User 엔티티에서 가져오는 정보]
                 .name(user.getName())
                 .phone(user.getPhoneNumber())
-
+                .emergencyNumber(worker.getEmergencyNumber())
                 // [Worker 엔티티에서 가져오는 정보]
                 .jobRole(worker.getPosition())       // position -> jobRole 매핑
                 .siteName(worker.getSiteName())      // 상세 현장명
