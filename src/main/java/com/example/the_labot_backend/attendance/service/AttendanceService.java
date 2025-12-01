@@ -9,6 +9,7 @@ import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.workers.entity.Worker;
+import com.example.the_labot_backend.workers.entity.WorkerStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,14 +70,12 @@ public class AttendanceService {
 
             // ▼▼▼ [★ 2. 10시/9시 기준 판별 로직 수정] ▼▼▼
             AttendanceStatus status;
-            if (!now.isBefore(TEN_AM)) { // 10시 00분 00초 "이후" (>= 10:00)
-                status = AttendanceStatus.ABSENT; // 결근
-            } else if (!now.isBefore(NINE_AM)) { // 9시 00분 00초 "이후" (>= 9:00 and < 10:00)
-                status = AttendanceStatus.LATE; // 지각
-            } else { // 9시 "이전" (< 9:00)
-                status = AttendanceStatus.PRESENT; // 출근(정상)
+            if (now.isBefore(NINE_AM)) {
+                status = AttendanceStatus.PRESENT; // 08:59:59 까지
+            } else {
+                status = AttendanceStatus.LATE;    // 09:00:00 부터 쭉~ (지각)
             }
-            // ▲▲▲ [★ 2. 10시/9시 기준 판별 로직 수정] ▲▲▲
+
 
 
 
@@ -87,6 +86,7 @@ public class AttendanceService {
                     .status(status)
                     .build();
             Attendance savedRecord = attendanceRepository.save(newRecord);
+            worker.setStatus(WorkerStatus.ACTIVE);
             return ClockInOutResponseDto.fromEntity(savedRecord);
 
         } else {
@@ -97,6 +97,7 @@ public class AttendanceService {
             }
             record.setClockOutTime(now); // [★] 그냥 현재 시간 저장
             Attendance savedRecord = attendanceRepository.save(record);
+            worker.setStatus(WorkerStatus.WAITING);
             return ClockInOutResponseDto.fromEntity(savedRecord);
         }
     }

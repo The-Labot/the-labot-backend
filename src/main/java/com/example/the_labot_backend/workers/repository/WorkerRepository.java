@@ -27,4 +27,6 @@ public interface WorkerRepository extends JpaRepository<Worker, Long> {
     List<Worker> findWorkersBySiteId(@Param("siteId") Long siteId);
 
     List<Worker> findByIdIn(List<Long> userIds);
+    // [★ 신규 추가] 내 현장의 '퇴직자가 아닌' 근로자 총원 카운트
+    long countByUser_Site_IdAndStatusNot(Long siteId, WorkerStatus status);
 }
