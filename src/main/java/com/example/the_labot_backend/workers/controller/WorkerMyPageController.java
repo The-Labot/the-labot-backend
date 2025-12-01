@@ -29,8 +29,7 @@ public class WorkerMyPageController {
         return ResponseEntity.ok(workerMyPageService.getMyPageInfo(userId));
     }
 
-    // 2. [★ 신규 추가] 마이페이지 정보 수정
-    // URL: PUT /api/worker/mypage
+
     @PatchMapping("/mypage")
     public ResponseEntity<?> updateMyPage(@RequestBody WorkerMyPageUpdateRequest request) {
 
@@ -43,19 +42,6 @@ public class WorkerMyPageController {
                 "status", 200,
                 "message", "정보 수정이 완료되었습니다."
         ));
-    }
-
-    @GetMapping("/files/download/{fileId}")
-    public ResponseEntity<Resource> downloadMyFile(@PathVariable Long fileId) {
-        Long userId = getCurrentUserId();
-
-        // 서비스 내부 클래스 DTO 사용
-        WorkerMyPageService.FileDownloadDto fileData = workerMyPageService.downloadFile(userId, fileId);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(fileData.getContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileData.getOriginalFileName() + "\"")
-                .body(fileData.getResource());
     }
 
     private Long getCurrentUserId() {

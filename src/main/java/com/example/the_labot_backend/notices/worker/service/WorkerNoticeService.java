@@ -1,6 +1,7 @@
 package com.example.the_labot_backend.notices.worker.service;
 
 import com.example.the_labot_backend.authuser.entity.User;
+import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.notices.repository.NoticeRepository;
@@ -89,7 +90,12 @@ public class WorkerNoticeService {
     public WorkerNoticeDetailDto getNoticeDetailForWorker(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeId));
-        List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
-        return WorkerNoticeDetailDto.fromEntity(notice, files);
+
+        // 2. [★ 수정됨] 파일 DTO 목록 바로 조회 (엔티티 조회 X)
+        // FileService의 getFilesResponseByTarget 메서드를 사용하여 바로 DTO 리스트를 받습니다.
+        List<FileResponse> fileResponses = fileService.getFilesResponseByTarget("NOTICE", noticeId);
+
+        // 3. 조립해서 반환
+        return WorkerNoticeDetailDto.of(notice, fileResponses);
     }
 }

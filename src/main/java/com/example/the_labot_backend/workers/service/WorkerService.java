@@ -7,6 +7,8 @@ import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.dto.FileResponse;
+import com.example.the_labot_backend.files.entity.File;
+import com.example.the_labot_backend.files.repository.FileRepository;
 import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
@@ -25,11 +27,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -41,10 +45,12 @@ public class WorkerService {
     private final PasswordEncoder passwordEncoder;
     private final AttendanceRepository attendanceRepository;// 워크서비스에서 attendace클래스를 변경가능하게끔 함.  11/16박찬홍
     private final FileService fileService;
+    private final FileRepository fileRepository; // [★] 개별 파일 조회를 위해 추가
+
 
     // 근로자 등록
     @Transactional
-    public void createWorker(Long managerId, FinalSaveDto request) {
+    public void createWorker(Long managerId, FinalSaveDto request,List<MultipartFile> contractFiles) {
 
         User manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + managerId));
@@ -115,6 +121,9 @@ public class WorkerService {
                 .build();
 
         workerRepository.save(worker);
+        if (contractFiles != null && !contractFiles.isEmpty()) {
+            fileService.saveFiles(contractFiles, "WORKER_CONTRACT", worker.getId());
+        }
     }
     // --- 헬퍼 메서드 ---
     private String determineGender(String rrn) {
@@ -282,6 +291,58 @@ public class WorkerService {
                 .attendanceHistory(attendanceLogs)
                 .build();
     }
+
+    /**
+     * [★ 추가됨] 관리자가 근로자의 특정 파일을 클릭했을 때 검증 및 반환
+     */
+    public FileResponse getWorkerFileWithValidation(Long managerId, Long fileId) {
+        // 1. 관리자 정보 조회
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 정보를 찾을 수 없습니다."));
+
+        // 2. 파일 정보 조회
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다."));
+
+        // 3. [핵심] 권한 검증 (같은 현장인지 확인)
+        validateFileAccess(file, manager);
+
+        // 4. DTO 변환
+        return FileResponse.from(file);
+    }
+
+    /**
+     * [내부 로직] 현장 일치 여부 검증
+     */
+    private void validateFileAccess(File file, User manager) {
+        // 관리자에게 배정된 현장이 없는 경우
+        if (manager.getSite() == null) {
+            throw new IllegalStateException("관리자에게 배정된 현장이 없습니다.");
+        }
+
+        // 파일이 'WORKER' 관련 파일인지 확인 (안전장치)
+        if (file.getTargetType() != null && file.getTargetType().startsWith("WORKER")) {
+            Long workerId = file.getTargetId();
+
+            // 파일 주인(근로자) 조회
+            Worker worker = workerRepository.findById(workerId)
+                    .orElseThrow(() -> new IllegalArgumentException("파일과 연결된 근로자가 존재하지 않습니다."));
+
+            // 근로자 현장 정보 확인
+            if (worker.getUser().getSite() == null) {
+                throw new IllegalStateException("근로자에게 배정된 현장이 없습니다.");
+            }
+
+            Long managerSiteId = manager.getSite().getId();
+            Long workerSiteId = worker.getUser().getSite().getId();
+
+            // [★] 현장 ID 비교: 다르면 예외 발생
+            if (!Objects.equals(managerSiteId, workerSiteId)) {
+                throw new SecurityException("타 현장 근로자의 파일에는 접근할 수 없습니다.");
+            }
+        }
+    }
+
 
     // 근로자 정보 수정
     @Transactional

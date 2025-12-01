@@ -2,8 +2,10 @@ package com.example.the_labot_backend.workers.service;
 
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.repository.FileRepository;
+import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageResponse;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageUpdateRequest;
 import com.example.the_labot_backend.workers.entity.Worker;
@@ -25,12 +27,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkerMyPageService {
     private final UserRepository userRepository;
-    private final FileRepository fileRepository;
+
+    private final FileService fileService; // [★] 우리가 만든 파일 서비스 사용
 
     // 기존 로컬 저장 경로 유지
     private final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
 
-    // 1. 마이페이지 정보 조회 로직
+    // 1. 마이페이지 정보 조회
     @Transactional(readOnly = true)
     public WorkerMyPageResponse getMyPageInfo(Long userId) {
 
@@ -42,13 +45,19 @@ public class WorkerMyPageService {
             throw new RuntimeException("해당 계정은 근로자 정보가 등록되지 않았습니다.");
         }
 
-        // 파일 ID 조회 (헬퍼 메서드 활용)
-        Long contractId = getFileIdByTypeAndTarget("WORKER_CONTRACT", worker.getId());
-        Long payrollId = getFileIdByTypeAndTarget("WORKER_PAYROLL", worker.getId());
-        Long certId = getFileIdByTypeAndTarget("WORKER_LICENSE", worker.getId());
+        // [★ 수정됨] FileService를 통해 S3 URL이 포함된 DTO 리스트 조회
+        // 1) 근로계약서 (WORKER_CONTRACT) - 1개만 가져옴
+        List<FileResponse> contracts = fileService.getFilesResponseByTarget("WORKER_CONTRACT", worker.getId());
+        FileResponse contractFile = contracts.isEmpty() ? null : contracts.get(0);
+
+        // 2) 급여명세서 (WORKER_PAYROLL) - 전체 리스트
+        List<FileResponse> payrolls = fileService.getFilesResponseByTarget("WORKER_PAYROLL", worker.getId());
+
+        // 3) 자격증 (WORKER_LICENSE) - 전체 리스트
+        List<FileResponse> licenses = fileService.getFilesResponseByTarget("WORKER_LICENSE", worker.getId());
 
         // DTO 변환 후 반환
-        return WorkerMyPageResponse.from(user, worker, contractId, payrollId, certId);
+        return WorkerMyPageResponse.from(user, worker, contractFile, payrolls, licenses);
     }
 
     // 2. [★ 신규 추가] 마이페이지 정보 수정
@@ -86,56 +95,5 @@ public class WorkerMyPageService {
         // @Transactional 때문에 save 호출 안 해도 자동 저장됨
     }
 
-    // 2. 파일 다운로드 로직 (로컬 파일 시스템 사용)
-    @Transactional(readOnly = true)
-    public FileDownloadDto downloadFile(Long userId, Long fileId) {
-        try {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
 
-            Worker worker = user.getWorker();
-            if (worker == null) throw new RuntimeException("근로자 정보 없음");
-
-            // 파일 메타데이터 조회
-            File fileEntity = fileRepository.findById(fileId)
-                    .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
-
-            // ★ 권한 검증: 본인의 파일인지 확인
-            if (!fileEntity.getTargetId().equals(worker.getId()) ||
-                    !fileEntity.getTargetType().startsWith("WORKER")) {
-                throw new RuntimeException("본인의 파일만 다운로드할 수 있습니다.");
-            }
-
-            // 실제 파일 리소스 로드 (로컬 경로 사용)
-            Path filePath = Paths.get(UPLOAD_DIR + fileEntity.getStoredFileName());
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if (!resource.exists()) throw new RuntimeException("디스크에 파일이 존재하지 않습니다.");
-
-            // 컨트롤러에게 넘겨줄 데이터 포장
-            return FileDownloadDto.builder()
-                    .resource(resource)
-                    .originalFileName(fileEntity.getOriginalFileName())
-                    .contentType(fileEntity.getContentType() != null ? fileEntity.getContentType() : "application/octet-stream")
-                    .build();
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("파일 경로 오류", e);
-        }
-    }
-
-    // (내부 헬퍼 메서드) 파일 ID 찾기
-    private Long getFileIdByTypeAndTarget(String type, Long targetId) {
-        List<File> files = fileRepository.findByTargetTypeAndTargetId(type, targetId);
-        return files.isEmpty() ? null : files.get(0).getId();
-    }
-
-    // (내부 DTO) 서비스 -> 컨트롤러 전달용
-    @Getter
-    @Builder
-    public static class FileDownloadDto {
-        private Resource resource;
-        private String originalFileName;
-        private String contentType;
-    }
 }
