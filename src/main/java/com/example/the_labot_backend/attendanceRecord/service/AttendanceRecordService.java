@@ -2,10 +2,7 @@ package com.example.the_labot_backend.attendanceRecord.service;
 
 import com.example.the_labot_backend.attendance.entity.Attendance;
 import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
-import com.example.the_labot_backend.attendanceRecord.dto.AttendanceRecordResponse;
-import com.example.the_labot_backend.attendanceRecord.dto.AttendanceRecordUpdateRequest;
-import com.example.the_labot_backend.attendanceRecord.dto.DailyAttendanceRecord;
-import com.example.the_labot_backend.attendanceRecord.dto.MonthlyAttendanceRecordResponse;
+import com.example.the_labot_backend.attendanceRecord.dto.*;
 import com.example.the_labot_backend.attendanceRecord.entity.AttendanceRecord;
 import com.example.the_labot_backend.attendanceRecord.repository.AttendanceRecordRepository;
 import com.example.the_labot_backend.authuser.entity.User;
@@ -205,5 +202,28 @@ public class AttendanceRecordService {
 
         // 8) 응답 반환
         return AttendanceRecordResponse.from(record);
+    }
+
+    @Transactional(readOnly = true)
+    public AttendanceMonthlyResponse getAttendanceMonthly(Long siteId, Long workerId, int year, int month) {
+
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+
+        List<AttendanceRecord> records =
+                attendanceRecordRepository.findByWorkerIdAndMonth(workerId, start, end);
+
+        List<AttendanceDailyResponse> dailyList = records.stream()
+                .map(r -> AttendanceDailyResponse.builder()
+                        .date(r.getWorkDate())
+                        .manHour(r.getManHour())
+                        .build())
+                .toList();
+
+        return AttendanceMonthlyResponse.builder()
+                .year(year)
+                .month(month)
+                .records(dailyList)
+                .build();
     }
 }

@@ -17,4 +17,14 @@ public interface WorkerRepository extends JpaRepository<Worker, Long> {
             "WHERE u.headOffice.id = :headOfficeId")
     List<Worker> findAllByHeadOfficeId(@Param("headOfficeId") Long headOfficeId);
     List<Worker> findByUser_Site_IdAndStatusNot(Long siteId, WorkerStatus status);
+
+
+    @Query("""
+    SELECT w 
+    FROM Worker w
+    WHERE w.user.site.id = :siteId
+    """)
+    List<Worker> findWorkersBySiteId(@Param("siteId") Long siteId);
+
+    List<Worker> findByIdIn(List<Long> userIds);
 }

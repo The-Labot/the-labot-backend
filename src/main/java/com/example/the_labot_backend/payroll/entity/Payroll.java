@@ -71,15 +71,11 @@ public class Payroll {
     /**
      * 소득세 (간이세액표 기준 자동 계산)
      */
-    private Long incomeTaxAuto;      // 자동 계산
-    private Long incomeTaxManual;    // 수동 입력
     private Long incomeTax;          // 최종 적용값
 
     /**
      * 지방소득세 (소득세 × 10%)
      */
-    private Long localIncomeTaxAuto;     // 자동 계산
-    private Long localIncomeTaxManual;   // 수동 입력
     private Long localIncomeTax;         // 최종 적용값
 
     // ============================================================
@@ -93,8 +89,6 @@ public class Payroll {
      */
     private Boolean isEmploymentInsuranceApplicable;
 
-    private Long employmentInsuranceAuto;      // 자동 계산
-    private Long employmentInsuranceManual;    // 수동 입력
     private Long employmentInsuranceAmount;    // 최종 값
 
     /**
@@ -103,8 +97,6 @@ public class Payroll {
 
     private Boolean isNationalPensionApplicable;
 
-    private Long nationalPensionAuto;
-    private Long nationalPensionManual;
     private Long nationalPensionAmount;
 
     /**
@@ -113,8 +105,6 @@ public class Payroll {
 
     private Boolean isHealthInsuranceApplicable;
 
-    private Long healthInsuranceAuto;
-    private Long healthInsuranceManual;
     private Long healthInsuranceAmount;
 
     /**
@@ -123,8 +113,6 @@ public class Payroll {
 
     private Boolean isLongTermCareApplicable;
 
-    private Long longTermCareAuto;
-    private Long longTermCareManual;
     private Long longTermCareAmount;
 
     // ============================================================

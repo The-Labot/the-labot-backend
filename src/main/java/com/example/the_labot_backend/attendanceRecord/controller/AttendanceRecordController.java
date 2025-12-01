@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.attendanceRecord.controller;
 
+import com.example.the_labot_backend.attendanceRecord.dto.AttendanceMonthlyResponse;
 import com.example.the_labot_backend.attendanceRecord.dto.AttendanceRecordResponse;
 import com.example.the_labot_backend.attendanceRecord.dto.AttendanceRecordUpdateRequest;
 import com.example.the_labot_backend.attendanceRecord.dto.MonthlyAttendanceRecordResponse;
@@ -53,4 +54,27 @@ public class AttendanceRecordController {
                 "data", response
         ));
     }
+
+    // 월별 출역 상세 조회
+    @GetMapping("/manHour")
+    public ResponseEntity<?> getWorkerMonthlyAttendance(
+            @PathVariable Long siteId,
+            @PathVariable Long userId,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+
+        AttendanceMonthlyResponse response =
+                attendanceRecordService.getAttendanceMonthly(siteId, userId, year, month);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", 200,
+                        "message", "근로자 월별 출역내역 조회 성공",
+                        "data", response
+                )
+        );
+    }
+
+
 }

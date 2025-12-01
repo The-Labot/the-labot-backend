@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PayrollManualUpdateResponse {
+public class PayrollUpdateResponse {
 
     private Long payrollId;
 

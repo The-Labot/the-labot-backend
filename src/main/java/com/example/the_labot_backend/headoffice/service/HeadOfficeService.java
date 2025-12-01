@@ -5,6 +5,7 @@ import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeCheckResponse;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeRequest;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeResponse;
+import com.example.the_labot_backend.headoffice.dto.HeadOfficeUpdateRequest;
 import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.headoffice.repository.HeadOfficeRepository;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +91,7 @@ public class HeadOfficeService {
 
     // 본사 수정
     @Transactional
-    public HeadOfficeResponse updateHeadOffice(Long userId, HeadOfficeRequest request){
+    public HeadOfficeResponse updateHeadOffice(Long userId, HeadOfficeUpdateRequest request){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
@@ -103,6 +104,7 @@ public class HeadOfficeService {
         office.setAddress(request.getAddress());
         office.setRepresentative(request.getRepresentative());
         office.setPhoneNumber(request.getPhoneNumber());
+        office.setSecretCode(request.getSecretCode());
 
         return HeadOfficeResponse.from(headOfficeRepository.save(office));
     }

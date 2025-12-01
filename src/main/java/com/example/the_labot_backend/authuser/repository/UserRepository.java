@@ -13,7 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     // 전화번호를 통해 user 조회
     Optional<User> findByPhoneNumber(String phoneNumber);
-    
+
+    List<User> findBySiteIdAndRole(Long siteId, Role role);
+
     // siteID를 통해 해당 역할의 인원 수 조회
     int countBySite_IdAndRole(Long siteId, Role role);
 

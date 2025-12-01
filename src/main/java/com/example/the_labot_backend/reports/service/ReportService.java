@@ -121,10 +121,6 @@ public class ReportService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
-        if(!report.getSite().getId().equals(user.getSite().getId())){
-            throw new ForbiddenException("해당 안전교육일지에 접근할 권한이 없습니다.");
-        }
-
         // 2) 근로자 목록
 
         // 3) 장비 목록
@@ -146,6 +142,7 @@ public class ReportService {
                 .workType(report.getWorkType())
                 .todayWork(report.getTodayWork())
                 .tomorrowPlan(report.getTomorrowPlan())
+                .workerCount(report.getWorkerCount())
                 .workLocation(report.getWorkLocation())
                 .specialNote(report.getSpecialNote())
 
@@ -277,9 +274,14 @@ public class ReportService {
 
     }
 
-    //
+    // 작업 상황,장비,자재 조회
     @Transactional(readOnly = true)
-    public List<DailyReportListResponse> getTodayReports(Long siteId, Long userId) {
+    public List<DailyReportListResponse> getReports(Long siteId,
+                                                    Long userId,
+                                                    int year,
+                                                    int month,
+                                                    int day
+    ) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
@@ -287,13 +289,13 @@ public class ReportService {
         Site site = siteRepository.findById(siteId)
                 .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다."));
 
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end   = today.plusDays(1).atStartOfDay();
+        LocalDate date = LocalDate.of(year, month, day);
 
-        // 오늘 날짜의 모든 보고서를 가져옴
-        List<Report> reports = reportRepository
-                .findBySiteIdAndCreatedAtBetween(siteId, start, end);
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.atTime(23, 59, 59);
+
+        List<Report> reports =
+                reportRepository.findDailyReports(siteId, start, end);
 
         return reports.stream()
                 .map(report -> {
