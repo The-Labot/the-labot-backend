@@ -9,9 +9,9 @@ import java.util.List;
 public interface HazardRepository extends JpaRepository<Hazard,Long> {
     List<Hazard> findAllBySite_Id(Long siteId);
 
-    // 1. 오늘 날짜의 위험요소 신고 수 (Start ~ End 사이)
+    // 1. 카운트: 오늘 하루 (Start ~ End)
     long countBySite_IdAndReportedAtBetween(Long siteId, LocalDateTime start, LocalDateTime end);
 
-    // 2. 최신 신고 5개 조회 (최근 활동용)
-    List<Hazard> findTop5BySite_IdOrderByReportedAtDesc(Long siteId);
+    // 2. 리스트: 오늘 하루 (Start ~ End) + 최신순 5개
+    List<Hazard> findTop5BySite_IdAndReportedAtBetweenOrderByReportedAtDesc(Long siteId, LocalDateTime start, LocalDateTime end);
 }

@@ -26,8 +26,8 @@ spring:
   #파일 업로드 용량 늘려주기 (기본은 1MB)
   servlet:
     multipart:
-      max-file-size: 10MB #보내는거 파일 하나당
-      max-request-size: 10MB # 한번 총 요청하는 최대 크기
+      max-file-size: 20MB #보내는거 파일 하나당
+      max-request-size: 20MB # 한번 총 요청하는 최대 크기
 
 ncp:
   ocr:

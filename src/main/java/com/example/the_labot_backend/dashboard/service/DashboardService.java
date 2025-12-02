@@ -78,40 +78,28 @@ public class DashboardService {
     // =========================================================
     private DashboardResponse buildDashboardResponse(Long siteId) {
 
-        // 1. 날짜 기준 설정
+        // 1. 시간 기준값 설정
+        LocalDateTime now = LocalDateTime.now();
         LocalDate todayDate = LocalDate.now();
-        DayOfWeek dayOfWeek = todayDate.getDayOfWeek();
-
-        LocalDate targetReportDate; // 작업일보 카운트 기준 날짜
-
-        // [★ 핵심 수정] 토, 일, 월요일은 무조건 '지난 금요일' 데이터를 바라봄
-        if (dayOfWeek == DayOfWeek.MONDAY) {
-            targetReportDate = todayDate.minusDays(3); // 월 -> 금 (3일 전)
-        } else if (dayOfWeek == DayOfWeek.SUNDAY) {
-            targetReportDate = todayDate.minusDays(2); // 일 -> 금 (2일 전)
-        } else if (dayOfWeek == DayOfWeek.SATURDAY) {
-            targetReportDate = todayDate.minusDays(1); // 토 -> 금 (1일 전)
-        } else {
-            // 화, 수, 목, 금요일은 -> '어제' 데이터를 바라봄
-            targetReportDate = todayDate.minusDays(1);
-        }
 
         LocalDateTime startOfDay = todayDate.atStartOfDay();
         LocalDateTime endOfDay = todayDate.atTime(LocalTime.MAX);
+        LocalDateTime twentyFourHoursAgo = now.minusHours(24);
 
-        // 2. 통계 카운트
+
+        // (1) 위험요소: 오늘 하루 발생 건수
         long hazardCount = hazardRepository.countBySite_IdAndReportedAtBetween(siteId, startOfDay, endOfDay);
 
-        // [수정된 날짜 적용] 금요일(또는 어제) 작업일보 개수
-        long reportCount = reportRepository.countBySite_IdAndWorkDate(siteId, targetReportDate);
+        // (2) 작업일보: 최근 24시간 이내 작성 건수
+        long reportCount = reportRepository.countBySite_IdAndCreatedAtAfter(siteId, twentyFourHoursAgo);
 
-        long workerCount = workerRepository.countByUser_Site_IdAndStatusNot(siteId, WorkerStatus.RETIRED);
+        // (3) [★ 수정됨] 근로자 수: 현재 'ACTIVE' 상태인 사람만 카운트
+        long workerCount = workerRepository.countByUser_Site_IdAndStatus(siteId, WorkerStatus.ACTIVE);
 
-        // 2. 리스트 수집
         List<DashboardResponse.RecentActivity> activityList = new ArrayList<>();
 
-        // (A) 위험요소
-        List<Hazard> hazards = hazardRepository.findTop5BySite_IdOrderByReportedAtDesc(siteId);
+        // (A) 위험요소 리스트: [오늘] 발생한 것
+        List<Hazard> hazards = hazardRepository.findTop5BySite_IdAndReportedAtBetweenOrderByReportedAtDesc(siteId, startOfDay, endOfDay);
         for (Hazard h : hazards) {
             activityList.add(DashboardResponse.RecentActivity.builder()
                     .id(h.getId())
@@ -124,8 +112,8 @@ public class DashboardService {
                     .build());
         }
 
-        // (B) 작업일보
-        List<Report> reports = reportRepository.findTop5BySite_IdOrderByCreatedAtDesc(siteId);
+        // (B) 작업일보 리스트: [최근 24시간] 이내 작성된 것
+        List<Report> reports = reportRepository.findTop5BySite_IdAndCreatedAtAfterOrderByCreatedAtDesc(siteId, twentyFourHoursAgo);
         for (Report r : reports) {
             activityList.add(DashboardResponse.RecentActivity.builder()
                     .id(r.getId())
@@ -138,7 +126,8 @@ public class DashboardService {
                     .build());
         }
 
-        // (C) 근태
+        // (C) 출근 리스트: [오늘] 출근한 기록
+        // (ACTIVE 상태가 아니더라도 오늘 출근 이력은 보여주는 것이 좋으므로 Attendance 테이블 사용)
         List<Attendance> attendances = attendanceRepository.findTop5ByWorker_User_Site_IdAndDateOrderByClockInTimeDesc(siteId, todayDate);
         for (Attendance a : attendances) {
             LocalDateTime clockInDateTime = LocalDateTime.of(a.getDate(), a.getClockInTime());
@@ -153,21 +142,21 @@ public class DashboardService {
                     .build());
         }
 
-        // 3. 정렬 및 자르기
+        // 4. 통합 정렬 및 자르기 (최신순 10개)
         activityList.sort(Comparator.comparing(DashboardResponse.RecentActivity::getOriginalTime).reversed());
         if (activityList.size() > 10) activityList = activityList.subList(0, 10);
 
-        // 4. 반환
         return DashboardResponse.builder()
                 .summary(DashboardResponse.Summary.builder()
                         .todayHazardCount(hazardCount)
                         .ongoingWorkCount(reportCount)
-                        .workerCount(workerCount)
+                        .workerCount(workerCount) // ACTIVE 상태인 사람 수
                         .build())
                 .activities(activityList)
                 .build();
     }
 
+    // 시간 포맷 헬퍼 메서드
     private String formatTimeAgo(LocalDateTime dateTime) {
         if (dateTime == null) return "";
         long seconds = Duration.between(dateTime, LocalDateTime.now()).getSeconds();

@@ -2,6 +2,7 @@ package com.example.the_labot_backend.workers.controller;
 
 
 
+import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageResponse;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageUpdateRequest;
 import com.example.the_labot_backend.workers.service.WorkerMyPageService;
@@ -42,6 +43,20 @@ public class WorkerMyPageController {
                 "status", 200,
                 "message", "정보 수정이 완료되었습니다."
         ));
+    }
+    /**
+     * [★ 신규 추가] 내 파일 상세 조회
+     * GET /api/worker/files/{fileId}
+     */
+    @GetMapping("/files/{fileId}")
+    public ResponseEntity<FileResponse> getMyFile(@PathVariable Long fileId) {
+
+        Long userId = getCurrentUserId(); // 토큰에서 내 ID 꺼내기
+
+        // 서비스 호출 (내 파일인지 검증 후 리턴)
+        FileResponse fileResponse = workerMyPageService.getMyFileWithValidation(userId, fileId);
+
+        return ResponseEntity.ok(fileResponse);
     }
 
     private Long getCurrentUserId() {

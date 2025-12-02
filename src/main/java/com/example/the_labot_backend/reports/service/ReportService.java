@@ -60,6 +60,7 @@ public class ReportService {
                         .tomorrowPlan(request.getTomorrowPlan())
                         .workLocation(request.getWorkLocation())
                         .specialNote(request.getSpecialNote())
+                        .workerCount(request.getWorkerCount())
                         .build()
         );
 

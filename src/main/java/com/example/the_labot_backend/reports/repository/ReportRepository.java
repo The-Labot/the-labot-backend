@@ -17,9 +17,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     List<Report> findAllBySite_IdOrderByCreatedAtDesc(Long siteId);
 
-    // 1. 오늘 날짜의 작업일보 수
-    long countBySite_IdAndWorkDate(Long siteId, LocalDate workDate);
+    long countBySite_IdAndCreatedAtAfter(Long siteId, LocalDateTime dateTime);
 
-    // 2. 최신 작업일보 5개 조회 (작성일 기준 내림차순)
-    List<Report> findTop5BySite_IdOrderByCreatedAtDesc(Long siteId);
+    // 2. 리스트: 24시간 이내 + 최신순 5개
+    List<Report> findTop5BySite_IdAndCreatedAtAfterOrderByCreatedAtDesc(Long siteId, LocalDateTime dateTime);
 }

@@ -27,9 +27,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkerMyPageService {
     private final UserRepository userRepository;
+    private final FileRepository fileRepository; // [★] 개별 조회를 위해 추가
 
     private final FileService fileService; // [★] 우리가 만든 파일 서비스 사용
-
     // 기존 로컬 저장 경로 유지
     private final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
 
@@ -93,6 +93,43 @@ public class WorkerMyPageService {
         if (request.getAccountHolder() != null) account.setAccountHolder(request.getAccountHolder());
 
         // @Transactional 때문에 save 호출 안 해도 자동 저장됨
+    }
+    @Transactional(readOnly = true)
+    public FileResponse getMyFileWithValidation(Long userId, Long fileId) {
+
+        // 1. 사용자 및 근로자 정보 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+        Worker worker = user.getWorker();
+
+        if (worker == null) {
+            throw new RuntimeException("근로자 정보가 존재하지 않습니다.");
+        }
+
+        // 2. 파일 정보 조회
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
+
+        // 3. [핵심] 내 파일이 맞는지 검증
+        validateMyFileAccess(file, worker);
+
+        // 4. DTO 반환 (S3 URL 포함)
+        return FileResponse.from(file);
+    }
+
+    /**
+     * [검증 로직] 요청한 파일이 내 것이 맞는지 확인
+     */
+    private void validateMyFileAccess(File file, Worker worker) {
+        // 1. 파일의 타겟이 'WORKER'로 시작하는지 확인
+        if (file.getTargetType() == null || !file.getTargetType().startsWith("WORKER")) {
+            throw new SecurityException("접근할 수 없는 파일 유형입니다.");
+        }
+
+        // 2. 파일의 주인(targetId)과 현재 로그인한 근로자(worker.id)가 일치하는지 확인
+        if (!file.getTargetId().equals(worker.getId())) {
+            throw new SecurityException("본인의 파일만 조회할 수 있습니다.");
+        }
     }
 
 
