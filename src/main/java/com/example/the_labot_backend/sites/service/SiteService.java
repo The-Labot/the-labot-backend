@@ -96,7 +96,9 @@ public class SiteService {
         int totalSiteCount = siteList.size();
 
         // 본사 전체 근로자 수
-        int activeWorkerCount = userRepository.countByHeadOffice_IdAndRole(headOfficeId, Role.ROLE_WORKER);
+        int activeWorkerCount = siteList.stream()
+                .mapToInt(site -> userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_WORKER))
+                .sum();
 
         // 현장별 목록 생성
         List<SiteListResponse> sites = siteList.stream()

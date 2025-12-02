@@ -16,7 +16,7 @@ public class AdminPayrollController {
 
     private final PayrollService payrollService;
 
-    // 월별 근로자 임금 조회
+    // 월별 근로자 리스트 조회
     @GetMapping()
     public ResponseEntity<?> getPayrollTable(
             @PathVariable Long siteId,
@@ -26,58 +26,71 @@ public class AdminPayrollController {
         List<PayrollTableResponse> response =  payrollService.getPayrollTable(siteId, year, month);
         return ResponseEntity.ok(Map.of(
                         "status", 200,
-                        "message", "월별 근로자 임금 조회 성공",
+                        "message", "월별 근로자 임금 조회 완료",
+                        "data", response
+                )
+        );
+    }
+
+    // 월별 임금 조회
+    @GetMapping("/{workerId}/{payrollId}")
+    public ResponseEntity<?> getPayrollInsuranceDetail(
+            @PathVariable Long siteId,
+            @PathVariable Long workerId,
+            @PathVariable Long payrollId
+    ) {
+        PayrollInsuranceResponse response =
+                payrollService.getPayrollDetail(siteId, workerId, payrollId);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", 200,
+                        "message", "급여 보험·세금 상세 조회 완료",
                         "data", response
                 )
         );
     }
 
     // 월별 급여 자동 생성
-    @PostMapping("/generate")
-    public ResponseEntity<?> generate(
+    @PostMapping("/create")
+    public ResponseEntity<?> createPayroll(
             @PathVariable Long siteId,
-            @RequestParam int year,
-            @RequestParam int month
+            @RequestBody PayrollCreateRequest request
     ) {
-        payrollService.generatePayrolls(siteId,year,month);
+        payrollService.createPayrolls(siteId,request);
         return ResponseEntity.ok(Map.of(
                         "status", 200,
-                        "message", "월별 급여 자동 생성 성공"
+                        "message", "월별 급여 자동 생성 완료"
                 )
         );
     }
 
-    // 보험 적용
-    @PatchMapping("/{payrollId}/insurance")
-    public ResponseEntity<?> updateInsurance(
-            @PathVariable Long siteId,
-            @PathVariable Long payrollId,
-            @RequestBody PayrollInsuranceUpdateRequest request
+    // 월별 임금 삭제
+    @PostMapping("/delete")
+    public ResponseEntity<?> deletePayrolls(
+            @RequestBody PayrollDeleteRequest request,
+            @PathVariable Long siteId
     ) {
-        PayrollInsuranceUpdateResponse response = payrollService.updateInsurance(siteId,payrollId, request);
+        payrollService.deletePayrolls(siteId, request);
+
         return ResponseEntity.ok(Map.of(
-                        "status", 200,
-                        "message", "보험 적용 성공",
-                        "data", response
-                )
-        );
+                "status", 200,
+                "message", "급여 삭제 완료"
+        ));
     }
 
-    @PatchMapping("/{payrollId}/manual")
-    public ResponseEntity<?> updateManual(
+    // 월별 임금 상세 수정
+    @PatchMapping("/{payrollId}")
+    public ResponseEntity<?> updatePayroll(
             @PathVariable Long siteId,
             @PathVariable Long payrollId,
-            @RequestBody PayrollManualUpdateRequest request
+            @RequestBody PayrollUpdateRequest request
     ) {
-
-        PayrollManualUpdateResponse response = payrollService.updateManualValues(siteId,payrollId, request);
+        payrollService.updatePayroll(siteId,payrollId, request);
         return ResponseEntity.ok(Map.of(
                         "status", 200,
-                        "message", "보험 적용 성공",
-                        "data", response
+                        "message", "임금 상세 수정 완료"
                 )
         );
     }
-
-
 }

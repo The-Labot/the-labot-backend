@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +25,8 @@ public class AdminWorkerController {
     private final UserRepository userRepository;
 
     // 통합 근로자 목록 조회 (GET)
-    @GetMapping
-    public ResponseEntity<?> getAllWorkers() {
+    @GetMapping("/{siteId}")
+    public ResponseEntity<?> getAllWorkers(@PathVariable Long siteId) {
 
         // 1. 현재 로그인한 관리자 ID 추출
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -36,7 +37,7 @@ public class AdminWorkerController {
                 .orElseThrow(() -> new RuntimeException("관리자 정보를 찾을 수 없습니다."));
 
         // 3. 서비스 호출 (본사 산하 모든 근로자 가져오기)
-        List<AdminWorkerListResponse> workerList = adminWorkerService.getAllWorkersByHeadOffice(admin);
+        List<AdminWorkerListResponse> workerList = adminWorkerService.getAllWorkersByHeadOffice(siteId,admin);
 
         return ResponseEntity.ok(Map.of(
                 "status", 200,

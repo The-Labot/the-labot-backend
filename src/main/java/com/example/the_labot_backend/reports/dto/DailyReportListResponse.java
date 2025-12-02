@@ -15,13 +15,15 @@ public class DailyReportListResponse {
     private String siteName;
     private String writerName;
 
+    // 작업 요약
     private String workType;
     private String workLocation;
     private String todayWork;
     private int workerCount;
     private String specialNote;
     private LocalDateTime createdAt;
-
+    
+    // 장비 & 자재
     private List<EquipmentInfo> equipmentList;
     private List<MaterialInfo> materialList;
 

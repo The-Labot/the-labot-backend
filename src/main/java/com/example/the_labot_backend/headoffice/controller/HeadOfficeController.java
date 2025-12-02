@@ -1,9 +1,6 @@
 package com.example.the_labot_backend.headoffice.controller;
 
-import com.example.the_labot_backend.headoffice.dto.HeadOfficeCheckResponse;
-import com.example.the_labot_backend.headoffice.dto.HeadOfficeRequest;
-import com.example.the_labot_backend.headoffice.dto.HeadOfficeResponse;
-import com.example.the_labot_backend.headoffice.dto.SecretCodeRequest;
+import com.example.the_labot_backend.headoffice.dto.*;
 import com.example.the_labot_backend.headoffice.service.HeadOfficeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +78,7 @@ public class HeadOfficeController {
 
     // 본사 수정
     @PutMapping
-    public ResponseEntity<?> update(@RequestBody HeadOfficeRequest request) {
+    public ResponseEntity<?> update(@RequestBody HeadOfficeUpdateRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 

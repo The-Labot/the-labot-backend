@@ -219,8 +219,10 @@ public class WorkerService {
     // 추후 출퇴근기록 등 기능 추가
     @Transactional(readOnly = true)
     public WorkerDetailResponse getWorkerDetail(Long workerId) {
+        
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new RuntimeException("해당 근로자를 찾을 수 없습니다."));
+
         // 1. 근로계약서 (우리가 저장할 때 targetType="WORKER_CONTRACT"로 하기로 약속)
         List<FileResponse> contractList = fileService.getFilesResponseByTarget("WORKER_CONTRACT", workerId);
         FileResponse contractFile = contractList.isEmpty() ? null : contractList.get(0); // 1개만 꺼냄
