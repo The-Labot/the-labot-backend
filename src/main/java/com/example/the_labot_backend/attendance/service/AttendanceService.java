@@ -7,6 +7,7 @@ import com.example.the_labot_backend.attendance.entity.Attendance;
 import com.example.the_labot_backend.attendance.entity.AttendanceStatus;
 import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
 import com.example.the_labot_backend.attendanceRecord.entity.AttendanceRecord;
+import com.example.the_labot_backend.attendanceRecord.repository.AttendanceRecordRepository;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.workers.entity.Worker;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
-
+    private final AttendanceRecordRepository attendanceRecordRepository;
 
     // ▼▼▼ [★ 1. 기준 시간 2개 설정] ▼▼▼
     private static final LocalTime NINE_AM = LocalTime.of(9, 0);  // 9시 00분 00초
