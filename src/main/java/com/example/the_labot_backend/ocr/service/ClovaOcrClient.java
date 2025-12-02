@@ -97,31 +97,13 @@ public class ClovaOcrClient {
 
     public String callIdCardApi(MultipartFile imageFile) {
         try {
-            // 1. HTTP 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("X-OCR-SECRET", idCardSecretKey);
 
-            // 2. HTTP 바디(Body) 생성
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-            // 2-1. 'message' JSON 파트 생성
-            Map<String, Object> message = new HashMap<>();
-            message.put("version", "V2");
-            message.put("requestId", UUID.randomUUID().toString());
-            message.put("timestamp", System.currentTimeMillis());
-
-
-            String format = getFileExtension(imageFile.getOriginalFilename());
-
-            Map<String, String> imageInfo = new HashMap<>();
-            imageInfo.put("format", format); // ★ 수정된 format 사용
-            imageInfo.put("name", "id-card-image");
-            message.put("images", List.of(imageInfo));
-
-            body.add("message", objectMapper.writeValueAsString(message));
-
-            // 2-2. 'file' 바이너리 파트 생성
+            // 1) file
             ByteArrayResource fileResource = new ByteArrayResource(imageFile.getBytes()) {
                 @Override
                 public String getFilename() {
@@ -130,22 +112,30 @@ public class ClovaOcrClient {
             };
             body.add("file", fileResource);
 
-            // 3. API 호출
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            // 2) message (Content-Type: application/json 필수)
+            Map<String, Object> message = new HashMap<>();
+            message.put("version", "V2");
+            message.put("requestId", UUID.randomUUID().toString());
+            message.put("timestamp", System.currentTimeMillis());
 
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                    idCardApiUrl,
-                    requestEntity,
-                    String.class
-            );
+            HttpHeaders jsonHeaders = new HttpHeaders();
+            jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-            // 4. 결과 파싱
+            HttpEntity<String> messagePart =
+                    new HttpEntity<>(objectMapper.writeValueAsString(message), jsonHeaders);
+
+            body.add("message", messagePart);
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                    new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response =
+                    restTemplate.exchange(idCardApiUrl, HttpMethod.POST, requestEntity, String.class);
+
             if (response.getStatusCode() == HttpStatus.OK) {
                 return response.getBody();
             } else {
-                // (디버깅을 위해 에러 본문도 로그에 추가)
-                String responseBody = response.getBody() != null ? response.getBody() : "No Response Body";
-                throw new RuntimeException("ID Card OCR API 호출 실패: " + response.getStatusCode() + " - " + responseBody);
+                throw new RuntimeException("ID Card OCR API 호출 실패: " + response.getStatusCode());
             }
 
         } catch (Exception e) {
@@ -153,6 +143,7 @@ public class ClovaOcrClient {
             throw new RuntimeException("ID Card OCR 처리 중 예외 발생", e);
         }
     }
+
 
     /**
      * [★ 신규 헬퍼 ★]
