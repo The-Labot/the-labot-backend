@@ -57,10 +57,16 @@ public class ClovaOcrClient {
             Map<String, String> imageInfo = new HashMap<>();
             imageInfo.put("format", format);
             imageInfo.put("name", templateName);
-
             message.put("images", List.of(imageInfo));
 
-            body.add("message", objectMapper.writeValueAsString(message));
+            // [★ 핵심 변경] 단순히 String만 넣는 게 아니라, Headers를 포함한 HttpEntity로 포장
+            HttpHeaders jsonHeaders = new HttpHeaders();
+            jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> messageEntity =
+                    new HttpEntity<>(objectMapper.writeValueAsString(message), jsonHeaders);
+
+            body.add("message", messageEntity);
 
             // file
             ByteArrayResource fileResource = new ByteArrayResource(imageFile.getBytes()) {
