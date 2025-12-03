@@ -7,6 +7,8 @@ import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
 import com.example.the_labot_backend.workers.dto.WorkerDashboardResponse;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import com.example.the_labot_backend.workers.service.WorkerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +27,16 @@ import java.util.Map;
 public class WorkerController {
 
     private final WorkerService workerService;
+    private final ObjectMapper objectMapper;
 
     // 근로자 등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createWorker(
-            @RequestPart(value = "data") FinalSaveDto request,
-            @RequestPart(value = "files", required = false) List<MultipartFile> contractFiles) {
+            @RequestPart(value = "data") String dataJson,
+            @RequestPart(value = "files", required = false) List<MultipartFile> contractFiles) throws JsonProcessingException {
         // 1. JSON 데이터 받기 (key: "data")
         // 2. 파일 데이터 받기 (key: "files") - 파일은 없을 수도 있으니 required=false
+        FinalSaveDto request = objectMapper.readValue(dataJson, FinalSaveDto.class);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = Long.parseLong(auth.getName());
 
