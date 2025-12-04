@@ -58,8 +58,7 @@ public class ContractOcrService {
         } else {
             dto.setContractType("일용직");
         }
-        String startY = null, startM = null, startD = null;
-        String endY = null, endM = null, endD = null;
+
 
         for (ClovaOcrResponseDto.Field field : fields) {
             String fieldName = field.getName();
@@ -67,19 +66,15 @@ public class ContractOcrService {
             if (rawText == null || rawText.isBlank()) continue;
             String cleanNumber = rawText.replaceAll("[^0-9]", "");
             switch (fieldName) {
-                case "contractStartDateYear":
-                    startY = cleanNumber;
-                    break;
-                case "contractStartDateMonth":
-                    startM = cleanNumber;
-                    break;
-                case "contractStartDateDay":   // (혹시 ContractStartDateDay 였다면 C를 대문자로 수정하세요)
-                    startD = cleanNumber;
+                case "contractStartDate":
+                    dto.setContractStartDate(parseDateFromMixedString(rawText));
                     break;
 
-                // ========================================================
-                //  [종료일]
-                // ========================================================
+                case "contractEndDate":
+                    dto.setContractEndDate(parseDateFromMixedString(rawText));
+                    break;
+
+
 
 
                 case "wage_calculation_date":
@@ -114,7 +109,21 @@ public class ContractOcrService {
                     break;
 
                 case "bank_name":
-                    String cleanBank = rawText.replaceAll("[:.]", "").trim();
+                    // 예: "(은행 국민" -> "국민"
+                    // 예: "(은행:농협" -> "농협"
+                    // 예: "신한은행" -> "신한은행" (유지됨)
+
+                    String rawBank = rawText;
+
+                    // 1. "(은행" 이라는 라벨 텍스트가 섞여 있다면 제거
+                    if (rawBank.contains("(은행")) {
+                        rawBank = rawBank.replace("(은행", "");
+                    }
+
+                    // 2. 라벨 제거 후 남은 특수문자(:, (, )) 및 공백 제거
+                    // [:()] -> 콜론, 여는괄호, 닫는괄호
+                    String cleanBank = rawBank.replaceAll("[:()]", "").trim();
+
                     dto.setBankName(cleanBank);
                     break;
 
@@ -135,9 +144,7 @@ public class ContractOcrService {
                     dto.setEmergencyNumber(cleanPhoneNumber(rawText));
                     break;
 
-                // ========================================================
-                //  ★ 분기가 필요한 필드들 (여기서 isMonthly로 가름)
-                // ========================================================
+
 
 
 
@@ -145,44 +152,89 @@ public class ContractOcrService {
 
             }
         }
-        // 5. [합체] 모은 조각들로 LocalDate 생성
-        LocalDate startDate = mergeDate(startY, startM, startD);
-        dto.setContractStartDate(startDate);
+
         
-        if (startDate != null) {
-            LocalDate endDate = startDate.plusMonths(1).minusDays(1);
-            dto.setContractEndDate(endDate);
-            log.info(">> 종료일 자동 계산: {} (시작일 {} 로부터 1개월)", endDate, startDate);
-        } else {
-            dto.setContractEndDate(null);
-        }
+
 
         return dto;
 
 
 
     }
-    private LocalDate mergeDate(String yStr, String mStr, String dStr) {
-        // 하나라도 비어있으면 날짜 생성 불가
-        if (yStr == null || mStr == null || dStr == null) return null;
-        if (yStr.isBlank() || mStr.isBlank() || dStr.isBlank()) return null;
+    private LocalDate parseDateFromMixedString(String raw) {
+        if (raw == null || raw.isBlank()) return null;
 
-        try {
-            int y = Integer.parseInt(yStr);
-            int m = Integer.parseInt(mStr);
-            int d = Integer.parseInt(dStr);
+        // 디버깅을 위해 로그를 꼭 확인해보세요!
+        log.info(">> 날짜 파싱 시도 (원본): [{}]", raw);
 
-            // 연도가 2자리(예: 25)로 인식됐다면 2025로 보정
-            if (y < 100) y += 2000;
-
-            // 유효성 검사 (13월, 32일 등 방지)
-            return LocalDate.of(y, m, d);
-
-        } catch (Exception e) {
-            log.warn("날짜 합치기 실패: {}-{}-{}", yStr, mStr, dStr);
-            return null;
+        // 1. 문자열에서 "숫자"만 모두 추출하여 리스트에 담기
+        // 예: "2. 근로계약 시작일: 2025. 09. 01." -> [2, 2025, 9, 1]
+        // 예: "25/10/15" -> [25, 10, 15]
+        List<Integer> numbers = new ArrayList<>();
+        Matcher matcher = Pattern.compile("\\d+").matcher(raw);
+        while (matcher.find()) {
+            numbers.add(Integer.parseInt(matcher.group()));
         }
+
+        // 2. 숫자 리스트를 순회하며 "연-월-일" 패턴 찾기
+        // (숫자가 최소 3개 이상이어야 날짜 구성 가능)
+        for (int i = 0; i <= numbers.size() - 3; i++) {
+            int y = numbers.get(i);
+            int m = numbers.get(i + 1);
+            int d = numbers.get(i + 2);
+
+            // [검증 1] 월(Month)은 1~12 사이여야 함
+            if (m < 1 || m > 12) continue;
+
+            // [검증 2] 일(Day)은 1~31 사이여야 함
+            if (d < 1 || d > 31) continue;
+
+            // [검증 3] 연도(Year) 보정 및 확인
+            // 경우 A: 4자리 연도 (예: 2025) -> 그대로 사용
+            // 경우 B: 2자리 연도 (예: 25) -> 2000 더하기
+            if (y < 100) {
+                y += 2000;
+            }
+
+            // 연도가 너무 작거나(1900년 미만) 너무 크면 날짜 아님 -> 패스
+            // (앞에 붙은 '2.' 같은 목차 번호를 여기서 걸러냄)
+            if (y < 2000 || y > 2100) continue;
+
+            try {
+                // 유효한 날짜 찾음 -> 즉시 리턴
+                LocalDate result = LocalDate.of(y, m, d);
+                log.info(">> 날짜 파싱 성공: {}", result);
+                return result;
+            } catch (Exception e) {
+                // 날짜 생성 실패 (예: 2월 30일 등) -> 다음 조합 검색
+                continue;
+            }
+        }
+
+        log.warn(">> 날짜 패턴을 찾을 수 없음: {}", raw);
+        return null;
     }
+
+    // 2자리 연도(예: 25.10.10) 처리를 위한 보조 메서드
+    private LocalDate parseShortYearDate(String raw) {
+        try {
+            String[] parts = raw.replaceAll("[^0-9]+", " ").trim().split(" ");
+            if (parts.length >= 3) {
+                int y = Integer.parseInt(parts[0]);
+                int m = Integer.parseInt(parts[1]);
+                int d = Integer.parseInt(parts[2]);
+
+                // 연도가 100 미만이면 2000년대라고 가정
+                if (y < 100) y += 2000;
+
+                return LocalDate.of(y, m, d);
+            }
+        } catch (Exception e) {
+            log.warn("2자리 연도 파싱 실패: {}", raw);
+        }
+        return null;
+    }
+
 
     private LocalDate[] parseWagePeriodSimple(String raw) {
         LocalDate[] results = new LocalDate[2];
