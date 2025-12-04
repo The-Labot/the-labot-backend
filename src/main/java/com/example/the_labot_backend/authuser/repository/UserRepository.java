@@ -23,4 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     int countByHeadOffice_IdAndRole(Long headOfficeId, Role role);
 
     List<User> findByHeadOfficeAndSiteAndRole(HeadOffice headOffice, Site site, Role role);
+
 }

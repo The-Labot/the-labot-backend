@@ -1,11 +1,13 @@
 package com.example.the_labot_backend.admins.controller;
 
+import com.example.the_labot_backend.admins.dto.SiteManagerResponse;
 import com.example.the_labot_backend.admins.service.AdminService;
 import com.example.the_labot_backend.admins.dto.ManagerCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -25,4 +27,18 @@ public class AdminController {
                 "message", "현장관리자 회원가입 성공"
         ));
     }
+
+    // 현장관리자 생성
+    @GetMapping("/{siteId}/manager")
+    public ResponseEntity<?> createManager(
+            @PathVariable Long siteId ) {
+        List<SiteManagerResponse> response =  service.getSiteManagers(siteId);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "현장관리자 회원가입 성공",
+                "data", response
+        ));
+    }
+
+
 }

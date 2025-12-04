@@ -1,6 +1,7 @@
 package com.example.the_labot_backend.admins.service;
 
 import com.example.the_labot_backend.admins.dto.ManagerCreateRequest;
+import com.example.the_labot_backend.admins.dto.SiteManagerResponse;
 import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +50,21 @@ public class AdminService {
         userRepository.save(manager);
 
         // 나중에 SMS 보내기 가능
+    }
+
+    /* 🔹 관리자 목록 조회 */
+    @Transactional(readOnly = true)
+    public List<SiteManagerResponse> getSiteManagers(Long siteId) {
+
+        List<User> managers = userRepository.findBySiteIdAndRole(siteId,Role.ROLE_MANAGER);
+
+        return managers.stream()
+                .map(m -> SiteManagerResponse.builder()
+                        .id(m.getId())
+                        .name(m.getName())
+                        .phone(m.getPhoneNumber())
+                        .build()
+                ).toList();
     }
 
 }
