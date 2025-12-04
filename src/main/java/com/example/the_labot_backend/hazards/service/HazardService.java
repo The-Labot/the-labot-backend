@@ -4,6 +4,7 @@ import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.hazards.dto.HazardDetailResponse;
 import com.example.the_labot_backend.hazards.dto.HazardListResponse;
 import com.example.the_labot_backend.hazards.entity.Hazard;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static com.example.the_labot_backend.global.util.TimeUtils.formatTimeAgo;
 
@@ -36,7 +36,7 @@ public class HazardService {
                              List<MultipartFile> files,
                              Long userId)   {
         User reporter = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(createHazard) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(createHazard) userId:" + userId));
 
         // 신고 엔티티 생성
         Hazard hazard = Hazard.builder()
@@ -60,7 +60,7 @@ public class HazardService {
 
         // 해당 User 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHazardsByUser) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getHazardsByUser) userId:" + userId));
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
@@ -85,7 +85,7 @@ public class HazardService {
     @Transactional(readOnly = true)
     public HazardDetailResponse getHazardDetail(Long hazardId) {
         Hazard hazard = hazardRepository.findById(hazardId)
-                .orElseThrow(() -> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다.(getHazardDetail) hazardId:" + hazardId));
+                .orElseThrow(() -> new NotFoundException("해당 위험요소 신고를 찾을 수 없습니다.(getHazardDetail) hazardId:" + hazardId));
 
         // 파일 조회
         List<File> files = fileService.getFilesByTarget("HAZARD", hazardId);
@@ -97,7 +97,7 @@ public class HazardService {
     @Transactional
     public Hazard updateStatus(Long hazardId, HazardStatus newStatus) {
         Hazard hazard = hazardRepository.findById(hazardId)
-                .orElseThrow(() -> new NoSuchElementException("해당 위험요소 신고를 찾을 수 없습니다.(updateStatus) hazardId:" + hazardId));
+                .orElseThrow(() -> new NotFoundException("해당 위험요소 신고를 찾을 수 없습니다.(updateStatus) hazardId:" + hazardId));
 
         hazard = Hazard.builder()
                 .site(hazard.getSite()) //site가 null이 되는거 해결!
@@ -119,7 +119,7 @@ public class HazardService {
     @Transactional
     public void deleteHazard(Long hazardId) {
         Hazard hazard = hazardRepository.findById(hazardId)
-                .orElseThrow(()-> new RuntimeException("해당 위험요소 신고를 찾을 수 없습니다.(deleteHazard) hazardId:" + hazardId));
+                .orElseThrow(()-> new NotFoundException("해당 위험요소 신고를 찾을 수 없습니다.(deleteHazard) hazardId:" + hazardId));
 
         // 위험요소 신고에 연결된 파일 삭제
         fileService.deleteFilesByTarget("HAZARD", hazardId);

@@ -100,7 +100,7 @@ public class ReportService {
         
         // 해당 User 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + userId));
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
@@ -288,7 +288,7 @@ public class ReportService {
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("현장을 찾을 수 없습니다."));
 
         LocalDate date = LocalDate.of(year, month, day);
 

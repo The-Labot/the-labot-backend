@@ -5,6 +5,7 @@ import com.example.the_labot_backend.admins.dto.AdminWorkerListResponse;
 import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.global.exception.ForbiddenException;
 import com.example.the_labot_backend.workers.entity.Worker;
 import com.example.the_labot_backend.workers.repository.WorkerRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class AdminWorkerService {
     public List<AdminWorkerListResponse> getAllWorkersByHeadOffice(Long siteId, User adminUser) {
         // 1. 관리자의 본사 정보 확인
         if (adminUser.getHeadOffice() == null) {
-            throw new RuntimeException("해당 관리자는 본사 소속이 아닙니다.");
+            throw new ForbiddenException("해당 관리자는 본사 소속이 아닙니다.");
         }
 
         // 2. 해당 본사 ID로 모든 근로자 조회 (Repository 호출)

@@ -2,6 +2,7 @@ package com.example.the_labot_backend.headoffice.service;
 
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeCheckResponse;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeRequest;
 import com.example.the_labot_backend.headoffice.dto.HeadOfficeResponse;
@@ -27,7 +28,7 @@ public class HeadOfficeService {
     public HeadOfficeResponse createHeadOffice(Long userId, HeadOfficeRequest request) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
         HeadOffice office = HeadOffice.builder()
                 .name(request.getName())
@@ -51,10 +52,10 @@ public class HeadOfficeService {
     public HeadOfficeCheckResponse checkHeadOffice(Long userId, String secretCode) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
         HeadOffice office = headOfficeRepository.findBySecretCode(secretCode)
-                .orElseThrow(() -> new RuntimeException("본사를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("본사를 찾을 수 없습니다."));
 
         user.setHeadOffice(office);
 
@@ -69,7 +70,7 @@ public class HeadOfficeService {
     public boolean hasHeadOffice(Long userId) {
         // HeadOffice 테이블에 관리자(Admin) ID로 매핑되어 있는 경우
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
         return user.getHeadOffice() != null;
     }
@@ -79,12 +80,12 @@ public class HeadOfficeService {
     public HeadOfficeResponse getHeadOffice(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
         Long officeId = user.getHeadOffice().getId();
 
         HeadOffice office = headOfficeRepository.findById(officeId)
-                .orElseThrow(() -> new RuntimeException("본사를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("본사를 찾을 수 없습니다."));
 
         return HeadOfficeResponse.from(office);
     }
@@ -93,12 +94,12 @@ public class HeadOfficeService {
     @Transactional
     public HeadOfficeResponse updateHeadOffice(Long userId, HeadOfficeUpdateRequest request){
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getHeadOffice) userId:" + userId));
 
         Long officeId = user.getHeadOffice().getId();
 
         HeadOffice office = headOfficeRepository.findById(officeId)
-                .orElseThrow(() -> new RuntimeException("본사를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("본사를 찾을 수 없습니다."));
 
         office.setName(request.getName());
         office.setAddress(request.getAddress());

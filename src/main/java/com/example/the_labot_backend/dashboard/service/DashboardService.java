@@ -4,14 +4,13 @@ import com.example.the_labot_backend.attendance.entity.Attendance;
 import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
-import com.example.the_labot_backend.global.util.TimeUtils;
 import com.example.the_labot_backend.dashboard.dto.DashboardResponse;
+import com.example.the_labot_backend.global.exception.ForbiddenException;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.hazards.entity.Hazard;
 import com.example.the_labot_backend.hazards.repository.HazardRepository;
 import com.example.the_labot_backend.reports.entity.Report;
 import com.example.the_labot_backend.reports.repository.ReportRepository;
-import java.time.DayOfWeek;
-
 import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.sites.repository.SiteRepository;
 import com.example.the_labot_backend.workers.entity.WorkerStatus;
@@ -45,7 +44,7 @@ public class DashboardService {
     @Transactional(readOnly = true)
     public DashboardResponse getDashboardForManager(Long userId) {
         User manager = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("관리자 정보 없음"));
+                .orElseThrow(() -> new NotFoundException("관리자 정보 없음"));
 
         // 내 소속 현장 ID 사용
         return buildDashboardResponse(manager.getSite().getId());
@@ -58,15 +57,15 @@ public class DashboardService {
     public DashboardResponse getDashboardForHeadOffice(Long adminId, Long siteId) {
         // (1) 본사 관리자 확인
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("관리자 정보 없음"));
+                .orElseThrow(() -> new NotFoundException("관리자 정보 없음"));
 
         // (2) 조회하려는 현장 확인
         Site targetSite = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장 정보 없음"));
+                .orElseThrow(() -> new NotFoundException("현장 정보 없음"));
 
         // (3) ★ 권한 검증: 내 본사(HeadOffice) 소속 현장이 맞는지?
         if (!admin.getHeadOffice().getId().equals(targetSite.getHeadOffice().getId())) {
-            throw new RuntimeException("해당 현장에 대한 접근 권한이 없습니다.");
+            throw new ForbiddenException("해당 현장에 대한 접근 권한이 없습니다.");
         }
 
         // (4) 검증 통과하면 똑같은 로직으로 데이터 생성

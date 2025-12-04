@@ -39,7 +39,7 @@ public class SiteService {
 
         // 1. 본사 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.: " + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.: " + userId));
 
         // SocialIns 생성
         SiteSocialIns socialIns = createSocialIns(request.getSocialIns());
@@ -85,7 +85,7 @@ public class SiteService {
     public DashboardResponse getDashboard(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(dashboard): " + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(dashboard): " + userId));
 
         Long headOfficeId = user.getHeadOffice().getId();
 
@@ -301,7 +301,7 @@ public class SiteService {
     public void deleteSite(Long siteId) {
 
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다. id=" + siteId));
+                .orElseThrow(() -> new NotFoundException("현장을 찾을 수 없습니다. id=" + siteId));
 
         siteRepository.delete(site); // 완전 삭제
     }

@@ -10,10 +10,12 @@ import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.repository.FileRepository;
 import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.global.exception.BadRequestException;
+import com.example.the_labot_backend.global.exception.ForbiddenException;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
 import com.example.the_labot_backend.sites.entity.Site;
-
 import com.example.the_labot_backend.workers.dto.WorkerDashboardResponse;
 import com.example.the_labot_backend.workers.dto.WorkerDetailResponse;
 import com.example.the_labot_backend.workers.dto.WorkerListResponse;
@@ -53,18 +55,18 @@ public class WorkerService {
     public void createWorker(Long managerId, FinalSaveDto request,List<MultipartFile> contractFiles) {
 
         User manager = userRepository.findById(managerId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + managerId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + managerId));
 
         Site site = manager.getSite();
         HeadOffice headOffice = site.getHeadOffice();
 
         if (manager.getRole() != Role.ROLE_MANAGER) {
-            throw new RuntimeException("현장관리자만 근로자를 등록할 수 있습니다.");
+            throw new ForbiddenException("현장관리자만 근로자를 등록할 수 있습니다.");
         }
 
         // 전화번호 중복 체크
         if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 전화번호입니다.");
+            throw new BadRequestException("이미 존재하는 전화번호입니다.");
         }
 
         // 임시 비밀번호 생성
@@ -172,7 +174,7 @@ public class WorkerService {
 
         // 1. 관리자 정보로 현장 ID 찾기
         User manager = userRepository.findById(managerId)
-                .orElseThrow(() -> new RuntimeException("관리자 정보 없음"));
+                .orElseThrow(() -> new NotFoundException("관리자 정보 없음"));
         Long siteId = manager.getSite().getId();
 
         // 2. 퇴직자(RETIRED)를 제외한 현장 근로자 전체 조회
@@ -221,7 +223,7 @@ public class WorkerService {
     public WorkerDetailResponse getWorkerDetail(Long workerId) {
         
         Worker worker = workerRepository.findById(workerId)
-                .orElseThrow(() -> new RuntimeException("해당 근로자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 근로자를 찾을 수 없습니다."));
 
         // 1. 근로계약서 (우리가 저장할 때 targetType="WORKER_CONTRACT"로 하기로 약속)
         List<FileResponse> contractList = fileService.getFilesResponseByTarget("WORKER_CONTRACT", workerId);

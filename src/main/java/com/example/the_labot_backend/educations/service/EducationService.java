@@ -103,7 +103,7 @@ public class EducationService {
 
         // 해당 User 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getReportsByUser) userId:" + userId));
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
@@ -118,7 +118,7 @@ public class EducationService {
     @Transactional(readOnly = true)
     public EducationDetailResponse getEducationDetail(Long userId, Long educationId) {
         Education edu = educationRepository.findById(educationId)
-                .orElseThrow(() -> new RuntimeException("안전교육일지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("안전교육일지를 찾을 수 없습니다."));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
@@ -161,7 +161,7 @@ public class EducationService {
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
         Education education = educationRepository.findById(educationId)
-                .orElseThrow(() -> new RuntimeException("교육일지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("교육일지를 찾을 수 없습니다."));
 
         if(!education.getSite().getId().equals(writer.getSite().getId())){
             throw new ForbiddenException("해당 안전교육일지에 접근할 권한이 없습니다.");

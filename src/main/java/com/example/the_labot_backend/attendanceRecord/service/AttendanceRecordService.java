@@ -42,17 +42,17 @@ public class AttendanceRecordService {
         // 1) 권한 검증
         // -----------------------
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("관리자를 찾을 수 없습니다. adminId=" + adminId));
+                .orElseThrow(() -> new NotFoundException("관리자를 찾을 수 없습니다. adminId=" + adminId));
 
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다. siteId=" + siteId));
+                .orElseThrow(() -> new NotFoundException("현장을 찾을 수 없습니다. siteId=" + siteId));
 
         if (!admin.getHeadOffice().getId().equals(site.getHeadOffice().getId())) {
             throw new ForbiddenException("해당 현장에 접근할 권한이 없습니다.");
         }
 
         User worker = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("근로자를 찾을 수 없습니다. userId=" + userId));
+                .orElseThrow(() -> new NotFoundException("근로자를 찾을 수 없습니다. userId=" + userId));
 
         if (!worker.getSite().getId().equals(siteId)) {
             throw new ForbiddenException("해당 현장에 소속된 근로자가 아닙니다.");
@@ -144,27 +144,27 @@ public class AttendanceRecordService {
         // 1) 권한 검증
         // -----------------------
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. adminId:" + adminId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다. adminId:" + adminId));
 
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다. siteId:" + siteId));
+                .orElseThrow(() -> new NotFoundException("현장을 찾을 수 없습니다. siteId:" + siteId));
 
         // 본사관리자의 현장과 현장Id가 다른 경우
         if (!admin.getHeadOffice().getId().equals(site.getHeadOffice().getId())) {
-            throw new RuntimeException("해당 현장에 접근할 권한이 없습니다.");
+            throw new ForbiddenException("해당 현장에 접근할 권한이 없습니다.");
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다. userId:" + userId));
 
         // 현장과 근로자의 현장이 다른 경우
         if (!user.getSite().getId().equals(siteId)) {
-            throw new RuntimeException("해당 현장에 소속된 근로자가 아닙니다.");
+            throw new ForbiddenException("해당 현장에 소속된 근로자가 아닙니다.");
         }
 
         // userId와 workerId는 동일
         Worker worker = workerRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("근로자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("근로자를 찾을 수 없습니다."));
         
         LocalDate targetDate = req.getDate();
 

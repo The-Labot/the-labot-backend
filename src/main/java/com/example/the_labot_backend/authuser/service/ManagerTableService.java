@@ -4,6 +4,9 @@ import com.example.the_labot_backend.authuser.dto.ManagerListResponse;
 import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.global.exception.BadRequestException;
+import com.example.the_labot_backend.global.exception.ForbiddenException;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.headoffice.entity.HeadOffice;
 import com.example.the_labot_backend.sites.entity.Site;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +29,18 @@ public class ManagerTableService {
     public List<ManagerListResponse> getCoManagers(Long currentManagerId) {
         // 1. 현재 요청한 관리자 정보 조회
         User currentManager = userRepository.findById(currentManagerId)
-                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("사용자 정보를 찾을 수 없습니다."));
 
         // 2. 관리자 권한 체크 (안전장치)
         if (currentManager.getRole() != Role.ROLE_MANAGER) {
-            throw new RuntimeException("현장 관리자만 조회할 수 있습니다.");
+            throw new ForbiddenException("현장 관리자만 조회할 수 있습니다.");
         }
 
         HeadOffice headOffice = currentManager.getHeadOffice();
         Site site = currentManager.getSite();
 
         if (site == null) {
-            throw new RuntimeException("본사 또는 현장 정보가 배정되지 않은 관리자입니다.");
+            throw new BadRequestException("본사 또는 현장 정보가 배정되지 않은 관리자입니다.");
         }
 
         // 3. 같은 본사 + 같은 현장 + ROLE_MANAGER인 유저 조회

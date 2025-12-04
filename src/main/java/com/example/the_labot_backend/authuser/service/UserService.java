@@ -2,6 +2,8 @@ package com.example.the_labot_backend.authuser.service;
 
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.global.exception.BadRequestException;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,10 @@ public class UserService {
     public void resetPassword(String phoneNumber,String name) {
 
         User user = userRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new RuntimeException("해당 전화번호로 등록된 사용자가 없습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 전화번호로 등록된 사용자가 없습니다."));
 
         if (!user.getName().equals(name)) {
-            throw new RuntimeException("입력하신 이름이 일치하지 않습니다.");
+            throw new BadRequestException("입력하신 이름이 일치하지 않습니다.");
         }
 
         // 임시 비밀번호 생성
@@ -46,10 +48,10 @@ public class UserService {
 
         // 테스트용 임시 SMS 전송 주석
         // SMS 전송
-        smsService.sendSms(
-                phoneNumber,
-                "[THE LABOT] 임시 비밀번호는 [" + tempPassword + "] 입니다.\n로그인 후 비밀번호를 변경하세요."
-        );
+//        smsService.sendSms(
+//                phoneNumber,
+//                "[THE LABOT] 임시 비밀번호는 [" + tempPassword + "] 입니다.\n로그인 후 비밀번호를 변경하세요."
+//        );
     }
 
     // 임시 비밀번호 생성
@@ -72,11 +74,11 @@ public class UserService {
     public void changePassword(Long userId, String oldPassword, String newPassword) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
         // 기존 비밀번호가 맞는지 확인
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new RuntimeException("기존 비밀번호가 일치하지 않습니다.");
+            throw new BadRequestException("기존 비밀번호가 일치하지 않습니다.");
         }
 
         // 새 비밀번호 암호화 후 저장

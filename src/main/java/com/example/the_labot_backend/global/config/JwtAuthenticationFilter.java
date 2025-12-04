@@ -46,8 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("JwtFilter 실행됨: " + request.getRequestURI() + "\n");
 
         // 1) 인증 필요 없는 경로는 필터 통과
-        String path = request.getServletPath();
-        if (path.startsWith("/api/auth")) {
+        String path = request.getRequestURI();
+        if (path.startsWith("/api/auth/login") ||
+                path.startsWith("/api/auth/reset-password") ||
+                path.startsWith("/api/auth/signup")) {
+
             filterChain.doFilter(request, response);
             return;
         }

@@ -4,6 +4,7 @@ import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +23,7 @@ public class MapService {
     @Transactional
     public void uploadMap(Long userId, List<MultipartFile> files){
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다. userId:" + userId));
 
         
         // user로 siteId 찾기
@@ -40,7 +41,7 @@ public class MapService {
     public List<FileResponse> getMapByUser(Long userId){
         // 해당 User 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getNoticesByUser) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getNoticesByUser) userId:" + userId));
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
@@ -61,7 +62,7 @@ public class MapService {
     public void deleteMap(Long userId){
         // 해당 User 찾기
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getNoticesByUser) userId:" + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다.(getNoticesByUser) userId:" + userId));
 
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();

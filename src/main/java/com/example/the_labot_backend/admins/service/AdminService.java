@@ -5,6 +5,9 @@ import com.example.the_labot_backend.admins.dto.SiteManagerResponse;
 import com.example.the_labot_backend.authuser.entity.Role;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.global.exception.BadRequestException;
+import com.example.the_labot_backend.global.exception.ConflictException;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.sites.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +29,21 @@ public class AdminService {
     @Transactional
     public void createManager(Long siteId, ManagerCreateRequest request) {
 
+        // 필수값 검증
+        if (request.getPhoneNumber() == null || request.getPhoneNumber().isBlank()) {
+            throw new BadRequestException("전화번호는 필수 입력 항목입니다.");
+        }
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new BadRequestException("이름은 필수 입력 항목입니다.");
+        }
+
         // 현장 존재 여부 확인
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new RuntimeException("현장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("현장을 찾을 수 없습니다."));
 
         // 전화번호 중복 검사
         if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 전화번호입니다.");
+            throw new ConflictException("이미 존재하는 전화번호입니다.");
         }
 
         // 4. 임시 비밀번호 생성
