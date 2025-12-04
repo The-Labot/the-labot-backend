@@ -48,10 +48,10 @@ public class UserService {
 
         // 테스트용 임시 SMS 전송 주석
         // SMS 전송
-//        smsService.sendSms(
-//                phoneNumber,
-//                "[THE LABOT] 임시 비밀번호는 [" + tempPassword + "] 입니다.\n로그인 후 비밀번호를 변경하세요."
-//        );
+        smsService.sendSms(
+                phoneNumber,
+                "[THE LABOT] 임시 비밀번호는 [" + tempPassword + "] 입니다.\n로그인 후 비밀번호를 변경하세요."
+        );
     }
 
     // 임시 비밀번호 생성
