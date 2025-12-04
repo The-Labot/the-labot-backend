@@ -29,7 +29,8 @@ public class UserService {
         }
 
         // 임시 비밀번호 생성
-        String tempPassword = generateTempPassword();
+        String tempPassword = "1234";
+    //    String tempPassword = generateTempPassword();
 
         // 비밀번호 변경
         user.setPassword(passwordEncoder.encode(tempPassword));
@@ -44,11 +45,11 @@ public class UserService {
         System.out.println(tempPassword);
 
         // 테스트용 임시 SMS 전송 주석
-//        // SMS 전송
-//        smsService.sendSms(
-//                phoneNumber,
-//                "[THE LABOT] 임시 비밀번호는 [" + tempPassword + "] 입니다.\n로그인 후 비밀번호를 변경하세요."
-//        );
+        // SMS 전송
+        smsService.sendSms(
+                phoneNumber,
+                "[THE LABOT] 임시 비밀번호는 [" + tempPassword + "] 입니다.\n로그인 후 비밀번호를 변경하세요."
+        );
     }
 
     // 임시 비밀번호 생성

@@ -33,14 +33,14 @@ public class AuthService {
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new RuntimeException("해당 전화번호가 존재하지 않습니다."));
 
-//        // **테스트용 임시 주석 처리
-//        // 비밀번호 조회
-//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-//
-//            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
-//            System.out.println("암호화된 비밀번호: " + user.getPassword());
-//            throw new RuntimeException("비밀번호가 올바르지 않습니다.");
-//        }
+        // **테스트용 임시 주석 처리
+        // 비밀번호 조회
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+
+            System.out.println("암호화된 비밀번호: " + passwordEncoder.encode(request.getPassword()));
+            System.out.println("암호화된 비밀번호: " + user.getPassword());
+            throw new RuntimeException("비밀번호가 올바르지 않습니다.");
+        }
 
         // clientType 값 체크
         if (request.getClientType() == null) {

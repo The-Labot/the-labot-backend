@@ -47,7 +47,7 @@ public class HeadOfficeService {
     // 본사코드로 본사 등록
     // 본사가 존재할 경우 true와 본사명 반환
     // 본사가 없을경우 false 반환
-    @Transactional(readOnly = true)
+    @Transactional
     public HeadOfficeCheckResponse checkHeadOffice(Long userId, String secretCode) {
 
         User user = userRepository.findById(userId)

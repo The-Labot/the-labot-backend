@@ -88,7 +88,7 @@ public class Site {
     @Column(nullable = false)
     private InsuranceResponsibility insuranceResponsibility;
 
-    @Column(length = 11, unique = true)
+    @Column(length = 15, unique = true)
     private String employmentInsuranceSiteNum; // 4대보험 고용번호 (사업장 관리번호 11자리, 근로자 실업급여용)
 
     @Column(length = 20)
