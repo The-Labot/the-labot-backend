@@ -6,6 +6,7 @@ services:
     restart: always #죽었을때나 재부팅할때 자동으로 재시작 (일부로 멈추는건 재시작 안함)
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - TZ=Asia/Seoul
     env_file:
       - .env
     depends_on:
@@ -24,6 +25,7 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+09:00
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s
