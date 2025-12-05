@@ -34,7 +34,7 @@ public class AttendanceService {
 
 
     // 현장 허용 거리 (예: 100미터)
-    private static final double ALLOWED_DISTANCE_METERS = 100.0;
+    private static final double ALLOWED_DISTANCE_METERS = 500.0;
 
     @Transactional
     public ClockInOutResponseDto recordClockInOut(User user, ClockInOutRequestDto dto) {
