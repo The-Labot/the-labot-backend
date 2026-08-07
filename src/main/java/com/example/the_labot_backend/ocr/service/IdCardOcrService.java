@@ -24,7 +24,8 @@ public class IdCardOcrService {
     public IdCardDataDto processIdCard(MultipartFile imageFile) {
         try {
             String jsonResponse = clovaOcrClient.callIdCardApi(imageFile);
-            log.info("CLOVA ID CARD 원본 응답: {}", jsonResponse);
+            // 원본 응답에는 주민등록번호·주소 등 개인정보가 포함되므로 본문을 남기지 않는다
+            log.debug("CLOVA ID CARD 응답 수신 완료");
 
             // [★ 수정된 DTO]를 사용해서 JSON을 받음
             ClovaIdCardResponseDto clovaResponse = objectMapper.readValue(jsonResponse, ClovaIdCardResponseDto.class);
@@ -32,7 +33,7 @@ public class IdCardOcrService {
             return parseToIdCardData(clovaResponse);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("ID Card OCR 파싱 실패", e);
             throw new RuntimeException("ID Card JSON 파싱 또는 처리 중 오류", e);
         }
     }
@@ -60,7 +61,7 @@ public class IdCardOcrService {
             throw new RuntimeException("인식된 신분증 정보(idCard.result)가 없습니다.");
         }
 
-        log.info("========= CLOVA '신분증' 파싱 시작 (필수 3종) =========");
+        log.debug("CLOVA 신분증 파싱 시작");
 
         IdCardDataDto dto = new IdCardDataDto();
         ClovaIdCardResponseDto.Result result = clovaResponse.getImages().get(0).getIdCard().getResult();
@@ -68,13 +69,13 @@ public class IdCardOcrService {
         // ★★★ 핵심 수정 ★★★
         ClovaIdCardResponseDto.IdData data;
         if (result.getDl() != null) {
-            log.info("운전면허증(dl) 데이터 감지");
+            log.debug("운전면허증(dl) 데이터 감지");
             data = result.getDl();
         } else if (result.getRc() != null) {
-            log.info("주민등록증(rc) 데이터 감지");
+            log.debug("주민등록증(rc) 데이터 감지");
             data = result.getRc();
         } else if (result.getIc() != null) { // ▼▼▼▼▼▼▼▼▼▼ [이 줄 추가!] ▼▼▼▼▼▼▼▼▼▼
-            log.info("주민등록증(ic) 데이터 감지");
+            log.debug("주민등록증(ic) 데이터 감지");
             data = result.getIc(); //             [이 줄 추가!]
         } else { // ▲▲▲▲▲▲▲▲▲▲ [이 줄 추가!] ▲▲▲▲▲▲▲▲▲▲
             throw new RuntimeException("dl, rc, ic 데이터를 모두 찾을 수 없습니다."); // (에러 메시지 수정)
@@ -85,7 +86,8 @@ public class IdCardOcrService {
         dto.setAddress(getFirstTextValue(data.getAddress()));
         dto.setResidentIdNumber(getFirstFormattedValue(data.getPersonalNum()));
 
-        log.info("========= CLOVA '신분증' 파싱 완료 (결과: {}) =========" , dto);
+        // dto에는 이름·주소·주민등록번호가 담기므로 값을 남기지 않는다
+        log.debug("CLOVA 신분증 파싱 완료");
         return dto;
     }
 

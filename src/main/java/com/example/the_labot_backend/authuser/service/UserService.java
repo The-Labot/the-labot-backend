@@ -31,22 +31,14 @@ public class UserService {
         }
 
         // 임시 비밀번호 생성
-        String tempPassword = "1234";
-    //    String tempPassword = generateTempPassword();
+        String tempPassword = generateTempPassword();
 
-        // 비밀번호 변경
+        // 비밀번호 변경 (암호화 후 저장)
         user.setPassword(passwordEncoder.encode(tempPassword));
-
-        // 암호화 후 저장
-        String encoded = passwordEncoder.encode(tempPassword);
-        user.setPassword(encoded);
 
         // UPDATE 반영 (필수!! — 이게 빠지면 저장 X)
         userRepository.save(user);
 
-        System.out.println(tempPassword);
-
-        // 테스트용 임시 SMS 전송 주석
         // SMS 전송
         smsService.sendSms(
                 phoneNumber,

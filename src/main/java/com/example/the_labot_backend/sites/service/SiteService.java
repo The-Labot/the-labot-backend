@@ -203,8 +203,6 @@ public class SiteService {
         if (site == null) {
             throw new NotFoundException("해당 사용자에게 배정된 현장이 없습니다.");
         }
-        System.out.println(userId);
-        System.out.println(site.getProjectName());
         return SiteDetailResponse.from(site);
     }
 

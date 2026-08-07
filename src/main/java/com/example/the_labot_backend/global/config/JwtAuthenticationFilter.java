@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Component
 //OncePerRequestFilter는 요청마다 딱 한번 실행되는 필터
 //요청이 1회 들어올 때 마다 doFilterInternal()이 호출됨.
@@ -42,8 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 디버깅 용
-        System.out.println("JwtFilter 실행됨: " + request.getRequestURI() + "\n");
+        log.debug("JwtFilter 실행: {}", request.getRequestURI());
 
         // 1) 인증 필요 없는 경로는 필터 통과
         String path = request.getRequestURI();
@@ -70,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String id = jwtTokenProvider.getIdFromToken(token);
             String role = jwtTokenProvider.getRoleFromToken(token);
 
-            System.out.println(role);
+            log.debug("인증 완료. userId={}, role={}", id, role);
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(id);
 
