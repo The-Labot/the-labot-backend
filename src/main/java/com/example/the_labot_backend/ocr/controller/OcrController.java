@@ -7,6 +7,7 @@ import com.example.the_labot_backend.ocr.service.ContractOcrService;
 import com.example.the_labot_backend.ocr.service.IdCardOcrService;
 import com.example.the_labot_backend.ocr.service.RegistrationService;
 import com.example.the_labot_backend.workers.entity.Worker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/manager/register")
 public class OcrController {
@@ -39,7 +41,7 @@ public class OcrController {
             return ResponseEntity.ok(extractedData);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("근로계약서 OCR 처리 실패", e);
             // 실제로는 @ControllerAdvice 등으로 더 정교한 에러 처리가 필요
             return ResponseEntity.status(500).body(null);
         }
@@ -57,7 +59,7 @@ public class OcrController {
             return ResponseEntity.ok(extractedData);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("신분증 OCR 처리 실패", e);
             return ResponseEntity.status(500).body(null);
         }
     }
@@ -75,7 +77,7 @@ public class OcrController {
             return ResponseEntity.ok("근로자 등록이 (메모리에) 완료되었습니다.");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("근로자 등록 저장 실패", e);
             return ResponseEntity.status(500).body("저장 중 오류가 발생했습니다.");
         }
     }
@@ -91,7 +93,7 @@ public class OcrController {
             List<Worker> workers = registrationService.getAllWorkers();
             return ResponseEntity.ok(workers);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("근로자 목록 조회 실패", e);
             return ResponseEntity.status(500).body(null);
         }
     }

@@ -2,6 +2,7 @@ package com.example.the_labot_backend.ocr.service;
 
 import com.example.the_labot_backend.ocr.dto.ClovaOcrResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class ClovaOcrClient {
     private final RestTemplate restTemplate;
@@ -145,7 +147,7 @@ public class ClovaOcrClient {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("ID Card OCR 처리 실패", e);
             throw new RuntimeException("ID Card OCR 처리 중 예외 발생", e);
         }
     }
