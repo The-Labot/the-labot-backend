@@ -1,6 +1,7 @@
 package com.example.the_labot_backend.authuser.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SmsService {
@@ -67,7 +69,8 @@ public class SmsService {
             // 5) 응답 검증
             // ─────────────────────────────────────────────
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("SMS 발송 실패: " + response.getBody());
+                log.error("SMS 발송 실패. status={}, response={}", response.getStatusCode(), response.getBody());
+                throw new RuntimeException("SMS 발송에 실패했습니다.");
             }
 
         } catch (Exception e) {
