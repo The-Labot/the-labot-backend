@@ -4,6 +4,7 @@ import com.example.the_labot_backend.admins.dto.AdminWorkerListResponse;
 import com.example.the_labot_backend.admins.service.AdminWorkerService;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,7 @@ public class AdminWorkerController {
 
         // 2. 관리자 정보 조회
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("관리자 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("관리자 정보를 찾을 수 없습니다."));
 
         // 3. 서비스 호출 (본사 산하 모든 근로자 가져오기)
         List<AdminWorkerListResponse> workerList = adminWorkerService.getAllWorkersByHeadOffice(siteId,admin);

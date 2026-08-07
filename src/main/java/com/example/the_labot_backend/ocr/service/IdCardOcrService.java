@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.ocr.service;
 
+import com.example.the_labot_backend.global.exception.BadRequestException;
 import com.example.the_labot_backend.ocr.dto.ClovaIdCardResponseDto;
 import com.example.the_labot_backend.ocr.dto.IdCardDataDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,7 @@ public class IdCardOcrService {
         if (clovaResponse.getImages() == null || clovaResponse.getImages().isEmpty() ||
                 clovaResponse.getImages().get(0).getIdCard() == null ||
                 clovaResponse.getImages().get(0).getIdCard().getResult() == null) {
-            throw new RuntimeException("인식된 신분증 정보(idCard.result)가 없습니다.");
+            throw new BadRequestException("인식된 신분증 정보(idCard.result)가 없습니다.");
         }
 
         log.debug("CLOVA 신분증 파싱 시작");
@@ -78,7 +79,7 @@ public class IdCardOcrService {
             log.debug("주민등록증(ic) 데이터 감지");
             data = result.getIc(); //             [이 줄 추가!]
         } else { // ▲▲▲▲▲▲▲▲▲▲ [이 줄 추가!] ▲▲▲▲▲▲▲▲▲▲
-            throw new RuntimeException("dl, rc, ic 데이터를 모두 찾을 수 없습니다."); // (에러 메시지 수정)
+            throw new BadRequestException("dl, rc, ic 데이터를 모두 찾을 수 없습니다."); // (에러 메시지 수정)
         }
 
         // --- 2. 필요한 3개 값만 매핑 ---

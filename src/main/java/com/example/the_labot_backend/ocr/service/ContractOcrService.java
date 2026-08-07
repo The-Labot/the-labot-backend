@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.ocr.service;
 
+import com.example.the_labot_backend.global.exception.BadRequestException;
 import com.example.the_labot_backend.ocr.dto.ClovaOcrResponseDto;
 import com.example.the_labot_backend.ocr.dto.ContractDataDto;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class ContractOcrService {
 
     private ContractDataDto parseToContractData(ClovaOcrResponseDto clovaResponse) {
         if (clovaResponse.getImages() == null || clovaResponse.getImages().isEmpty()) {
-            throw new RuntimeException("OCR 결과에 이미지가 없습니다.");
+            throw new BadRequestException("OCR 결과에 이미지가 없습니다.");
         }
 
 

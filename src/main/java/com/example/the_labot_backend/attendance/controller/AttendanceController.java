@@ -5,6 +5,7 @@ import com.example.the_labot_backend.attendance.dto.ObjectionRequestDto;
 import com.example.the_labot_backend.attendance.service.AttendanceService;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
+import com.example.the_labot_backend.global.exception.UnauthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -110,7 +111,7 @@ public class AttendanceController {
 
         // (혹시 모를 예외 처리)
         if (auth == null || auth.getName() == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
+            throw new UnauthorizedException("인증 정보가 없습니다.");
         }
 
         try {
@@ -118,7 +119,7 @@ public class AttendanceController {
             return userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다. ID: " + userId));
         } catch (NumberFormatException e) {
-            throw new RuntimeException("유효하지 않은 토큰 ID 형식입니다.");
+            throw new UnauthorizedException("유효하지 않은 토큰 ID 형식입니다.");
         }
     }
 }

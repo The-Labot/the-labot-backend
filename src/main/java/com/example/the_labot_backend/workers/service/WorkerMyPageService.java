@@ -6,6 +6,7 @@ import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.repository.FileRepository;
 import com.example.the_labot_backend.files.service.FileService;
+import com.example.the_labot_backend.global.exception.NotFoundException;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageResponse;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageUpdateRequest;
 import com.example.the_labot_backend.workers.entity.Worker;
@@ -38,11 +39,11 @@ public class WorkerMyPageService {
     public WorkerMyPageResponse getMyPageInfo(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("사용자 정보를 찾을 수 없습니다."));
 
         Worker worker = user.getWorker();
         if (worker == null) {
-            throw new RuntimeException("해당 계정은 근로자 정보가 등록되지 않았습니다.");
+            throw new NotFoundException("해당 계정은 근로자 정보가 등록되지 않았습니다.");
         }
 
         // [★ 수정됨] FileService를 통해 S3 URL이 포함된 DTO 리스트 조회
@@ -66,11 +67,11 @@ public class WorkerMyPageService {
 
         // (1) User & Worker 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("사용자 정보를 찾을 수 없습니다."));
 
         Worker worker = user.getWorker();
         if (worker == null) {
-            throw new RuntimeException("근로자 정보가 존재하지 않습니다.");
+            throw new NotFoundException("근로자 정보가 존재하지 않습니다.");
         }
 
         // (2) User 정보 수정 (전화번호)
@@ -99,16 +100,16 @@ public class WorkerMyPageService {
 
         // 1. 사용자 및 근로자 정보 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("사용자 정보를 찾을 수 없습니다."));
         Worker worker = user.getWorker();
 
         if (worker == null) {
-            throw new RuntimeException("근로자 정보가 존재하지 않습니다.");
+            throw new NotFoundException("근로자 정보가 존재하지 않습니다.");
         }
 
         // 2. 파일 정보 조회
         File file = fileRepository.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("파일을 찾을 수 없습니다."));
 
         // 3. [핵심] 내 파일이 맞는지 검증
         validateMyFileAccess(file, worker);

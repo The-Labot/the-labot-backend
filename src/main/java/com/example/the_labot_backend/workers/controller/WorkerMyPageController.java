@@ -3,6 +3,7 @@ package com.example.the_labot_backend.workers.controller;
 
 
 import com.example.the_labot_backend.files.dto.FileResponse;
+import com.example.the_labot_backend.global.exception.UnauthorizedException;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageResponse;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageUpdateRequest;
 import com.example.the_labot_backend.workers.service.WorkerMyPageService;
@@ -62,7 +63,7 @@ public class WorkerMyPageController {
     private Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getName() == null) {
-            throw new RuntimeException("로그인 정보가 없습니다.");
+            throw new UnauthorizedException("로그인 정보가 없습니다.");
         }
         return Long.parseLong(auth.getName());
     }
