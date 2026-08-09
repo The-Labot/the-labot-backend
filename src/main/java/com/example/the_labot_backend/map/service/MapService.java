@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.map.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.dto.FileResponse;
@@ -30,10 +31,10 @@ public class MapService {
         Long siteId = user.getSite().getId();
 
         // 파일 삭제
-        fileService.deleteFilesByTarget("SITE_MAP", siteId);
+        fileService.deleteFilesByTarget(FileTargetType.SITE_MAP, siteId);
         
         // 파일 저장
-        fileService.saveFiles(files, "SITE_MAP", siteId);
+        fileService.saveFiles(files, FileTargetType.SITE_MAP, siteId);
     }
 
     // 본인 현장 지도 조회
@@ -47,12 +48,12 @@ public class MapService {
         Long siteId = user.getSite().getId();
 
         // 파일 추출 (지도)
-        return fileService.getFilesResponseByTarget("SITE_MAP", siteId);
+        return fileService.getFilesResponseByTarget(FileTargetType.SITE_MAP, siteId);
     }
 
     // 특정 현장 지도 조회
     @Transactional(readOnly = true)
-    public List<FileResponse> getMapBySite(String targetType, Long siteId){
+    public List<FileResponse> getMapBySite(FileTargetType targetType, Long siteId){
         // 파일 추출 (지도)
         return fileService.getFilesResponseByTarget(targetType, siteId);
     }
@@ -67,7 +68,7 @@ public class MapService {
         // user로 siteId 찾기
         Long siteId = user.getSite().getId();
 
-        fileService.deleteFilesByTarget("SITE_MAP", siteId);
+        fileService.deleteFilesByTarget(FileTargetType.SITE_MAP, siteId);
     }
 
 }

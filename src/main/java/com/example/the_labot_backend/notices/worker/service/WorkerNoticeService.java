@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.notices.worker.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.entity.File;
@@ -93,7 +94,7 @@ public class WorkerNoticeService {
 
         // 2. [★ 수정됨] 파일 DTO 목록 바로 조회 (엔티티 조회 X)
         // FileService의 getFilesResponseByTarget 메서드를 사용하여 바로 DTO 리스트를 받습니다.
-        List<FileResponse> fileResponses = fileService.getFilesResponseByTarget("NOTICE", noticeId);
+        List<FileResponse> fileResponses = fileService.getFilesResponseByTarget(FileTargetType.NOTICE, noticeId);
 
         // 3. 조립해서 반환
         return WorkerNoticeDetailDto.of(notice, fileResponses);

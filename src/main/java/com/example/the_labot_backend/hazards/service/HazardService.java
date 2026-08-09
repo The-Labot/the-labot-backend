@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.hazards.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.entity.File;
@@ -51,7 +52,7 @@ public class HazardService {
 
         hazardRepository.save(hazard);
 
-        fileService.saveFiles(files, "HAZARD", hazard.getId());
+        fileService.saveFiles(files, FileTargetType.HAZARD, hazard.getId());
     }
 
     // userId를 통한 위험요소 신고 목록 조회
@@ -88,7 +89,7 @@ public class HazardService {
                 .orElseThrow(() -> new NotFoundException("해당 위험요소 신고를 찾을 수 없습니다.(getHazardDetail) hazardId:" + hazardId));
 
         // 파일 조회
-        List<File> files = fileService.getFilesByTarget("HAZARD", hazardId);
+        List<File> files = fileService.getFilesByTarget(FileTargetType.HAZARD, hazardId);
 
         return new HazardDetailResponse(hazard,files);
     }
@@ -122,7 +123,7 @@ public class HazardService {
                 .orElseThrow(()-> new NotFoundException("해당 위험요소 신고를 찾을 수 없습니다.(deleteHazard) hazardId:" + hazardId));
 
         // 위험요소 신고에 연결된 파일 삭제
-        fileService.deleteFilesByTarget("HAZARD", hazardId);
+        fileService.deleteFilesByTarget(FileTargetType.HAZARD, hazardId);
 
         // 위험요소 신고 삭제
         hazardRepository.deleteById(hazardId);

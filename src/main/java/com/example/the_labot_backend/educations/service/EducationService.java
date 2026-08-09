@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.educations.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.educations.dto.EducationCreateRequest;
@@ -91,9 +92,9 @@ public class EducationService {
         }
 
         // --- 4. 파일 업로드 (교육자료 / 사진 / 서명PDF) ---
-        fileService.saveFiles(materials, "EDUCATION-MATERIAL", education.getId());
-        fileService.saveFiles(photos, "EDUCATION-PHOTO", education.getId());
-        fileService.saveFiles(signatures, "EDUCATION-SIGNATURE", education.getId());
+        fileService.saveFiles(materials, FileTargetType.EDUCATION_MATERIAL, education.getId());
+        fileService.saveFiles(photos, FileTargetType.EDUCATION_PHOTO, education.getId());
+        fileService.saveFiles(signatures, FileTargetType.EDUCATION_SIGNATURE, education.getId());
 
     }
 
@@ -132,13 +133,13 @@ public class EducationService {
 
         // 파일 조회
         List<File> materialFiles =
-                fileService.getFilesByTarget("EDUCATION-MATERIAL", edu.getId());
+                fileService.getFilesByTarget(FileTargetType.EDUCATION_MATERIAL, edu.getId());
 
         List<File> photoFiles =
-                fileService.getFilesByTarget("EDUCATION-PHOTO", edu.getId());
+                fileService.getFilesByTarget(FileTargetType.EDUCATION_PHOTO, edu.getId());
 
         List<File> signatureFiles =
-                fileService.getFilesByTarget("EDUCATION-SIGNATURE", edu.getId());
+                fileService.getFilesByTarget(FileTargetType.EDUCATION_SIGNATURE, edu.getId());
 
         return EducationDetailResponse.from(edu,participants,materialFiles,photoFiles,signatureFiles);
     }
@@ -199,14 +200,14 @@ public class EducationService {
         }
 
         // 기존 파일 삭제
-        fileService.deleteFilesByTarget("EDUCATION-MATERIAL", education.getId());
-        fileService.deleteFilesByTarget("EDUCATION-PHOTO", education.getId());
-        fileService.deleteFilesByTarget("EDUCATION-SIGNATURE", education.getId());
+        fileService.deleteFilesByTarget(FileTargetType.EDUCATION_MATERIAL, education.getId());
+        fileService.deleteFilesByTarget(FileTargetType.EDUCATION_PHOTO, education.getId());
+        fileService.deleteFilesByTarget(FileTargetType.EDUCATION_SIGNATURE, education.getId());
 
         // 새 파일 저장
-        fileService.saveFiles(materials, "EDUCATION-MATERIAL", education.getId());
-        fileService.saveFiles(photos, "EDUCATION-PHOTO", education.getId());
-        fileService.saveFiles(signatures, "EDUCATION-SIGNATURE", education.getId());
+        fileService.saveFiles(materials, FileTargetType.EDUCATION_MATERIAL, education.getId());
+        fileService.saveFiles(photos, FileTargetType.EDUCATION_PHOTO, education.getId());
+        fileService.saveFiles(signatures, FileTargetType.EDUCATION_SIGNATURE, education.getId());
     }
 
     @Transactional
@@ -228,9 +229,9 @@ public class EducationService {
         participantRepository.deleteAllByEducation(education);
 
         // 4. 관련 파일 삭제
-        fileService.deleteFilesByTarget("EDUCATION-MATERIAL", education.getId());
-        fileService.deleteFilesByTarget("EDUCATION-PHOTO", education.getId());
-        fileService.deleteFilesByTarget("EDUCATION-SIGNATURE", education.getId());
+        fileService.deleteFilesByTarget(FileTargetType.EDUCATION_MATERIAL, education.getId());
+        fileService.deleteFilesByTarget(FileTargetType.EDUCATION_PHOTO, education.getId());
+        fileService.deleteFilesByTarget(FileTargetType.EDUCATION_SIGNATURE, education.getId());
 
         // 5. 메인 교육일지 삭제
         educationRepository.delete(education);

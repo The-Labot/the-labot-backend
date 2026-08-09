@@ -2,6 +2,7 @@ package com.example.the_labot_backend.files.service;
 
 import com.example.the_labot_backend.files.dto.FileResponse;
 import com.example.the_labot_backend.files.entity.File;
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.files.repository.FileRepository;
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Resource;
@@ -35,7 +36,7 @@ public class FileService {
 
     //파일저장
     @Transactional
-    public void saveFiles(List<MultipartFile> multipartFiles, String targetType, Long targetId) {
+    public void saveFiles(List<MultipartFile> multipartFiles, FileTargetType targetType, Long targetId) {
 
         //파일이 없으면 종료
         if (multipartFiles == null || multipartFiles.isEmpty()) {
@@ -55,7 +56,7 @@ public class FileService {
             //targetType이 "SITE"이면 site/ 라는 문자열 만듦
             //s3는 폴더명/ 붙이면 자동으로 폴더 안에 저장해줌
             //s3는 사실 폴더라는 개념이 없음 우리한테는 그렇게 보여질뿐 걍 경로임
-            String folderPath = targetType.toLowerCase() + "/";
+            String folderPath = targetType.name().toLowerCase() + "/";
 
             //s3에 저장될 최종 이름
             String storedName = folderPath + uuid + "_" + originalName;
@@ -102,7 +103,7 @@ public class FileService {
 
     //파일삭제
     @Transactional
-    public void deleteFilesByTarget(String targetType, Long targetId) {
+    public void deleteFilesByTarget(FileTargetType targetType, Long targetId) {
         //db에서 파일 찾기
         List<File> files = fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
 
@@ -117,14 +118,13 @@ public class FileService {
 
     //조회하는건 수정없음. url 반환만 해주면 됨
     @Transactional(readOnly = true)
-    public List<File> getFilesByTarget(String targetType, Long targetId) {
+    public List<File> getFilesByTarget(FileTargetType targetType, Long targetId) {
         return fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
     }
 
-    //얘는 위에 조회랑 다른게 뭐지?
+    //위와 같은 조회이며 응답 DTO로 변환해서 반환한다. 쿼리는 위 메서드에 위임
     @Transactional(readOnly = true)
-    public List<FileResponse> getFilesResponseByTarget(String targetType, Long targetId) {
-        List<File> files = fileRepository.findByTargetTypeAndTargetId(targetType, targetId);
-        return FileResponse.fromList(files);
+    public List<FileResponse> getFilesResponseByTarget(FileTargetType targetType, Long targetId) {
+        return FileResponse.fromList(getFilesByTarget(targetType, targetId));
     }
 }
