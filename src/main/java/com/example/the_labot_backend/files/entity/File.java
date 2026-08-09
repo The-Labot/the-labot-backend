@@ -31,7 +31,10 @@ public class File {
     private Long size;           // 파일 크기 (byte)
 
     // 어떤 도메인에 속하는 파일인지 구분용
-    private String targetType; // 예: "NOTICE", "WORKER", "EDUCATION", "HAZARD"
-    private Long targetId;     // 예: 1L (공지사항 id)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private FileTargetType targetType;
+
+    private Long targetId;     // targetType이 가리키는 도메인의 id (예: 공지사항 id)
 
 }

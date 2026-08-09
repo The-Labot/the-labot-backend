@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.entity.File;
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.files.repository.FileRepository;
 import com.example.the_labot_backend.workers.entity.Worker;
 import com.example.the_labot_backend.workers.repository.WorkerRepository;
@@ -38,7 +39,7 @@ public class FileController {
     @PostMapping(value = "/save", consumes = {"multipart/form-data"})
     public ResponseEntity<?> uploadFiles(
             @RequestParam("files") List<MultipartFile> files,
-            @RequestParam("targetType") String targetType,
+            @RequestParam("targetType") FileTargetType targetType,
             @RequestParam("targetId") Long targetId
     ) {
 

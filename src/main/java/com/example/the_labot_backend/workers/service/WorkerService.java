@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.workers.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.attendance.dto.AttendanceUpdateRequestDto;
 import com.example.the_labot_backend.attendance.entity.Attendance;
 import com.example.the_labot_backend.attendance.repository.AttendanceRepository;
@@ -124,7 +125,7 @@ public class WorkerService {
 
         workerRepository.save(worker);
         if (contractFiles != null && !contractFiles.isEmpty()) {
-            fileService.saveFiles(contractFiles, "WORKER_CONTRACT", worker.getId());
+            fileService.saveFiles(contractFiles, FileTargetType.WORKER_CONTRACT, worker.getId());
         }
     }
     // --- 헬퍼 메서드 ---
@@ -225,15 +226,15 @@ public class WorkerService {
         Worker worker = workerRepository.findById(workerId)
                 .orElseThrow(() -> new NotFoundException("해당 근로자를 찾을 수 없습니다."));
 
-        // 1. 근로계약서 (우리가 저장할 때 targetType="WORKER_CONTRACT"로 하기로 약속)
-        List<FileResponse> contractList = fileService.getFilesResponseByTarget("WORKER_CONTRACT", workerId);
+        // 1. 근로계약서
+        List<FileResponse> contractList = fileService.getFilesResponseByTarget(FileTargetType.WORKER_CONTRACT, workerId);
         FileResponse contractFile = contractList.isEmpty() ? null : contractList.get(0); // 1개만 꺼냄
 
-        // 2. 임금명세서 (targetType="WORKER_PAYSTUB" - 나중에 급여대장 만들 때 이 타입으로 저장하면 됨)
-        List<FileResponse> payStubs = fileService.getFilesResponseByTarget("WORKER_PAYSTUB", workerId);
+        // 2. 임금명세서 (저장 로직 미구현 상태라 현재는 항상 빈 리스트)
+        List<FileResponse> payStubs = fileService.getFilesResponseByTarget(FileTargetType.WORKER_PAYROLL, workerId);
 
-        // 3. 자격증 (targetType="WORKER_LICENSE" - 자격증 올릴 때 이 타입으로 저장)
-        List<FileResponse> licenses = fileService.getFilesResponseByTarget("WORKER_LICENSE", workerId);
+        // 3. 자격증
+        List<FileResponse> licenses = fileService.getFilesResponseByTarget(FileTargetType.WORKER_LICENSE, workerId);
 
         // 2. [추가] 출퇴근 기록(List<Attendance>) -> DTO 리스트로 변환
         List<WorkerDetailResponse.AttendanceLogDto> attendanceLogs = worker.getAttendanceRecords().stream()
@@ -324,8 +325,8 @@ public class WorkerService {
             throw new IllegalStateException("관리자에게 배정된 현장이 없습니다.");
         }
 
-        // 파일이 'WORKER' 관련 파일인지 확인 (안전장치)
-        if (file.getTargetType() != null && file.getTargetType().startsWith("WORKER")) {
+        // 근로자 개인 문서인지 확인 (안전장치)
+        if (file.getTargetType() != null && file.getTargetType().isWorkerDocument()) {
             Long workerId = file.getTargetId();
 
             // 파일 주인(근로자) 조회

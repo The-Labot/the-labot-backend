@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.notices.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.entity.File;
@@ -66,7 +67,7 @@ public class NoticeService {
         );
 
         // 파일 업로드 (로컬 or S3)
-        fileService.saveFiles(files, "NOTICE", notice.getId());
+        fileService.saveFiles(files, FileTargetType.NOTICE, notice.getId());
     }
 
     // userId를 통해 현장별 공지사항 목록 조회
@@ -117,7 +118,7 @@ public class NoticeService {
             throw new ForbiddenException("해당 공지사항에 접근 권한이 없습니다.");
         }
 
-        List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
+        List<File> files = fileService.getFilesByTarget(FileTargetType.NOTICE, noticeId);
 
         return new NoticeDetailResponse(notice, files);
     }
@@ -158,15 +159,15 @@ public class NoticeService {
         notice.setPinned(form.isPinned());
 
         // 기존 파일 전체 삭제
-        fileService.deleteFilesByTarget("NOTICE", noticeId);
+        fileService.deleteFilesByTarget(FileTargetType.NOTICE, noticeId);
 
         // 새 파일 업로드
         if (newFiles != null && !newFiles.isEmpty()) {
-            fileService.saveFiles(newFiles, "NOTICE", notice.getId());
+            fileService.saveFiles(newFiles, FileTargetType.NOTICE, notice.getId());
         }
 
         // 최신 파일 목록 조회
-        List<File> files = fileService.getFilesByTarget("NOTICE", noticeId);
+        List<File> files = fileService.getFilesByTarget(FileTargetType.NOTICE, noticeId);
 
         // 최신 공지사항 정보 + 파일 함께 반환
         return new NoticeDetailResponse(notice, files);
@@ -187,7 +188,7 @@ public class NoticeService {
         }
 
         // 공지사항에 연결된 파일 모두 삭제
-        fileService.deleteFilesByTarget("NOTICE", noticeId);
+        fileService.deleteFilesByTarget(FileTargetType.NOTICE, noticeId);
 
         // 공지사항 삭제
         noticeRepository.delete(notice);

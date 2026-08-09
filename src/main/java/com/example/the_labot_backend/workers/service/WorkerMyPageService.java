@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.workers.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.dto.FileResponse;
@@ -48,14 +49,14 @@ public class WorkerMyPageService {
 
         // [★ 수정됨] FileService를 통해 S3 URL이 포함된 DTO 리스트 조회
         // 1) 근로계약서 (WORKER_CONTRACT) - 1개만 가져옴
-        List<FileResponse> contracts = fileService.getFilesResponseByTarget("WORKER_CONTRACT", worker.getId());
+        List<FileResponse> contracts = fileService.getFilesResponseByTarget(FileTargetType.WORKER_CONTRACT, worker.getId());
         FileResponse contractFile = contracts.isEmpty() ? null : contracts.get(0);
 
         // 2) 급여명세서 (WORKER_PAYROLL) - 전체 리스트
-        List<FileResponse> payrolls = fileService.getFilesResponseByTarget("WORKER_PAYROLL", worker.getId());
+        List<FileResponse> payrolls = fileService.getFilesResponseByTarget(FileTargetType.WORKER_PAYROLL, worker.getId());
 
         // 3) 자격증 (WORKER_LICENSE) - 전체 리스트
-        List<FileResponse> licenses = fileService.getFilesResponseByTarget("WORKER_LICENSE", worker.getId());
+        List<FileResponse> licenses = fileService.getFilesResponseByTarget(FileTargetType.WORKER_LICENSE, worker.getId());
 
         // DTO 변환 후 반환
         return WorkerMyPageResponse.from(user, worker, contractFile, payrolls, licenses);
@@ -122,8 +123,8 @@ public class WorkerMyPageService {
      * [검증 로직] 요청한 파일이 내 것이 맞는지 확인
      */
     private void validateMyFileAccess(File file, Worker worker) {
-        // 1. 파일의 타겟이 'WORKER'로 시작하는지 확인
-        if (file.getTargetType() == null || !file.getTargetType().startsWith("WORKER")) {
+        // 1. 근로자 개인 문서인지 확인
+        if (file.getTargetType() == null || !file.getTargetType().isWorkerDocument()) {
             throw new SecurityException("접근할 수 없는 파일 유형입니다.");
         }
 

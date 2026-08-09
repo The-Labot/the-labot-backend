@@ -1,5 +1,6 @@
 package com.example.the_labot_backend.reports.service;
 
+import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.authuser.repository.UserRepository;
 import com.example.the_labot_backend.files.dto.FileResponse;
@@ -131,7 +132,7 @@ public class ReportService {
         List<ReportMaterial> materialList = reportMaterialRepository.findByReportId(reportId);
 
         // 파일 조회 (targetType = REPORT)
-        List<FileResponse> fileResponses = fileService.getFilesResponseByTarget("REPORT", reportId);
+        List<FileResponse> fileResponses = fileService.getFilesResponseByTarget(FileTargetType.REPORT, reportId);
 
         // 5) DTO로 변환하여 반환
         return ReportDetailResponse.builder()
@@ -246,7 +247,7 @@ public class ReportService {
         }
 
         // 관련 파일 삭제
-        fileService.deleteFilesByTarget("REPORT",reportId);
+        fileService.deleteFilesByTarget(FileTargetType.REPORT,reportId);
 
         return reportId;
     }
@@ -271,7 +272,7 @@ public class ReportService {
         reportRepository.deleteById(reportId);
 
         // 관련 파일 삭제
-        fileService.deleteFilesByTarget("REPORT",reportId);
+        fileService.deleteFilesByTarget(FileTargetType.REPORT,reportId);
 
     }
 
