@@ -12,17 +12,10 @@ import com.example.the_labot_backend.workers.dto.WorkerMyPageResponse;
 import com.example.the_labot_backend.workers.dto.WorkerMyPageUpdateRequest;
 import com.example.the_labot_backend.workers.entity.Worker;
 import com.example.the_labot_backend.workers.entity.embeddable.WorkerBankAccount;
-import org.springframework.core.io.Resource;
-import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service

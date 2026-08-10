@@ -2,7 +2,6 @@ package com.example.the_labot_backend.workers.dto;
 
 import com.example.the_labot_backend.attendance.entity.AttendanceStatus;
 import com.example.the_labot_backend.files.dto.FileResponse;
-import com.example.the_labot_backend.sites.entity.Site;
 import com.example.the_labot_backend.workers.entity.WorkerStatus;
 import lombok.Builder;
 import lombok.Getter;

@@ -3,7 +3,6 @@ package com.example.the_labot_backend.notices.worker.service;
 import com.example.the_labot_backend.files.entity.FileTargetType;
 import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.files.dto.FileResponse;
-import com.example.the_labot_backend.files.entity.File;
 import com.example.the_labot_backend.files.service.FileService;
 import com.example.the_labot_backend.notices.repository.NoticeRepository;
 import com.example.the_labot_backend.notices.entity.Notice;

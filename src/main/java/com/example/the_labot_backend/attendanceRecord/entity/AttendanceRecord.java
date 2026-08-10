@@ -28,16 +28,6 @@ public class AttendanceRecord {
     @Column(nullable = false)
     private LocalDate workDate;
 
-//    // =============================
-//    // 계획시간 (스케줄 기준)
-//    // =============================
-//    private Double plannedTotalWork;      // 총근로
-//    private Double plannedBasicWork;      // 기본근로
-//    private Double plannedExtendedWork;   // 연장근로
-//    private Double plannedOvertimeWork;   // 초과근로
-//    private Double plannedNightWork;      // 야간근로
-//    private Double plannedHolidayWork;    // 휴일근로
-
     // =============================
     // 실제시간 (출퇴근 기록 기반)
     // =============================
