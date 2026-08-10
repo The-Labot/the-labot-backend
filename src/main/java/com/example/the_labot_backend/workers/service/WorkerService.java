@@ -364,7 +364,6 @@ public class WorkerService {
         if (dto.getStatus() != null) {
             worker.setStatus(dto.getStatus());
         }
-        //workerRepository.save(worker);
     }
 
     // 박찬홍 11/16일 추가

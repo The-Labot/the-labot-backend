@@ -1,9 +1,7 @@
 package com.example.the_labot_backend.workers.controller;
 
 import com.example.the_labot_backend.attendance.dto.AttendanceUpdateRequestDto;
-import com.example.the_labot_backend.authuser.entity.User;
 import com.example.the_labot_backend.ocr.dto.FinalSaveDto;
-import com.example.the_labot_backend.workers.dto.WorkerCreateRequest;
 import com.example.the_labot_backend.workers.dto.WorkerDashboardResponse;
 import com.example.the_labot_backend.workers.dto.WorkerUpdateRequest;
 import com.example.the_labot_backend.workers.service.WorkerService;
@@ -13,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

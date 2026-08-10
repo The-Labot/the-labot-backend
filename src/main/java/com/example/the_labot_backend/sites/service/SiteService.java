@@ -127,46 +127,6 @@ public class SiteService {
                 .build();
     }
 
-    //    // userId를 통해 해당 본사의 현장 목록 조회 (보류: 필요없음)
-    //    public List<SiteListResponse> getSitesByUser(Long userId) {
-    //
-    //        User user = userRepository.findById(userId)
-    //                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.(getSitesByUser) userId:" + userId));
-    //
-    //        // user로 headOfficeId 찾기
-    //        Long headOfficeId = user.getHeadOffice().getId();
-    //
-    //        List<Site> sites = siteRepository.findAllByHeadOffice_Id(headOfficeId);
-    //
-    //        return sites.stream()
-    //                .map(site -> SiteListResponse.builder()
-    //                        .siteName(site.getSiteName())
-    //                        .siteAddress(site.getSiteAddress())
-    //                        .managerCount(userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_MANAGER))
-    //                        .workerCount(userRepository.countBySite_IdAndRole(site.getId(), Role.ROLE_WORKER))
-    //                        .build())
-    //                .toList();
-    //    }
-
-//    // siteId로 현장 상세 조회
-//    public SiteResponse getSiteBySiteId(Long siteId) {
-//        Site site = siteRepository.findById(siteId)
-//                .orElseThrow(() -> new IllegalArgumentException("현장을 찾을 수 없습니다. ID: " + siteId));
-//        return toResponse(site);
-//    }
-//
-//    // userId로 현장 상세 조회 (현장관리자)
-//    public SiteResponse getSiteDetail(Long userId) {
-//
-//        // 1) 유저 → 본사 조회
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId:" + userId));
-//
-//        Site site = user.getSite();
-//
-//        return toResponse(site);
-//    }
-//
     // siteId로 현장 상세 조회 (본사관리자)
     @Transactional(readOnly = true)
     public SiteDetailResponse getSiteDetail(Long userId, Long siteId) {
