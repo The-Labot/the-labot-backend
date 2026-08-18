@@ -24,9 +24,7 @@ public class WorkerMyPageService {
     private final UserRepository userRepository;
     private final FileRepository fileRepository; // [★] 개별 조회를 위해 추가
 
-    private final FileService fileService; // [★] 우리가 만든 파일 서비스 사용
-    // 기존 로컬 저장 경로 유지
-    private final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
+    private final FileService fileService;
 
     // 1. 마이페이지 정보 조회
     @Transactional(readOnly = true)

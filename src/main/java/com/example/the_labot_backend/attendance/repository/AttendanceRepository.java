@@ -24,9 +24,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Long> findWorkerIdsWithObjection(@Param("siteId") Long siteId);
 
 
-    // 1. 오늘 출근한 근로자 수
-    long countByWorker_User_Site_IdAndDate(Long siteId, LocalDate date);
-
     // 리스트: 오늘 날짜(date) + 출근시간 최신순 5개
     List<Attendance> findTop5ByWorker_User_Site_IdAndDateOrderByClockInTimeDesc(Long siteId, LocalDate date);
 }
