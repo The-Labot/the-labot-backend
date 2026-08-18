@@ -12,7 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 캐싱
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -29,9 +28,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: rmsckd1640/the-labot-backend:latest
-
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          #GHA 캐시(type=gha)는 사용하지 않는다.
+          #러너의 Maven 다운로드(24.5s)보다 캐시 레이어 전송 비용(다운 ~19s + 업로드 33~56s)이 커서 순손실 (#168)
 
   deploy:
     needs: build-and-push
