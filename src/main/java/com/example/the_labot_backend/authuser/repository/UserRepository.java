@@ -19,9 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // siteID를 통해 해당 역할의 인원 수 조회
     int countBySite_IdAndRole(Long siteId, Role role);
 
-    // headOfficeId를 통해 해당 역할의 인원 수 조회
-    int countByHeadOffice_IdAndRole(Long headOfficeId, Role role);
-
     List<User> findByHeadOfficeAndSiteAndRole(HeadOffice headOffice, Site site, Role role);
 
 }

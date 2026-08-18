@@ -19,15 +19,6 @@ public interface PayrollRepository extends JpaRepository<Payroll, Long> {
            """)
     List<Payroll> findBySiteAndMonth(Long siteId, int year, int month);
 
-    // 해당 년,월에 만들어진 payroll이 있는지 확인 개수
-    @Query("""
-       SELECT COUNT(p) FROM Payroll p
-       WHERE p.site.id = :siteId
-       AND FUNCTION('YEAR', p.payDate) = :year
-       AND FUNCTION('MONTH', p.payDate) = :month
-       """)
-    Long countBySiteAndYearMonth(Long siteId, int year, int month);
-
     @Query("""
         SELECT p FROM Payroll p
         WHERE p.worker.id = :workerId

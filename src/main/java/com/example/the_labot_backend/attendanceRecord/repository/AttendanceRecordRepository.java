@@ -20,15 +20,6 @@ public interface AttendanceRecordRepository extends JpaRepository<AttendanceReco
        """)
     List<AttendanceRecord> findMonthlyRecords(Long workerId, int year, int month);
 
-    // 해당 siteId와 년/월에 맞는 기록 가져오기 
-    @Query("""
-       SELECT ar FROM AttendanceRecord ar
-       WHERE ar.worker.user.site.id = :siteId
-       AND FUNCTION('YEAR', ar.workDate) = :year
-       AND FUNCTION('MONTH', ar.workDate) = :month
-       """)
-    List<AttendanceRecord> findMonthlyRecordsBySite(Long siteId, int year, int month);
-
     // 특정 날짜 사이 총 공수 가져오기
     @Query("""
         SELECT COALESCE(SUM(a.manHour), 0)
