@@ -1,0 +1,28 @@
+#로컬 개발용 — DB만 컨테이너로 띄우고 앱은 bootRun/IDE로 실행한다.
+#  docker compose -f docker-compose.local.yml up -d
+#  ./gradlew bootRun
+#운영 이미지까지 통째로 띄워보려면(리허설) docker-compose.prod.yml을 사용
+services:
+  db:
+    container_name: labot-db-local
+    image: mysql:8.0
+    env_file:
+      - .env
+    ports:
+      #호스트 3306이 이미 쓰이면 .env에 MYSQL_PORT=3307. application-local.yaml도 같은 변수를 봄
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+09:00
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - labot-db-local:/var/lib/mysql
+
+volumes:
+  labot-db-local:

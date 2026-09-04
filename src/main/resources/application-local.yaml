@@ -1,0 +1,77 @@
+# ─────────────────────────────────────────────────────────
+# 로컬 개발용 설정 — 커밋됩니다.
+# 규칙: 값은 전부 .env에서 읽고(compose와 같은 키), .env가 없어도 기동되도록 기본값을 둡니다.
+#       개발용 JWT처럼 노출돼도 무해한 로컬 값만 직접 적습니다.
+#
+# ▶ 처음 쓸 때
+#   1) cp .env.example .env  →  쓰는 기능의 키만 채우기 (없어도 기동은 됨)
+#   2) DB 띄우기:  docker compose -f docker-compose.local.yml up -d
+#      (직접 설치한 MySQL을 쓰려면 .env의 MYSQL_ROOT_PASSWORD와 비밀번호를 맞추고 the_labot DB 생성)
+#   3) ./gradlew bootRun   (별도 export 불필요 — 아래 config.import가 .env를 읽음)
+# ─────────────────────────────────────────────────────────
+
+spring:
+  config:
+    import: optional:file:.env[.properties]   # 같은 폴더의 .env를 읽어 ${VAR}를 채움. 없으면 무시
+
+  datasource:
+    url: jdbc:mysql://localhost:${MYSQL_PORT:3306}/${MYSQL_DATABASE:the_labot}   # 3306이 겹치면 .env에 MYSQL_PORT=3307
+    username: root
+    password: ${MYSQL_ROOT_PASSWORD:1234}   # docker-compose.local.yml의 db와 같은 값(.env). 없으면 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+      leak-detection-threshold: 2000   # 로컬은 운영(10s)보다 민감하게 — 점유 시간 관찰용
+
+  jpa:
+    open-in-view: false     # 운영과 동일 조건
+    hibernate:
+      ddl-auto: update      # 로컬은 스키마 자동 반영. 운영(prod)은 none
+    show-sql: true          # 로컬에서만 SQL 출력
+    properties:
+      hibernate:
+        format_sql: true
+
+  cloud:
+    aws:
+      credentials:
+        access-key: ${IAM_ACCESS_KEY:dummy}      # 실제 자격증명은 .env
+        secret-key: ${IAM_SECRET_KEY:dummy}
+      region:
+        static: "ap-northeast-2"
+      s3:
+        bucket: ${S3_BUCKET_NAME:dummy-bucket}
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+logging:
+  level:
+    com.example.the_labot_backend: DEBUG
+    com.zaxxer.hikari: DEBUG   # 풀 상태(active/idle/waiting) 30초마다 출력
+
+# 외부 서비스 자격증명 — 전부 .env. 기본값은 기동만 되게 하는 더미
+ncp:
+  ocr:
+    invoke:
+      url: ${NCP_OCR_INVOKE_URL:https://example.com/ocr}
+    secret:
+      key: ${NCP_OCR_SECRET_KEY:dummy}
+    idcard:
+      invoke:
+        url: ${NCP_OCR_IDCARD_URL:https://example.com/ocr-idcard}
+      secret:
+        key: ${NCP_OCR_IDCARD_KEY:dummy}
+
+solapi:
+  api-key: ${SOLAPI_API_KEY:dummy}
+  api-secret: ${SOLAPI_API_SECRET:dummy}
+  sender-number: ${SOLAPI_SENDER_NUMBER:01000000000}
+  api-url: ${SOLAPI_API_URL:https://api.solapi.com/messages/v4/send}
+
+jwt:
+  secret: local-dev-only-jwt-secret-key-not-for-production-0123456789abcdef   # 로컬 전용 (32바이트 이상)
+  access-token-validity: 3600000   #1시간. 프로젝트 정책이라 환경변수로 두지 않음
