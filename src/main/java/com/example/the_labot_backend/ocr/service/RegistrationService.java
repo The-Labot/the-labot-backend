@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -105,8 +104,4 @@ public class RegistrationService {
             return null; // 파싱 실패 시
         }
     }
-    public List<Worker> getAllWorkers() {
-        return workerRepository.findAll();
-    }
-
 }

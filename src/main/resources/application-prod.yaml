@@ -4,14 +4,28 @@ spring:
     username: root
     password: ${MYSQL_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      #풀 크기는 늘리지 않는다. 점유 시간을 줄이는 것이 본질이며,
+      #증설은 천장을 옮길 뿐 DB 쪽 경합 비용만 키운다
+      maximum-pool-size: 10
+      minimum-idle: 10
+      #고갈 시 30초 대기는 스레드까지 30초 묶는다. 빨리 실패시켜 장애를 드러낸다
+      connection-timeout: 3000
+      #커넥션을 10초 이상 반납하지 않으면 스택트레이스와 함께 경고 (장시간 점유 상시 관측)
+      leak-detection-threshold: 10000
+      #MySQL wait_timeout(기본 28800s)보다 짧게 유지
+      max-lifetime: 1740000
+      pool-name: LabotHikariPool
 
   jpa:
     hibernate:
       ddl-auto: none #처음 한번만? none으로 하면 자동으로 db생성 안해줌 #create해야 스키마 변경했을때도 적용됨 (재부팅 하면서 drop-create)
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+    #운영에서 SQL 확인이 필요하면 아래 logging.level.org.hibernate.SQL을 DEBUG로 올린다.
+    #show-sql은 로깅 프레임워크를 거치지 않고 System.out으로 동기 출력하므로 사용하지 않는다
+    show-sql: false
+    #영속성 컨텍스트(커넥션)를 응답 직렬화까지 유지하지 않는다.
+    #DTO 변환이 서비스 계층에서 끝나는 구조라 안전함을 스모크 테스트로 확인
+    open-in-view: false
 
   cloud:
     aws:
@@ -50,3 +64,8 @@ solapi:
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY}
+
+logging:
+  level:
+    #필요할 때만 DEBUG로 올려 SQL 확인 (로깅 프레임워크 경유라 레벨·비동기 제어 가능)
+    org.hibernate.SQL: WARN
