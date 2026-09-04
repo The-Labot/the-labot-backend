@@ -63,7 +63,7 @@ solapi:
 
 jwt:
   secret: ${JWT_SECRET_KEY}
-  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY}
+  access-token-validity: 3600000   #1시간. 프로젝트 정책이라 환경변수로 두지 않음
 
 logging:
   level:

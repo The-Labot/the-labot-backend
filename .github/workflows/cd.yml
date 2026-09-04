@@ -44,8 +44,50 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          source: "docker-compose.yml"
+          source: "docker-compose.prod.yml"
           target: "/home/ubuntu/the-labot-backend"
+
+      #운영 .env의 출처는 GitHub Secrets 하나. 배포마다 새로 생성하므로 서버를 재생성해도 복구됨
+      - name: Create .env on EC2
+        uses: appleboy/ssh-action@master
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          IAM_ACCESS_KEY: ${{ secrets.IAM_ACCESS_KEY }}
+          IAM_SECRET_KEY: ${{ secrets.IAM_SECRET_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          NCP_OCR_INVOKE_URL: ${{ secrets.NCP_OCR_INVOKE_URL }}
+          NCP_OCR_SECRET_KEY: ${{ secrets.NCP_OCR_SECRET_KEY }}
+          NCP_OCR_IDCARD_URL: ${{ secrets.NCP_OCR_IDCARD_URL }}
+          NCP_OCR_IDCARD_KEY: ${{ secrets.NCP_OCR_IDCARD_KEY }}
+          SOLAPI_API_KEY: ${{ secrets.SOLAPI_API_KEY }}
+          SOLAPI_API_SECRET: ${{ secrets.SOLAPI_API_SECRET }}
+          SOLAPI_SENDER_NUMBER: ${{ secrets.SOLAPI_SENDER_NUMBER }}
+          SOLAPI_API_URL: ${{ secrets.SOLAPI_API_URL }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          envs: MYSQL_ROOT_PASSWORD,JWT_SECRET_KEY,IAM_ACCESS_KEY,IAM_SECRET_KEY,S3_BUCKET_NAME,NCP_OCR_INVOKE_URL,NCP_OCR_SECRET_KEY,NCP_OCR_IDCARD_URL,NCP_OCR_IDCARD_KEY,SOLAPI_API_KEY,SOLAPI_API_SECRET,SOLAPI_SENDER_NUMBER,SOLAPI_API_URL
+          script: |
+            mkdir -p /home/ubuntu/the-labot-backend
+            cat > /home/ubuntu/the-labot-backend/.env <<EOF
+            MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+            MYSQL_DATABASE=the_labot
+            JWT_SECRET_KEY=$JWT_SECRET_KEY
+            IAM_ACCESS_KEY=$IAM_ACCESS_KEY
+            IAM_SECRET_KEY=$IAM_SECRET_KEY
+            S3_BUCKET_NAME=$S3_BUCKET_NAME
+            NCP_OCR_INVOKE_URL=$NCP_OCR_INVOKE_URL
+            NCP_OCR_SECRET_KEY=$NCP_OCR_SECRET_KEY
+            NCP_OCR_IDCARD_URL=$NCP_OCR_IDCARD_URL
+            NCP_OCR_IDCARD_KEY=$NCP_OCR_IDCARD_KEY
+            SOLAPI_API_KEY=$SOLAPI_API_KEY
+            SOLAPI_API_SECRET=$SOLAPI_API_SECRET
+            SOLAPI_SENDER_NUMBER=$SOLAPI_SENDER_NUMBER
+            SOLAPI_API_URL=$SOLAPI_API_URL
+            EOF
+            chmod 600 /home/ubuntu/the-labot-backend/.env
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -56,5 +98,5 @@ jobs:
           script: |
             cd /home/ubuntu/the-labot-backend
             docker pull rmsckd1640/the-labot-backend:latest
-            docker compose up -d --remove-orphans
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker image prune -f

@@ -10,6 +10,8 @@
 *.BACKUP.*
 *.BASE.*
 *.LOCAL.*
+# 위 병합충돌 패턴(*.LOCAL.*)에 걸리므로 예외 처리 (gitignore는 인라인 주석 불가)
+!docker-compose.local.yml
 *.REMOTE.*
 *_BACKUP_*.txt
 *_BASE_*.txt
@@ -250,6 +252,7 @@ gradle-app.setting
 # Environment variable files (민감정보 저장용)
 .env
 .env.*
+!.env.example
 .env.local
 .env.production
 .env.development
@@ -271,7 +274,6 @@ id_ed25519
 
 ###############################################
 .idea/
-src/main/resources/application-local.yaml
 
 # 파일 업로드 경로
 uploads/
