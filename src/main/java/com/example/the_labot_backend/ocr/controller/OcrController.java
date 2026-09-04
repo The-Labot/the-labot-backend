@@ -6,14 +6,12 @@ import com.example.the_labot_backend.ocr.dto.IdCardDataDto;
 import com.example.the_labot_backend.ocr.service.ContractOcrService;
 import com.example.the_labot_backend.ocr.service.IdCardOcrService;
 import com.example.the_labot_backend.ocr.service.RegistrationService;
-import com.example.the_labot_backend.workers.entity.Worker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -82,19 +80,4 @@ public class OcrController {
         }
     }
 
-    /**
-     * (테스트용) 현재 메모리에 저장된 모든 근로자 목록을 JSON으로 확인
-     * 웹 브라우저나 Postman에서 GET http://localhost:8080/api/register/all-members
-     */
-    @GetMapping("/all-workers") // 1. 주소도 바꿨어
-    public ResponseEntity<List<Worker>> getAllWorkers() { // 2. 반환 타입을 List<Worker>로 변경
-        try {
-            // 3. registrationService에 새로 만들 메서드를 호출
-            List<Worker> workers = registrationService.getAllWorkers();
-            return ResponseEntity.ok(workers);
-        } catch (Exception e) {
-            log.error("근로자 목록 조회 실패", e);
-            return ResponseEntity.status(500).body(null);
-        }
-    }
 }
