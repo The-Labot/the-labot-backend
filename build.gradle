@@ -34,6 +34,8 @@ dependencies {
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 	
 	// 데이터베이스
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -41,6 +43,8 @@ dependencies {
 	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// SecurityContext를 직접 채우기 위한 @WithMockUser 등
+	testImplementation 'org.springframework.security:spring-security-test'
 
     // Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
@@ -56,6 +60,13 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.0'
 }
 
+//실행 환경(호스트 로케일, CI 러너)에 관계없이 항상 같은 타임존에서 돌도록 고정한다.
+//ci.yml의 TZ는 그 워크플로에서만 유효하므로 빌드 스크립트에도 명시한다 (#156)
 tasks.named('test') {
 	useJUnitPlatform()
+	systemProperty 'user.timezone', 'Asia/Seoul'
+}
+
+tasks.named('bootRun') {
+	systemProperty 'user.timezone', 'Asia/Seoul'
 }

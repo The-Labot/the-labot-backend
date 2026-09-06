@@ -1,0 +1,63 @@
+# 테스트 전용 설정.
+#
+# DB는 개발용 MySQL 컨테이너를 그대로 쓰되, 스키마는 the_labot_test로 분리한다
+# (create-drop이 개발 데이터를 지우지 않도록). 없으면 접속 시 생성된다.
+#   로컬: docker compose -f docker-compose.local.yml up -d
+#   CI:   워크플로의 서비스 컨테이너
+spring:
+  config:
+    import: optional:file:.env[.properties]   # 로컬에서 MYSQL_PORT 등을 재사용
+
+  datasource:
+    url: jdbc:mysql://localhost:${MYSQL_PORT:3306}/the_labot_test?createDatabaseIfNotExist=true&characterEncoding=UTF-8
+    username: root
+    password: ${MYSQL_ROOT_PASSWORD:1234}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    open-in-view: false     # 운영과 동일 조건에서 검증
+    hibernate:
+      ddl-auto: create-drop # 테스트 시작 시 스키마 생성, 종료 시 폐기
+    show-sql: false
+
+  cloud:
+    aws:
+      credentials:
+        access-key: test
+        secret-key: test
+      region:
+        static: "ap-northeast-2"
+      s3:
+        bucket: test-bucket
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+# 외부 서비스는 호출하지 않는다. 빈 생성만 가능하면 되므로 더미 값
+ncp:
+  ocr:
+    invoke:
+      url: https://example.com/ocr
+    secret:
+      key: test
+    idcard:
+      invoke:
+        url: https://example.com/ocr-idcard
+      secret:
+        key: test
+
+solapi:
+  api-key: test
+  api-secret: test
+  sender-number: "01000000000"
+  api-url: https://example.com/sms
+
+jwt:
+  secret: test-only-jwt-secret-key-must-be-at-least-32-bytes-long-0123456789
+  access-token-validity: 3600000
+
+logging:
+  level:
+    org.hibernate.SQL: WARN

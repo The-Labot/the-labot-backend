@@ -13,6 +13,29 @@ jobs:
     #우분투기반-버전은 최근꺼
     runs-on: ubuntu-latest
 
+    #러너 기본이 UTC라 운영(컨테이너 TZ=Asia/Seoul)과 어긋난다.
+    #날짜 경계에서 결과가 달라지지 않도록 JVM 기본 타임존을 맞춘다 (#156)
+    env:
+      TZ: Asia/Seoul
+
+    #테스트용 DB. 운영과 같은 MySQL 8.0을 쓴다 (H2는 @Query의 MySQL 문법을 해석하지 못함)
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 1234
+          #GHA services는 컨테이너 command를 지정할 수 없어 --default-time-zone을 넘길 수 없다.
+          #대신 TZ로 OS 타임존을 맞춰 time_zone=SYSTEM이 KST로 해석되게 한다.
+          #한국은 DST가 없어 운영의 +09:00과 실효 오프셋이 같다.
+          TZ: Asia/Seoul
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -p1234"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     #한 작업 안에서 수행할 작은 단위를 의미
     steps:
       #코드 받기
@@ -34,5 +57,6 @@ jobs:
       - name: gradle permission
         run: chmod +x gradlew
 
+      #테스트 포함 빌드. 스키마(the_labot_test)는 JDBC URL의 createDatabaseIfNotExist로 생성됨
       - name: gradle build
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean build

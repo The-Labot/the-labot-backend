@@ -1,10 +1,9 @@
 package com.example.the_labot_backend;
 
+import com.example.the_labot_backend.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class TheLabotBackendApplicationTests {
+class TheLabotBackendApplicationTests extends IntegrationTestSupport {
 
 	@Test
 	void contextLoads() {
